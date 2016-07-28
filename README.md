@@ -16,7 +16,7 @@ var PARALLEL_LIMIT = env('PARALLEL_LIMIT').required().asInt();
 ```
 
 ## Overview
-Over time it became apparent that parsing environment variables becomes a
+Over time it became apparent that parsing environment variables is a
 repetitive task, and testing code that relies on them is cumbersome unless
 using an inversion of control system for declaring modules so we can inject a
 fake *process.env*.
@@ -71,7 +71,8 @@ set on process.env, or if the variable is not set _default_ run through the
 variable instance functions as though it was set on *process.env*.
 
 ### variable
-A returned variable has the following functions defined for parsing to the required format.
+A returned variable has the following functions defined for parsing to the
+required format.
 
 ##### required()
 Ensure the variable is set on *process.env*, if not an exception will be thrown.
@@ -115,7 +116,7 @@ var allVars = env();
 // Returns a string. Throws an exception if not set
 var stringVar = env('STRING').required().asString();
 
-// Return an int, or undefined if not set, and throws if set to a non integer value
+// Returns an int, undefined if not set, or throws if set to a non integer value
 var intVar = env('INTEGER').asInt();
 
 // Return a float, or 23.2 if not set
@@ -124,7 +125,7 @@ var floatVar = env('FLOAT', '23.2').asFloat();
 // Return a Boolean. Throws an exception if not set or parsing fails
 var boolVar = env('BOOL').required().asBool();
 
-// Return a JSON Object, or undefined if not set, or throws if set to invalid JSON
+// Returns a JSON Object, undefined if not set, or throws if set to invalid JSON
 var jsonVar = env('JSON').asJson();
 ```
 
