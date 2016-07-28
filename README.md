@@ -1,5 +1,7 @@
 # env-var
 
+[![Travis CI](https://travis-ci.org/evanshortiss/env-var.svg?branch=master)](https://travis-ci.org/evanshortiss/env-var)
+
 An elegant solution for loading environment variables in node.js.
 
 ## Install
