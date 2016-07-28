@@ -3,9 +3,6 @@
   "version": "2.0.0",
   "description": "programmatic wrapper for process.env with support for defaults",
   "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "check-coverage": "istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
     "cover": "istanbul cover _mocha test/",
@@ -14,12 +11,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/evanshortiss/env-get.git"
+    "url": "https://github.com/evanshortiss/env-var.git"
   },
   "keywords": [
     "get",
     "env",
     "process.env",
+    "process",
     "var",
     "environment",
     "variables",
@@ -28,9 +26,9 @@
   "author": "Evan Shortiss",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/evanshortiss/env-get/issues"
+    "url": "https://github.com/evanshortiss/env-var/issues"
   },
-  "homepage": "https://github.com/evanshortiss/env-get",
+  "homepage": "https://github.com/evanshortiss/env-var",
   "devDependencies": {
     "chai": "^3.5.0",
     "istanbul": "^0.4.2",
