@@ -36,5 +36,8 @@
   },
   "dependencies": {
     "verror": "~1.6.1"
+  },
+  "engines": {
+    "node": ">=0.10"
   }
 }
