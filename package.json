@@ -30,9 +30,9 @@
   },
   "homepage": "https://github.com/evanshortiss/env-var",
   "devDependencies": {
-    "chai": "^3.5.0",
-    "istanbul": "^0.4.2",
-    "mocha": "^2.4.5"
+    "chai": "3.5.0",
+    "istanbul": "0.4.2",
+    "mocha": "2.4.5"
   },
   "dependencies": {
     "verror": "~1.6.1"
