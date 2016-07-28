@@ -84,6 +84,14 @@ Attempt to parse the variable to an integer. Throws an exception if parsing
 fails. This is a strict check, meaning that if the *process.env* value is 1.2,
 an exception will be raised rather than rounding up/down.
 
+##### isPositiveInt()
+Performs the same task as _asInt()_, but also verifies that the number is
+positive (greater than or equal to zero).
+
+##### isNegativeInt()
+Performs the same task as _asInt()_, but also verifies that the number is
+negative (less than zero).
+
 ##### asFloat()
 Attempt to parse the variable to a float. Throws an exception if parsing fails.
 

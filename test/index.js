@@ -59,6 +59,35 @@ describe('env-var', function () {
     });
   });
 
+  describe('#asPositiveInt', function () {
+    it('should return a positive integer', function () {
+      expect(mod('INTEGER').asPositiveInt()).to.be.a('number');
+      expect(mod('INTEGER').asPositiveInt()).to.equal(parseInt(TEST_VARS.INTEGER));
+    });
+
+    it('should throw an exception - non positive int found', function () {
+      process.env.INTEGER = '-10';
+
+      expect(function () {
+        mod('INTEGER').asPositiveInt();
+      }).to.throw();
+    });
+  });
+
+  describe('#asNegativeInt', function () {
+    it('should return a negative integer', function () {
+      process.env.INTEGER = '-10';
+      expect(mod('INTEGER').asNegativeInt()).to.be.a('number');
+      expect(mod('INTEGER').asNegativeInt()).to.equal(parseInt(-10));
+    });
+
+    it('should throw an exception - positive int found', function () {
+      expect(function () {
+        mod('INTEGER').asNegativeInt();
+      }).to.throw();
+    });
+  });
+
   describe('#asFloat', function () {
     it('should return a float', function () {
       expect(mod('FLOAT').asFloat()).to.be.a('number');
