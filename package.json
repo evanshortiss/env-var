@@ -1,6 +1,6 @@
 {
   "name": "env-var",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "programmatic wrapper for process.env with support for defaults",
   "main": "index.js",
   "directories": {
@@ -8,8 +8,9 @@
   },
   "scripts": {
     "check-coverage": "istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
-    "unit": "istanbul cover _mocha test/",
-    "test": "npm run unit && npm run check-coverage"
+    "cover": "istanbul cover _mocha test/",
+    "unit": "mocha test/",
+    "test": "npm run unit && npm run cover && npm run check-coverage"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,11 @@
   "keywords": [
     "get",
     "env",
-    "process.env"
+    "process.env",
+    "var",
+    "environment",
+    "variables",
+    "variable"
   ],
   "author": "Evan Shortiss",
   "license": "MIT",
@@ -30,5 +35,8 @@
     "chai": "^3.5.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.4.5"
+  },
+  "dependencies": {
+    "verror": "^1.6.1"
   }
 }
