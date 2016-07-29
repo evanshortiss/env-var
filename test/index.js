@@ -26,7 +26,7 @@ describe('env-var', function () {
 
 
   describe('getting process.env', function () {
-    it('should return the entire env object', function () {
+    it('should return process.env object when no args provided', function () {
       var res = mod();
 
       expect(res).to.be.an('object');
@@ -50,7 +50,7 @@ describe('env-var', function () {
       expect(mod('INTEGER').asInt()).to.equal(parseInt(TEST_VARS.INTEGER));
     });
 
-    it('should throw an exception', function () {
+    it('should throw an exception - non integer type found', function () {
       process.env.INTEGER = 'nope';
 
       expect(function () {
@@ -65,7 +65,7 @@ describe('env-var', function () {
       expect(mod('INTEGER').asPositiveInt()).to.equal(parseInt(TEST_VARS.INTEGER));
     });
 
-    it('should throw an exception - non positive int found', function () {
+    it('should throw an exception - negative integer found', function () {
       process.env.INTEGER = '-10';
 
       expect(function () {
@@ -81,7 +81,7 @@ describe('env-var', function () {
       expect(mod('INTEGER').asNegativeInt()).to.equal(parseInt(-10));
     });
 
-    it('should throw an exception - positive int found', function () {
+    it('should throw an exception - positive integer found', function () {
       expect(function () {
         mod('INTEGER').asNegativeInt();
       }).to.throw();
@@ -94,7 +94,7 @@ describe('env-var', function () {
       expect(mod('FLOAT').asFloat()).to.equal(parseFloat(TEST_VARS.FLOAT));
     });
 
-    it('should throw an exception', function () {
+    it('should throw an exception - non float found', function () {
       process.env.FLOAT = 'nope';
 
       expect(function () {
@@ -109,7 +109,7 @@ describe('env-var', function () {
       expect(mod('BOOL').asBool()).to.equal(Boolean(TEST_VARS.BOOL));
     });
 
-    it('should throw an exception', function () {
+    it('should throw an exception - invalid boolean found', function () {
       process.env.BOOL = 'nope';
 
       expect(function () {
@@ -124,7 +124,7 @@ describe('env-var', function () {
       expect(mod('JSON').asJson()).to.deep.equal(JSON.parse(TEST_VARS.JSON));
     });
 
-    it('should throw an exception', function () {
+    it('should throw an exception - json parsing failed', function () {
       process.env.JSON = '{ nope}';
 
       expect(function () {
@@ -134,16 +134,22 @@ describe('env-var', function () {
   });
 
   describe('#required', function () {
-    it('should not throw', function () {
+    it('should not throw if required and found', function () {
       expect(mod('JSON').required().asJson()).to.be.an('object');
     });
 
-    it('should throw an exception', function () {
+    it('should throw an exception when required, but not set', function () {
       delete process.env.JSON;
 
       expect(function () {
         mod('JSON').required().asJson();
       }).to.throw();
+    });
+
+    it('should return undefined when not set and not required', function () {
+      delete process.env.STRING;
+
+      expect(mod('STRING').asString()).to.be.undefined;
     });
   });
 });

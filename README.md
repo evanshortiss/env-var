@@ -14,8 +14,16 @@ npm install env-var --save
 In the example below we read the environment variable *PARALLEL_LIMIT*, ensure
 it is set (required), and parse it to an integer.
 ```js
-var PARALLEL_LIMIT = env('PARALLEL_LIMIT').required().asInt();
+var PARALLEL_LIMIT = env('PARALLEL_LIMIT').required().asPositiveInt();
 ```
+
+Here's what each piece of this code means:
+
+1. If *PARALLEL_LIMIT* is not set _required()_ will raise an exception.
+2. If it is set, but not a positive integer _asPositiveInt()_ will raise an
+exception.
+3. If #1 and #2 do not raise an exception, the number will be returned as a
+valid JavaScript number type.
 
 ## Overview
 Over time it became apparent that parsing environment variables is a
@@ -76,35 +84,35 @@ variable instance functions as though it was set on *process.env*.
 A returned variable has the following functions defined for parsing to the
 required format.
 
-##### required()
+#### required()
 Ensure the variable is set on *process.env*, if not an exception will be thrown.
 
-##### asInt()
+#### asInt()
 Attempt to parse the variable to an integer. Throws an exception if parsing
 fails. This is a strict check, meaning that if the *process.env* value is 1.2,
 an exception will be raised rather than rounding up/down.
 
-##### isPositiveInt()
+#### asPositiveInt()
 Performs the same task as _asInt()_, but also verifies that the number is
 positive (greater than or equal to zero).
 
-##### isNegativeInt()
+#### asNegativeInt()
 Performs the same task as _asInt()_, but also verifies that the number is
 negative (less than zero).
 
-##### asFloat()
+#### asFloat()
 Attempt to parse the variable to a float. Throws an exception if parsing fails.
 
-##### asString()
+#### asString()
 Return the variable value as a String. Throws an exception if value is not a
 String. It's highly unlikely that a variable will not be a String since all
 *process.env* entries you set in bash are Strings by default.
 
-##### asBool()
+#### asBool()
 Attempt to parse the variable to a Boolean. Throws an exception if parsing
 fails. The var must be set to either "true" or "false" to succeed.
 
-##### asJson()
+#### asJson()
 Attempt to parse the variable to a JSON Object. Throws an exception if parsing
 fails.
 
@@ -140,7 +148,7 @@ var jsonVar = env('JSON').asJson();
 ```
 
 
-## Testing Benefits
+## Testing Overview
 
 When testing code that relies on environment variables sometimes we need to
 mock out/set the environment variables. Having calls to _process.env_ strewn
