@@ -164,11 +164,15 @@ describe('env-var', function () {
     });
 
     it('Should get a mock boolean', function() {
-      expect(mockMod('A_BOOL').asBool()).to.eql(true);
+      expect(mockMod('A_BOOL').required().asBool()).to.eql(true);
     });
 
     it('Should get a mock string', function() {
-      expect(mockMod('A_STRING').asString()).to.eql('blah');
+      expect(mockMod('A_STRING').required().asString()).to.eql('blah');
+    });
+
+    it('Should get undefined for a missing un-required value', function() {
+      expect(mockMod('DONTEXIST').asString()).to.eql(undefined);
     });
 
     it('Should throw an exception on a missing required value', function() {
