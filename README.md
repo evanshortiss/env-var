@@ -62,8 +62,8 @@ var MAX_BATCH_SIZE = env('MAX_BATCH_SIZE').required().asInt();
 ```
 
 When it comes to testing code that relies on environment variables this is also
-great since you can stub out *env-var* using *proxyquire* and *sinon* to easily
-alter results returned without having to share state via *process.env*. A
+great since you can mock out *env-var* using *proxyquire* to easily alter 
+results returned without having to share state via *process.env*. A
 demonstration of this is at the bottom of the README.
 
 
@@ -154,7 +154,10 @@ When testing code that relies on environment variables sometimes we need to
 mock out/set the environment variables. Having calls to _process.env_ strewn
 throughout a test is and can get confusing and modifies global state (not good).
 
-It's better to use *env-var* and do something along these lines:
+It's better to use *env-var* and its built-in `mock()` function. Using `mock()` 
+will allow you to create a mocked version of env-var which will use a literal
+object **instead** of using _process.env_. You can use this mocked version with 
+something like Proxyquire. For example:
 
 ```js
 /**
@@ -175,24 +178,23 @@ exports.concat = function (envVarToGet) {
  * Reads in a var and constructs a string by adding the var name plus its value
  */
 
-var sinon = require('sinon');
 var expect = require('chai').expect;
 var proxyquire = require('proxyquire');
+var env = require('env-var');
 
-describe('module test', function () {
+describe('concat.js', function () {
 
-  var envStub;
   var mod;
 
   beforeEach(function () {
-    envStub = sinon.stub();
-
-    // Require our concat file, but stub out env-var
+    // Require our concat file, but replace env-var with a mocked version.
+    // This mocked version will NOT use process.env
     mod = proxyquire('./concat', {
-      'env-var': sinon.stub().returns({
-        asString: sinon.stub().returns('WORLD')
+      'env-var': env.mock({
+        HELLO: 'WORLD'
       })
     });
+
   });
 
   describe('#concat', function () {

@@ -152,4 +152,35 @@ describe('env-var', function () {
       expect(mod('STRING').asString()).to.be.undefined;
     });
   });
+
+  describe('#mock', function() {
+    var mockMod;
+
+    beforeEach(function() {
+      mockMod = mod.mock({
+        A_BOOL: 'true',
+        A_STRING: 'blah'
+      });
+    });
+
+    it('Should get a mock boolean', function() {
+      expect(mockMod('A_BOOL').asBool()).to.eql(true);
+    });
+
+    it('Should get a mock string', function() {
+      expect(mockMod('A_STRING').asString()).to.eql('blah');
+    });
+
+    it('Should throw an exception on a missing required value', function() {
+      expect(function () {
+        mockMod('DONTEXIST').required().asJson();
+      }).to.throw();
+    });
+
+    it('Should return the mock values object if no arguments', function() {
+      expect(mockMod()).to.have.property('A_BOOL', 'true');
+      expect(mockMod()).to.have.property('A_STRING', 'blah');
+    });
+
+  });
 });
