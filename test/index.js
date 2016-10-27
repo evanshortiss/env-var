@@ -104,23 +104,123 @@ describe('env-var', function () {
   });
 
   describe('#asBool', function () {
-    it('should return a bool - for false value', function () {
+    it('should return a bool - for string "false"', function () {
       expect(mod('BOOL').asBool()).to.be.a('boolean');
       expect(mod('BOOL').asBool()).to.equal(false);
     });
-    
-    it('should return a bool - for true value', function () {
+
+    it('should return a bool - for string "FALSE"', function () {
+      process.env.BOOL = 'FALSE';
+      expect(mod('BOOL').asBool()).to.be.a('boolean');
+      expect(mod('BOOL').asBool()).to.equal(false);
+    });
+
+    it('should return a bool - for string "0"', function () {
+      process.env.BOOL = '0';
+      expect(mod('BOOL').asBool()).to.be.a('boolean');
+      expect(mod('BOOL').asBool()).to.equal(false);
+    });
+
+    it('should return a bool - for integer 0', function () {
+      process.env.BOOL = 0;
+      expect(mod('BOOL').asBool()).to.be.a('boolean');
+      expect(mod('BOOL').asBool()).to.equal(false);
+    });
+
+    it('should return a bool - for string "true"', function () {
       process.env.BOOL = 'true';
       expect(mod('BOOL').asBool()).to.be.a('boolean');
       expect(mod('BOOL').asBool()).to.equal(true);
     });
-    
+
+    it('should return a bool - for string "TRUE"', function () {
+      process.env.BOOL = 'TRUE';
+      expect(mod('BOOL').asBool()).to.be.a('boolean');
+      expect(mod('BOOL').asBool()).to.equal(true);
+    });
+
+    it('should return a bool - for string "1"', function () {
+      process.env.BOOL = '1';
+      expect(mod('BOOL').asBool()).to.be.a('boolean');
+      expect(mod('BOOL').asBool()).to.equal(true);
+    });
+
+    it('should return a bool - for integer 1', function () {
+      process.env.BOOL = 1;
+      expect(mod('BOOL').asBool()).to.be.a('boolean');
+      expect(mod('BOOL').asBool()).to.equal(true);
+    });
 
     it('should throw an exception - invalid boolean found', function () {
       process.env.BOOL = 'nope';
 
       expect(function () {
         mod('BOOL').asBool();
+      }).to.throw();
+    });
+  });
+
+  describe('#asStrictBoolean', function () {
+    it('should return a bool - for string "false"', function () {
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(false);
+    });
+
+    it('should return a bool - for string "FALSE"', function () {
+      process.env.BOOL = 'FALSE';
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(false);
+    });
+
+    it('should throw an exception - for string "0"', function () {
+      process.env.BOOL = '0';
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should throw an exception - for integer 0', function () {
+      process.env.BOOL = 0;
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should return a bool - for string "true"', function () {
+      process.env.BOOL = 'true';
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(true);
+    });
+
+    it('should return a bool - for string "TRUE"', function () {
+      process.env.BOOL = 'TRUE';
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(true);
+    });
+
+    it('should throw an exception - for string "1"', function () {
+      process.env.BOOL = '1';
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should throw an exception - for integer 1', function () {
+      process.env.BOOL = 1;
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should throw an exception - invalid boolean found', function () {
+      process.env.BOOL = 'nope';
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
       }).to.throw();
     });
   });
