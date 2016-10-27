@@ -104,10 +104,17 @@ describe('env-var', function () {
   });
 
   describe('#asBool', function () {
-    it('should return a bool', function () {
+    it('should return a bool - for false value', function () {
       expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(Boolean(TEST_VARS.BOOL));
+      expect(mod('BOOL').asBool()).to.equal(false);
     });
+    
+    it('should return a bool - for true value', function () {
+      process.env.BOOL = 'true';
+      expect(mod('BOOL').asBool()).to.be.a('boolean');
+      expect(mod('BOOL').asBool()).to.equal(true);
+    });
+    
 
     it('should throw an exception - invalid boolean found', function () {
       process.env.BOOL = 'nope';
