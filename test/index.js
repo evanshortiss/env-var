@@ -160,23 +160,23 @@ describe('env-var', function () {
     });
   });
 
-  describe('#asStrictBoolean', function () {
+  describe('#asStrictBool', function () {
     it('should return a bool - for string "false"', function () {
-      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBoolean()).to.equal(false);
+      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBool()).to.equal(false);
     });
 
     it('should return a bool - for string "FALSE"', function () {
       process.env.BOOL = 'FALSE';
-      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBoolean()).to.equal(false);
+      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBool()).to.equal(false);
     });
 
     it('should throw an exception - for string "0"', function () {
       process.env.BOOL = '0';
 
       expect(function () {
-        mod('BOOL').asStrictBoolean();
+        mod('BOOL').asStrictBool();
       }).to.throw();
     });
 
@@ -184,27 +184,27 @@ describe('env-var', function () {
       process.env.BOOL = 0;
 
       expect(function () {
-        mod('BOOL').asStrictBoolean();
+        mod('BOOL').asStrictBool();
       }).to.throw();
     });
 
     it('should return a bool - for string "true"', function () {
       process.env.BOOL = 'true';
-      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBoolean()).to.equal(true);
+      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBool()).to.equal(true);
     });
 
     it('should return a bool - for string "TRUE"', function () {
       process.env.BOOL = 'TRUE';
-      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBoolean()).to.equal(true);
+      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBool()).to.equal(true);
     });
 
     it('should throw an exception - for string "1"', function () {
       process.env.BOOL = '1';
 
       expect(function () {
-        mod('BOOL').asStrictBoolean();
+        mod('BOOL').asStrictBool();
       }).to.throw();
     });
 
@@ -212,7 +212,7 @@ describe('env-var', function () {
       process.env.BOOL = 1;
 
       expect(function () {
-        mod('BOOL').asStrictBoolean();
+        mod('BOOL').asStrictBool();
       }).to.throw();
     });
 
@@ -220,7 +220,7 @@ describe('env-var', function () {
       process.env.BOOL = 'nope';
 
       expect(function () {
-        mod('BOOL').asStrictBoolean();
+        mod('BOOL').asStrictBool();
       }).to.throw();
     });
   });
