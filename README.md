@@ -110,7 +110,13 @@ String. It's highly unlikely that a variable will not be a String since all
 
 #### asBool()
 Attempt to parse the variable to a Boolean. Throws an exception if parsing
-fails. The var must be set to either "true" or "false" to succeed.
+fails. The var must be set to either "true", "false" (and any case writing of 
+those two strings), 0 or 1 to succeed.
+
+#### asStrictBool()
+Attempt to parse the variable to a Boolean. Throws an exception if parsing
+fails. The var must be set to either "true" or "false" (and any case writing 
+of those two strings) to succeed.
 
 #### asJson()
 Attempt to parse the variable to a JSON Object. Throws an exception if parsing
