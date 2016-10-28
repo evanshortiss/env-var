@@ -160,6 +160,71 @@ describe('env-var', function () {
     });
   });
 
+  describe('#asStrictBoolean', function () {
+    it('should return a bool - for string "false"', function () {
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(false);
+    });
+
+    it('should return a bool - for string "FALSE"', function () {
+      process.env.BOOL = 'FALSE';
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(false);
+    });
+
+    it('should throw an exception - for string "0"', function () {
+      process.env.BOOL = '0';
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should throw an exception - for integer 0', function () {
+      process.env.BOOL = 0;
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should return a bool - for string "true"', function () {
+      process.env.BOOL = 'true';
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(true);
+    });
+
+    it('should return a bool - for string "TRUE"', function () {
+      process.env.BOOL = 'TRUE';
+      expect(mod('BOOL').asStrictBoolean()).to.be.a('boolean');
+      expect(mod('BOOL').asStrictBoolean()).to.equal(true);
+    });
+
+    it('should throw an exception - for string "1"', function () {
+      process.env.BOOL = '1';
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should throw an exception - for integer 1', function () {
+      process.env.BOOL = 1;
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+
+    it('should throw an exception - invalid boolean found', function () {
+      process.env.BOOL = 'nope';
+
+      expect(function () {
+        mod('BOOL').asStrictBoolean();
+      }).to.throw();
+    });
+  });
+
   describe('#asJson', function () {
     it('should return a json object', function () {
       expect(mod('JSON').asJson()).to.be.an('object');
