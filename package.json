@@ -1,6 +1,6 @@
 {
   "name": "env-var",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "programmatic wrapper for process.env with support for defaults",
   "main": "lib/index.js",
   "scripts": {
@@ -25,7 +25,10 @@
   ],
   "author": "Evan Shortiss",
   "license": "MIT",
-  "files": ["lib/"],
+  "files": [
+    "lib/",
+    "env-var.d.ts"
+  ],
   "bugs": {
     "url": "https://github.com/evanshortiss/env-var/issues"
   },

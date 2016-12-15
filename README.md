@@ -212,6 +212,14 @@ describe('concat.js', function () {
 
 ```
 
+## TypeScript
+To use with TypeScript, just import it like this:
+```ts
+import env from 'get-env';
+
+const stringVar = env('STRING').required().asString();
+```
+
 ## Contributors
 * @MikeyBurkman
 * @itavy
