@@ -1,7 +1,7 @@
 {
   "name": "env-var",
-  "version": "2.4.1",
-  "description": "solution for loading and sanatizing environment variables in node.js",
+  "version": "2.4.2",
+  "description": "Solution for loading and sanatizing environment variables in node.js",
   "main": "lib/index.js",
   "scripts": {
     "check-coverage": "istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
