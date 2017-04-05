@@ -1,13 +1,14 @@
 {
   "name": "env-var",
   "version": "2.4.2",
-  "description": "Solution for loading and sanatizing environment variables in node.js",
+  "description": "Solution for loading and sanatizing environment variables in node.js with correct typings",
   "main": "lib/index.js",
   "scripts": {
-    "check-coverage": "istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
-    "cover": "istanbul cover _mocha test/",
+    "coveralls": "npm run coverage && cat coverage/lcov.info | coveralls",
+    "coverage": "nyc mocha test/ && nyc report --reporter=lcov",
+    "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
     "unit": "mocha test/",
-    "test": "npm run unit && npm run cover && npm run check-coverage"
+    "test": "npm run unit && npm run coverage && npm run check-coverage"
   },
   "repository": {
     "type": "git",
@@ -21,7 +22,12 @@
     "var",
     "environment",
     "variables",
-    "variable"
+    "variable",
+    "loader",
+    "env-var",
+    "config",
+    "configuration",
+    "settings"
   ],
   "author": "Evan Shortiss",
   "license": "MIT",
@@ -35,8 +41,10 @@
   "homepage": "https://github.com/evanshortiss/env-var",
   "devDependencies": {
     "chai": "3.5.0",
-    "istanbul": "0.4.2",
-    "mocha": "2.4.5"
+    "coveralls": "~2.13.0",
+    "mocha": "2.4.5",
+    "mocha-lcov-reporter": "~1.3.0",
+    "nyc": "~10.2.0"
   },
   "dependencies": {
     "verror": "~1.6.1"

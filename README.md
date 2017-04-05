@@ -1,9 +1,11 @@
 # env-var
 
-[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 [![Travis CI](https://travis-ci.org/evanshortiss/env-var.svg?branch=master)](https://travis-ci.org/evanshortiss/env-var)
+[![Coverage Status](https://coveralls.io/repos/github/evanshortiss/env-var/badge.svg?branch=master)](https://coveralls.io/github/evanshortiss/env-var?branch=master)
+[![npm version](https://badge.fury.io/js/env-var.svg)](https://badge.fury.io/js/env-var)
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-solution for loading and sanatizing environment variables in node.js
+solution for loading and sanatizing environment variables in node.js with correct typings
 
 ## Install
 
@@ -133,7 +135,7 @@ The same as _asJson_ but checks that the data is a JSON Object, e.g {a: 1}.
 #### asArray([delimiter])
 Reads an environment variable as a string, then splits it on each occurence of
 the specified _delimiter_. By default a comma is used as the delimiter. For
-example a var set to "1,2,3" would become ['1', '2', '3']. 
+example a var set to "1,2,3" would become ['1', '2', '3'].
 
 
 ## Example

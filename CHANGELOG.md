@@ -1,10 +1,19 @@
+## 2.4.3 (5 April  2017)
+* Update with build, coverage, and version information badges.
+
+## 2.4.2 (19 December 2016)
+* Fix TypeScript definition file
+
+## 2.4.1 (15 December 2016)
+* Remove unnecessary code path
+
 ## 2.4.0 (15 December 2016)
 * Add `asArray([delimeter])` to read environment variables as an array by splitting
 the varible string on each instance of _delimeter_;
 * Add `asJsonArray()` to read in an environment variable that contains a JSON
 Array. Similar to `asJson()`, but ensures the variable is an Array.
 * Add `asJsonObject()` to read in an environment variable that contains a JSON
-Object. Similar to `asJson()`, but ensures the variable is an Object. 
+Object. Similar to `asJson()`, but ensures the variable is an Object.
 
 ## 2.3.0 & 2.3.1 (12 December 2016)
 * Add typings support for TypeScript
