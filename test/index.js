@@ -1,6 +1,8 @@
-'use strict';
+'use strict'
 
-var expect = require('chai').expect;
+/* eslint-env mocha */
+
+var expect = require('chai').expect
 
 describe('env-var', function () {
   // Some default env vars for tests
@@ -13,343 +15,407 @@ describe('env-var', function () {
     JSON_OBJECT: '{"name":"value"}',
     JSON_ARRAY: '[1,2,3]',
     COMMA_ARRAY: '1,2,3',
-    DASH_ARRAY: '1-2-3'
-  };
+    DASH_ARRAY: '1-2-3',
+    URL: 'http://google.com'
+  }
 
-  var mod;
+  var mod = require('../env-var.js')
 
   beforeEach(function () {
-    delete require.cache[require.resolve('../lib/index.js')];
-    mod = require('../lib/index.js');
-
     // Inject our dummy vars
     Object.keys(TEST_VARS).forEach(function (key) {
-      process.env[key] = TEST_VARS[key];
-    });
-  });
-
+      process.env[key] = TEST_VARS[key]
+    })
+  })
 
   describe('getting process.env', function () {
     it('should return process.env object when no args provided', function () {
-      var res = mod();
+      var res = mod.get()
 
       expect(res).to.be.an('object');
 
-      ['STRING','FLOAT','INTEGER','BOOL','JSON'].forEach(function (name) {
-        expect(res[name]).to.be.defined;
-      });
-    });
-  });
+      ['STRING', 'FLOAT', 'INTEGER', 'BOOL', 'JSON'].forEach(function (name) {
+        expect(res[name]).to.not.equal(undefined)
+      })
+    })
+  })
 
   describe('#asString', function () {
     it('should return a string', function () {
-      expect(mod('STRING').asString()).to.be.a('string');
-      expect(mod('STRING').asString()).to.equal(TEST_VARS.STRING);
-    });
-  });
+      expect(mod.get('STRING').asString()).to.be.a('string')
+      expect(mod.get('STRING').asString()).to.equal(TEST_VARS.STRING)
+    })
+  })
+
+  describe('#asUrlString', function () {
+    it('should return a url string', function () {
+      expect(mod.get('URL').asUrlString()).to.be.a('string')
+      expect(mod.get('URL').asUrlString()).to.equal(TEST_VARS.URL)
+    })
+
+    it('should throw due to bad url', function () {
+      process.env.URL = 'not a url'
+
+      expect(() => {
+        mod.get('URL').asUrlString()
+      }).to.throw('env-var: "URL" should be a valid URL, but was "not a url"')
+    })
+  })
+
+  describe('#asUrlObject', function () {
+    it('should return a url object', function () {
+      expect(mod.get('URL').asUrlObject()).to.be.a('object')
+      expect(mod.get('URL').asUrlObject()).to.deep.equal(require('url').parse(process.env.URL))
+    })
+
+    it('should throw due to bad url', function () {
+      process.env.URL = 'not a url'
+
+      expect(() => {
+        mod.get('URL').asUrlObject()
+      }).to.throw('env-var: "URL" should be a valid URL, but was "not a url"')
+    })
+  })
 
   describe('#asInt', function () {
     it('should return an integer', function () {
-      expect(mod('INTEGER').asInt()).to.be.a('number');
-      expect(mod('INTEGER').asInt()).to.equal(parseInt(TEST_VARS.INTEGER));
-    });
+      expect(mod.get('INTEGER').asInt()).to.be.a('number')
+      expect(mod.get('INTEGER').asInt()).to.equal(parseInt(TEST_VARS.INTEGER))
+    })
 
     it('should throw an exception - non integer type found', function () {
-      process.env.INTEGER = 'nope';
+      process.env.INTEGER = '1.2'
 
       expect(function () {
-        mod('INTEGER').asInt();
-      }).to.throw();
-    });
-  });
+        mod.get('INTEGER').asInt()
+      }).to.throw()
+    })
 
-  describe('#asPositiveInt', function () {
+    it('should throw an exception - non integer type found', function () {
+      process.env.INTEGER = 'nope'
+
+      expect(function () {
+        mod.get('INTEGER').asInt()
+      }).to.throw()
+    })
+  })
+
+  describe('#asIntPositive', function () {
     it('should return a positive integer', function () {
-      expect(mod('INTEGER').asPositiveInt()).to.be.a('number');
-      expect(mod('INTEGER').asPositiveInt()).to.equal(parseInt(TEST_VARS.INTEGER));
-    });
+      expect(mod.get('INTEGER').asIntPositive()).to.be.a('number')
+      expect(mod.get('INTEGER').asIntPositive()).to.equal(parseInt(TEST_VARS.INTEGER))
+    })
 
     it('should throw an exception - negative integer found', function () {
-      process.env.INTEGER = '-10';
+      process.env.INTEGER = '-10'
 
       expect(function () {
-        mod('INTEGER').asPositiveInt();
-      }).to.throw();
-    });
-  });
+        mod.get('INTEGER').asIntPositive()
+      }).to.throw()
+    })
+  })
 
-  describe('#asNegativeInt', function () {
+  describe('#asIntNegative', function () {
     it('should return a negative integer', function () {
-      process.env.INTEGER = '-10';
-      expect(mod('INTEGER').asNegativeInt()).to.be.a('number');
-      expect(mod('INTEGER').asNegativeInt()).to.equal(parseInt(-10));
-    });
+      process.env.INTEGER = '-10'
+      expect(mod.get('INTEGER').asIntNegative()).to.be.a('number')
+      expect(mod.get('INTEGER').asIntNegative()).to.equal(parseInt(-10))
+    })
 
     it('should throw an exception - positive integer found', function () {
       expect(function () {
-        mod('INTEGER').asNegativeInt();
-      }).to.throw();
-    });
-  });
+        mod.get('INTEGER').asIntNegative()
+      }).to.throw()
+    })
+  })
 
   describe('#asFloat', function () {
     it('should return a float', function () {
-      expect(mod('FLOAT').asFloat()).to.be.a('number');
-      expect(mod('FLOAT').asFloat()).to.equal(parseFloat(TEST_VARS.FLOAT));
-    });
+      expect(mod.get('FLOAT').asFloat()).to.be.a('number')
+      expect(mod.get('FLOAT').asFloat()).to.equal(parseFloat(TEST_VARS.FLOAT))
+    })
 
     it('should throw an exception - non float found', function () {
-      process.env.FLOAT = 'nope';
+      process.env.FLOAT = 'nope'
 
       expect(function () {
-        mod('FLOAT').asFloat();
-      }).to.throw();
-    });
-  });
+        mod.get('FLOAT').asFloat()
+      }).to.throw()
+    })
+  })
+
+  describe('#asFloatPositive', function () {
+    it('should return a positive float', function () {
+      expect(mod.get('FLOAT').asFloatPositive()).to.be.a('number')
+      expect(mod.get('FLOAT').asFloatPositive()).to.equal(parseFloat(TEST_VARS.FLOAT))
+    })
+
+    it('should throw an exception - negative integer found', function () {
+      process.env.FLOAT = `-${process.env.FLOAT}`
+
+      expect(function () {
+        mod.get('FLOAT').asFloatPositive()
+      }).to.throw()
+    })
+  })
+
+  describe('#asFloatNegative', function () {
+    it('should return a negative float', function () {
+      const numberString = `-${TEST_VARS.FLOAT}`
+      process.env.FLOAT = numberString
+      expect(mod.get('FLOAT').asFloatNegative()).to.be.a('number')
+      expect(mod.get('FLOAT').asFloatNegative()).to.equal(parseFloat(numberString))
+    })
+
+    it('should throw an exception - positive integer found', function () {
+      expect(function () {
+        mod.get('FLOAT').asFloatNegative()
+      }).to.throw()
+    })
+  })
 
   describe('#asBool', function () {
     it('should return a bool - for string "false"', function () {
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(false);
-    });
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(false)
+    })
 
     it('should return a bool - for string "FALSE"', function () {
-      process.env.BOOL = 'FALSE';
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(false);
-    });
+      process.env.BOOL = 'FALSE'
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(false)
+    })
 
     it('should return a bool - for string "0"', function () {
-      process.env.BOOL = '0';
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(false);
-    });
+      process.env.BOOL = '0'
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(false)
+    })
 
     it('should return a bool - for integer 0', function () {
-      process.env.BOOL = 0;
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(false);
-    });
+      process.env.BOOL = 0
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(false)
+    })
 
     it('should return a bool - for string "true"', function () {
-      process.env.BOOL = 'true';
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(true);
-    });
+      process.env.BOOL = 'true'
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(true)
+    })
 
     it('should return a bool - for string "TRUE"', function () {
-      process.env.BOOL = 'TRUE';
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(true);
-    });
+      process.env.BOOL = 'TRUE'
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(true)
+    })
 
     it('should return a bool - for string "1"', function () {
-      process.env.BOOL = '1';
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(true);
-    });
+      process.env.BOOL = '1'
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(true)
+    })
 
     it('should return a bool - for integer 1', function () {
-      process.env.BOOL = 1;
-      expect(mod('BOOL').asBool()).to.be.a('boolean');
-      expect(mod('BOOL').asBool()).to.equal(true);
-    });
+      process.env.BOOL = 1
+      expect(mod.get('BOOL').asBool()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBool()).to.equal(true)
+    })
 
     it('should throw an exception - invalid boolean found', function () {
-      process.env.BOOL = 'nope';
+      process.env.BOOL = 'nope'
 
       expect(function () {
-        mod('BOOL').asBool();
-      }).to.throw();
-    });
-  });
+        mod.get('BOOL').asBool()
+      }).to.throw()
+    })
+  })
 
-  describe('#asStrictBool', function () {
+  describe('#asBoolStrict', function () {
     it('should return a bool - for string "false"', function () {
-      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBool()).to.equal(false);
-    });
+      expect(mod.get('BOOL').asBoolStrict()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBoolStrict()).to.equal(false)
+    })
 
     it('should return a bool - for string "FALSE"', function () {
-      process.env.BOOL = 'FALSE';
-      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBool()).to.equal(false);
-    });
+      process.env.BOOL = 'FALSE'
+      expect(mod.get('BOOL').asBoolStrict()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBoolStrict()).to.equal(false)
+    })
 
     it('should throw an exception - for string "0"', function () {
-      process.env.BOOL = '0';
+      process.env.BOOL = '0'
 
       expect(function () {
-        mod('BOOL').asStrictBool();
-      }).to.throw();
-    });
+        mod.get('BOOL').asBoolStrict()
+      }).to.throw()
+    })
 
     it('should throw an exception - for integer 0', function () {
-      process.env.BOOL = 0;
+      process.env.BOOL = 0
 
       expect(function () {
-        mod('BOOL').asStrictBool();
-      }).to.throw();
-    });
+        mod.get('BOOL').asBoolStrict()
+      }).to.throw()
+    })
 
     it('should return a bool - for string "true"', function () {
-      process.env.BOOL = 'true';
-      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBool()).to.equal(true);
-    });
+      process.env.BOOL = 'true'
+      expect(mod.get('BOOL').asBoolStrict()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBoolStrict()).to.equal(true)
+    })
 
     it('should return a bool - for string "TRUE"', function () {
-      process.env.BOOL = 'TRUE';
-      expect(mod('BOOL').asStrictBool()).to.be.a('boolean');
-      expect(mod('BOOL').asStrictBool()).to.equal(true);
-    });
+      process.env.BOOL = 'TRUE'
+      expect(mod.get('BOOL').asBoolStrict()).to.be.a('boolean')
+      expect(mod.get('BOOL').asBoolStrict()).to.equal(true)
+    })
 
     it('should throw an exception - for string "1"', function () {
-      process.env.BOOL = '1';
+      process.env.BOOL = '1'
 
       expect(function () {
-        mod('BOOL').asStrictBool();
-      }).to.throw();
-    });
+        mod.get('BOOL').asBoolStrict()
+      }).to.throw()
+    })
 
     it('should throw an exception - for integer 1', function () {
-      process.env.BOOL = 1;
+      process.env.BOOL = 1
 
       expect(function () {
-        mod('BOOL').asStrictBool();
-      }).to.throw();
-    });
+        mod.get('BOOL').asBoolStrict()
+      }).to.throw()
+    })
 
     it('should throw an exception - invalid boolean found', function () {
-      process.env.BOOL = 'nope';
+      process.env.BOOL = 'nope'
 
       expect(function () {
-        mod('BOOL').asStrictBool();
-      }).to.throw();
-    });
-  });
+        mod.get('BOOL').asBoolStrict()
+      }).to.throw()
+    })
+  })
 
   describe('#asJson', function () {
     it('should return a json object', function () {
-      expect(mod('JSON').asJson()).to.be.an('object');
-      expect(mod('JSON').asJson()).to.deep.equal(JSON.parse(TEST_VARS.JSON));
-    });
+      expect(mod.get('JSON').asJson()).to.be.an('object')
+      expect(mod.get('JSON').asJson()).to.deep.equal(JSON.parse(TEST_VARS.JSON))
+    })
 
     it('should throw an exception - json parsing failed', function () {
-      process.env.JSON = '{ nope}';
+      process.env.JSON = '{ nope}'
 
       expect(function () {
-        mod('JSON').asJson();
-      }).to.throw();
-    });
-  });
+        mod.get('JSON').asJson()
+      }).to.throw()
+    })
+  })
 
   describe('#required', function () {
     it('should not throw if required and found', function () {
-      expect(mod('JSON').required().asJson()).to.be.an('object');
-    });
+      expect(mod.get('JSON').required().asJson()).to.be.an('object')
+    })
 
     it('should throw an exception when required, but not set', function () {
-      delete process.env.JSON;
+      delete process.env.JSON
 
       expect(function () {
-        mod('JSON').required().asJson();
-      }).to.throw();
-    });
+        mod.get('JSON').required().asJson()
+      }).to.throw()
+    })
 
     it('should return undefined when not set and not required', function () {
-      delete process.env.STRING;
+      delete process.env.STRING
 
-      expect(mod('STRING').asString()).to.be.undefined;
-    });
-  });
+      expect(mod.get('STRING').asString()).to.equal(undefined)
+    })
+  })
 
   describe('#asJsonArray', function () {
     it('should return undefined', function () {
       expect(
-        mod('nope').asJsonArray()
-      ).to.be.undefined;
-    });
+        mod.get('nope').asJsonArray()
+      ).to.equal(undefined)
+    })
 
     it('should throw an error - value was an object', function () {
       expect(function () {
-        mod('JSON_OBJECT').asJsonArray()
-      }).to.throw();
-    });
+        mod.get('JSON_OBJECT').asJsonArray()
+      }).to.throw()
+    })
 
     it('should return a JSON Array', function () {
       expect(
-        mod('JSON_ARRAY').asJsonArray()
-      ).to.deep.equal([1,2,3]);
-    });
-  });
+        mod.get('JSON_ARRAY').asJsonArray()
+      ).to.deep.equal([1, 2, 3])
+    })
+  })
 
   describe('#asJsonObject', function () {
     it('should throw an exception', function () {
       expect(
-        mod('nope').asJsonObject()
-      ).to.be.undefined;
-    });
+        mod.get('nope').asJsonObject()
+      ).to.equal(undefined)
+    })
 
     it('should throw an error - value was an array', function () {
       expect(function () {
-        mod('JSON_ARRAY').asJsonObject()
-      }).to.throw();
-    });
+        mod.get('JSON_ARRAY').asJsonObject()
+      }).to.throw()
+    })
 
     it('should return a JSON Object', function () {
       expect(
-        mod('JSON_OBJECT').asJsonObject()
-      ).to.deep.equal({name:'value'});
-    });
-  });
+        mod.get('JSON_OBJECT').asJsonObject()
+      ).to.deep.equal({name: 'value'})
+    })
+  })
 
   describe('#asArray', function () {
     it('should return undefined when not set', function () {
-      expect(mod('.NOPE.').asArray()).to.be.undefined;
-    });
+      expect(mod.get('.NOPE.').asArray()).to.equal(undefined)
+    })
 
     it('should return an array that was split on commas', function () {
-      expect(mod('COMMA_ARRAY').asArray()).to.deep.equal(['1','2','3']);
-    });
+      expect(mod.get('COMMA_ARRAY').asArray()).to.deep.equal(['1', '2', '3'])
+    })
 
     it('should return an array that was split on dashes', function () {
-      expect(mod('DASH_ARRAY').asArray('-')).to.deep.equal(['1','2','3']);
-    });
-  });
+      expect(mod.get('DASH_ARRAY').asArray('-')).to.deep.equal(['1', '2', '3'])
+    })
+  })
 
-  describe('#mock', function() {
-    var mockMod;
+  describe('#mock', function () {
+    var mockMod
 
-    beforeEach(function() {
+    beforeEach(function () {
       mockMod = mod.mock({
         A_BOOL: 'true',
         A_STRING: 'blah'
-      });
-    });
+      })
+    })
 
-    it('Should get a mock boolean', function() {
-      expect(mockMod('A_BOOL').required().asBool()).to.eql(true);
-    });
+    it('should get a mock boolean', function () {
+      expect(mockMod.get('A_BOOL').required().asBool()).to.eql(true)
+    })
 
-    it('Should get a mock string', function() {
-      expect(mockMod('A_STRING').required().asString()).to.eql('blah');
-    });
+    it('should get a mock string', function () {
+      expect(mockMod.get('A_STRING').required().asString()).to.eql('blah')
+    })
 
-    it('Should get undefined for a missing un-required value', function() {
-      expect(mockMod('DONTEXIST').asString()).to.eql(undefined);
-    });
+    it('should get undefined for a missing un-required value', function () {
+      expect(mockMod.get('DONTEXIST').asString()).to.eql(undefined)
+    })
 
-    it('Should throw an exception on a missing required value', function() {
+    it('should throw an exception on a missing required value', function () {
       expect(function () {
-        mockMod('DONTEXIST').required().asJson();
-      }).to.throw();
-    });
+        mockMod.get('DONTEXIST').required().asJson()
+      }).to.throw()
+    })
 
-    it('Should return the mock values object if no arguments', function() {
-      expect(mockMod()).to.have.property('A_BOOL', 'true');
-      expect(mockMod()).to.have.property('A_STRING', 'blah');
-    });
-
-  });
-});
+    it('should return the mock values object if no arguments', function () {
+      expect(mockMod.get()).to.have.property('A_BOOL', 'true')
+      expect(mockMod.get()).to.have.property('A_STRING', 'blah')
+    })
+  })
+})

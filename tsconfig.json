@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "target": "es5",
+		"moduleResolution": "node",
+		"skipLibCheck": true
+  }
+}

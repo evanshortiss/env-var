@@ -15,19 +15,29 @@ npm install env-var --save
 
 ## Example
 In the example below we read the environment variable *PARALLEL_LIMIT*, ensure
-it is set (required), and parse it to an integer.
+it is set, and parse it to an integer.
 
 ```js
-var PARALLEL_LIMIT = env('PARALLEL_LIMIT').required().asPositiveInt();
+var PARALLEL_LIMIT = env.get('PARALLEL_LIMIT').required().asIntPositive();
 ```
 
 Here's what each piece of this code means:
 
 1. If *PARALLEL_LIMIT* is not set _required()_ will raise an exception.
-2. If it is set, but not a positive integer _asPositiveInt()_ will raise an
+2. If it is set, but not a positive integer _asIntPositive()_ will raise an
 exception.
 3. If #1 and #2 do not raise an exception, the number will be returned as a
 valid JavaScript number type.
+
+
+## TypeScript
+To use with TypeScript, just import it like this:
+
+```ts
+import * as env from 'env-var';
+
+const stringVar = env.get('STRING').required().asString();
+```
 
 ## Overview
 Over time it became apparent that parsing environment variables is a
@@ -57,12 +67,12 @@ assert(
 );
 ```
 
-With *env-var* the example above can be written cleanly:
+With *env-var* the example above can be written cleanly as:
 
 ```js
 var env = require('env-var');
 
-var MAX_BATCH_SIZE = env('MAX_BATCH_SIZE').required().asInt();
+var MAX_BATCH_SIZE = env.get('MAX_BATCH_SIZE').required().asInt();
 ```
 
 When it comes to testing code that relies on environment variables this is also
@@ -72,40 +82,85 @@ demonstration of this is at the bottom of the README.
 
 
 ## API
-The API is just a single function that's exposed, let's call it _env_.
 
-### env([varname, [default]])
+### env.get([varname, [default]])
 You can call this function 3 different ways:
 
 1. Calling without arguments will return the entire _process.env_ Object.
-2. Calling with _varname_ will return a variable instance with utilities for
+2. Calling with _varname_ will return a _variable_ instance with utilities for
 parsing variables and is detailed below.
 3. Calling with _varname_, and _default_ will return the value for _varname_
 set on process.env, or if the variable is not set _default_ run through the
 variable instance functions as though it was set on *process.env*.
+
+
+### env.EnvVarError
+This is the error class used to represent errors raised by this module. You can
+use it like so:
+
+```js
+const env = require('env-var')
+
+try {
+  // will throw if you have not set this variable
+  env.get('MISSING_VARIABLE').required().asString()
+
+  // if catch error is set, we'll end up throwing here instead
+  throw new Error('some other error')
+} catch (e) {
+  if (e instanceof env.EnvVarError) {
+    console.log('we got an env-var error', e)
+  } else {
+    console.log('we got some error that wasn\'t an env-var error', e)
+  }
+}
+```
 
 ### variable
 A returned variable has the following functions defined for parsing to the
 required format.
 
 #### required()
-Ensure the variable is set on *process.env*, if not an exception will be thrown.
+Ensure the variable is set on *process.env*. If the variable is not set, then
+this function will throw an `EnvVarError`. Typically you will use this during
+the initialisation of your program in order to fail fast if a required variable
+is not set.
+
+For example:
+
+```js
+const env = require('env-var')
+
+// Read PORT variable and ensure it's a positive integer. If it is not a
+// positive integer or is not set the process will exit with an error
+const PORT = env.get('PORT').required().asIntPositive()
+
+app.listen(PORT)
+```
 
 #### asInt()
 Attempt to parse the variable to an integer. Throws an exception if parsing
-fails. This is a strict check, meaning that if the *process.env* value is 1.2,
+fails. This is a strict check, meaning that if the *process.env* value is "1.2",
 an exception will be raised rather than rounding up/down.
 
-#### asPositiveInt()
+#### asIntPositive()
 Performs the same task as _asInt()_, but also verifies that the number is
-positive (greater than or equal to zero).
+positive (greater than zero).
 
-#### asNegativeInt()
+#### asIntNegative()
 Performs the same task as _asInt()_, but also verifies that the number is
 negative (less than zero).
 
 #### asFloat()
 Attempt to parse the variable to a float. Throws an exception if parsing fails.
+
+#### asFloatPositive()
+Performs the same task as _asFloat()_, but also verifies that the number is
+positive (greater than zero).
+
+#### asFloatNegative()
+Performs the same task as _asFloat()_, but also verifies that the number is
+negative (less than zero).
 
 #### asString()
 Return the variable value as a String. Throws an exception if value is not a
@@ -117,7 +172,7 @@ Attempt to parse the variable to a Boolean. Throws an exception if parsing
 fails. The var must be set to either "true", "false" (upper or lowercase),
 0 or 1 to succeed.
 
-#### asStrictBool()
+#### asBoolStrict()
 Attempt to parse the variable to a Boolean. Throws an exception if parsing
 fails. The var must be set to either "true" or "false" (upper or lowercase) to
 succeed.
@@ -137,11 +192,19 @@ Reads an environment variable as a string, then splits it on each occurence of
 the specified _delimiter_. By default a comma is used as the delimiter. For
 example a var set to "1,2,3" would become ['1', '2', '3'].
 
+#### asUrlString()
+Verifies that the variable is a valid URL string and returns that string. Uses
+`is-url` to perform validation, so check that module for validation rules.
+
+#### asUrlObject()
+Verifies that the variable is a valid URL string, then parses it using
+`url.parse` from the Node.js core `url` module and returns the parsed Object.
+See the [Node.js docs](https://nodejs.org/api/url.html#url_url_parse_urlstring_parsequerystring_slashesdenotehost) for more info
 
 ## Example
 
 ```js
-var env = require('env-var');
+const env = require('env-var');
 
 // Normally these would be set using "export VARNAME" or similar in bash
 process.env.STRING = 'test';
@@ -152,28 +215,28 @@ process.env.COMMA_ARRAY = '1,2,3';
 process.env.DASH_ARRAY = '1-2-3';
 
 // The entire process.env object
-var allVars = env();
+const allVars = env.get();
 
 // Returns a string. Throws an exception if not set
-var stringVar = env('STRING').required().asString();
+const stringVar = env.get('STRING').required().asString();
 
 // Returns an int, undefined if not set, or throws if set to a non integer value
-var intVar = env('INTEGER').asInt();
+const intVar = env.get('INTEGER').asInt();
 
 // Return a float, or 23.2 if not set
-var floatVar = env('FLOAT', '23.2').asFloat();
+const floatVar = env.get('FLOAT', '23.2').asFloat();
 
 // Return a Boolean. Throws an exception if not set or parsing fails
-var boolVar = env('BOOL').required().asBool();
+const boolVar = env.get('BOOL').required().asBool();
 
 // Returns a JSON Object, undefined if not set, or throws if set to invalid JSON
-var jsonVar = env('JSON').asJson();
+const jsonVar = env.get('JSON').asJson();
 
 // Returns an array if defined, or undefined if not set
-var commaArray = env('COMMA_ARRAY').asArray();
+const commaArray = env.get('COMMA_ARRAY').asArray();
 
 // Returns an array if defined, or undefined if not set
-var commaArray = env('DASH_ARRAY').asArray('-');
+const commaArray = env.get('DASH_ARRAY').asArray('-');
 ```
 
 
@@ -186,7 +249,7 @@ throughout a test is and can get confusing and modifies global state (not good).
 It's better to use *env-var* and its built-in `mock()` function. Using `mock()`
 will allow you to create a mocked version of env-var which will use a literal
 object **instead** of using _process.env_. You can use this mocked version with
-something like Proxyquire. For example:
+something like `proxyquire`. For example:
 
 ```js
 /**
@@ -197,7 +260,7 @@ something like Proxyquire. For example:
 var env = require('env-var');
 
 exports.concat = function (envVarToGet) {
-  return envVarToGet + ' ' + env(envVarToGet).asString();
+  return envVarToGet + ' ' + env.get(envVarToGet).required().asString();
 };
 ```
 
@@ -235,13 +298,6 @@ describe('concat.js', function () {
 
 ```
 
-## TypeScript
-To use with TypeScript, just import it like this:
-```ts
-import env from 'get-env';
-
-const stringVar = env('STRING').required().asString();
-```
 
 ## Contributors
 * @MikeyBurkman

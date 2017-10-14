@@ -1,25 +1,39 @@
 
+/// <reference types="node" />
+
+import { Url } from 'url';
+
 interface IPresentVariable {
   /**
    * Attempt to parse the variable to a float. Throws an exception if parsing fails.
    */
-  asFloat: () => number;
+  asFloat: () => number|undefined;
+
+  /**
+   * Performs the same task as asFloat(), but also verifies that the number is positive (greater than zero).
+   */
+  asFloatPositive: () => number|undefined;
+
+  /**
+   * Performs the same task as asFloat(), but also verifies that the number is negative (less than zero).
+   */
+  asFloatNegative: () => number|undefined;
 
   /**
    * Attempt to parse the variable to an integer. Throws an exception if parsing fails.
    * This is a strict check, meaning that if the process.env value is 1.2, an exception will be raised rather than rounding up/down.
    */
-  asInt: () => number;
+  asInt: () => number|undefined;
 
   /**
-   * Performs the same task as asInt(), but also verifies that the number is positive (greater than or equal to zero).
+   * Performs the same task as asInt(), but also verifies that the number is positive (greater than zero).
    */
-  asPositiveInt: () => number;
+  asIntPositive: () => number|undefined;
 
   /**
    * Performs the same task as asInt(), but also verifies that the number is negative (less than zero).
    */
-  asNegativeInt: () => number;
+  asIntNegative: () => number|undefined;
 
   /**
    * Return the variable value as a String. Throws an exception if value is not a String.
@@ -59,6 +73,18 @@ interface IPresentVariable {
    * The var must be set to either "true" or "false" (upper or lowercase) to succeed.
    */
   asStrictBool: () => boolean;
+
+  /**
+   * Verifies that the environment variable begin accessed is a valid URL and
+   * returns it as a string. Uses the "is-url" module
+   */
+  asUrlString: () => string;
+
+  /**
+   * Verifies that the environment variable begin accessed is a valid URL and
+   * returns it as a core URL object. Uses the "is-url" module.
+   */
+  asUrlObject: () => Url;
 }
 
 interface IOptionalVariable {
@@ -73,20 +99,30 @@ interface IOptionalVariable {
   asFloat: () => number|undefined;
 
   /**
+   * Performs the same task as asFloat(), but also verifies that the number is positive (greater than zero).
+   */
+  asFloatPositive: () => number|undefined;
+
+  /**
+   * Performs the same task as asFloat(), but also verifies that the number is negative (less than zero).
+   */
+  asFloatNegative: () => number|undefined;
+
+  /**
    * Attempt to parse the variable to an integer. Throws an exception if parsing fails.
    * This is a strict check, meaning that if the process.env value is 1.2, an exception will be raised rather than rounding up/down.
    */
   asInt: () => number|undefined;
 
   /**
-   * Performs the same task as asInt(), but also verifies that the number is positive (greater than or equal to zero).
+   * Performs the same task as asInt(), but also verifies that the number is positive (greater than zero).
    */
-  asPositiveInt: () => number|undefined;
+  asIntPositive: () => number|undefined;
 
   /**
    * Performs the same task as asInt(), but also verifies that the number is negative (less than zero).
    */
-  asNegativeInt: () => number|undefined;
+  asIntNegative: () => number|undefined;
 
   /**
    * Return the variable value as a String. Throws an exception if value is not a String.
@@ -126,28 +162,49 @@ interface IOptionalVariable {
    * The var must be set to either "true" or "false" (upper or lowercase) to succeed.
    */
   asStrictBool: () => boolean|undefined;
+
+  /**
+   * Verifies that the environment variable begin accessed is a valid URL and
+   * returns it as a string. Uses the "is-url" module
+   */
+  asUrlString: () => string;
+
+  /**
+   * Verifies that the environment variable begin accessed is a valid URL and
+   * returns it as a core URL object. Uses the "is-url" module.
+   */
+  asUrlObject: () => Url;
 }
+
+declare class EnvVarError extends Error {}
 
 interface IEnv {
   /**
    * Returns an object containing all current environment variables
    */
-  (): {[varName: string]: string},
+  get (): {[varName: string]: string},
 
   /**
    * Gets an environment variable that is possibly not set to a value
    */
-  (varName: string): IOptionalVariable;
+  get (varName: string): IOptionalVariable;
 
   /**
    * Gets an environment variable, using the default value if it is not already set
    */
-  (varName: string, defaultValue: string): IPresentVariable;
+  get (varName: string, defaultValue: string): IPresentVariable;
 
   /**
-   * Returns a mock env-var instance, where the given object is used for the environment variable mapping. Use this when writing unit tests.
+   * Returns a mock env-var instance, where the given object is used for the environment variable mapping.
+   * Use this when writing unit tests.
    */
   mock(mockVars: {[varName: string]: string}): IEnv;
+
+  /**
+   * This is the error type used to represent error returned by this module.
+   * Useful for filtering errors and responding appropriately.
+   */
+  EnvVarError: EnvVarError
 }
 
 declare const env: IEnv;
