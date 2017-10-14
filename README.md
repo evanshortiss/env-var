@@ -298,7 +298,40 @@ describe('concat.js', function () {
 
 ```
 
-
 ## Contributors
 * @MikeyBurkman
 * @itavy
+
+
+## Contributing
+Contributions are welcomed. If you'd like to discuss an idea open an issue, or a
+PR with an initial implementation.
+
+If you want to add a new type it's pretty easy. Add a file to `lib/accessors`,
+with the name of the type e.g add a file named `number-zero.js` into that folder
+and populate it with code following this structure:
+
+```js
+/**
+ * Validate that the environment value is an integer and equals zero.
+ * @param {Function} raiseError use this to raise a cleanly formatted error
+ * @param {String}   environmentValue this is the string from process.env
+ */
+module.exports = function numberZero (raiseError, environmentValue) {
+  const val = parseInt(environmentValue)
+
+  if (val === 0) {
+    return ret;
+  } else {
+    raiseError('should be zero')
+  }
+}
+```
+
+The `env-var` module will auto load this new file and add it to the public
+exports with the name in camelcase format `asNumberZero`
+
+```js
+// Uses your new function to ensure the SOME_NUMBER is the integer 0
+env.get('SOME_NUMBER').asNumberZero()
+```

@@ -36,6 +36,7 @@
   "license": "MIT",
   "files": [
     "lib/",
+    "env-var.js",
     "env-var.d.ts"
   ],
   "bugs": {
