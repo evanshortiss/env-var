@@ -36,7 +36,7 @@ _asStrictBool_ function
 ## 2.1.0 (25/10/2016)
 * Added _env.mock_ PR from @MikeyBurkman to improve testability
 
-## 2.0.0 (27/08/2016)
+## 2.0.0 (27/07/2016)
 * Add CI process for node 6, 5, 4, and 0.10
 * Add chained functions for variable validations
 * Add assertions for _required()_ and various type checks, e.g _asPositiveInt(_)
