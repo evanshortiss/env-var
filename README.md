@@ -5,7 +5,7 @@
 [![npm version](https://badge.fury.io/js/env-var.svg)](https://badge.fury.io/js/env-var)
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-solution for loading and sanatizing environment variables in node.js with correct typings
+solution for loading and sanitizing environment variables in node.js with correct typings
 
 ## Install
 

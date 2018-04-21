@@ -1,7 +1,7 @@
 {
   "name": "env-var",
   "version": "3.2.0",
-  "description": "Solution for loading and sanatizing environment variables in node.js with correct typings",
+  "description": "Solution for loading and sanitizing environment variables in node.js with correct typings",
   "main": "env-var.js",
   "typings": "env-var.d.ts",
   "scripts": {
