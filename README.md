@@ -136,6 +136,9 @@ const PORT = env.get('PORT').required().asIntPositive()
 
 app.listen(PORT)
 ```
+#### asEnum(validValues: string[])
+Converts the value to a string, and matches against the list of valid values.
+If the value is not valid, an error will be raised describing valid input.
 
 #### asInt()
 Attempt to parse the variable to an integer. Throws an exception if parsing

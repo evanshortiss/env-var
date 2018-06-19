@@ -16,7 +16,8 @@ describe('env-var', function () {
     JSON_ARRAY: '[1,2,3]',
     COMMA_ARRAY: '1,2,3',
     DASH_ARRAY: '1-2-3',
-    URL: 'http://google.com'
+    URL: 'http://google.com',
+    ENUM: 'VALID',
   }
 
   var mod = require('../env-var.js')
@@ -45,6 +46,19 @@ describe('env-var', function () {
       const ret = mod.get('XXX_NOT_DEFINED', 'default').asString()
 
       expect(ret).to.equal('default')
+    })
+  })
+
+  describe('#asEnum', function() {
+    it('should return a string', function () {
+      expect(mod.get('ENUM').asEnum(['VALID'])).to.be.a('string')
+      expect(mod.get('ENUM').asEnum(['VALID'])).to.equal('VALID')
+    })
+
+    it('should throw when value is not expected', function () {
+      expect(() => {
+        expect(mod.get('ENUM').asEnum(['INVALID']))
+      }).to.throw('env-var: "ENUM" should be a one of [INVALID], but was "VALID"')
     })
   })
 
