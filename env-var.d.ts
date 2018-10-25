@@ -5,6 +5,11 @@ import { Url } from 'url';
 
 interface IPresentVariable {
   /**
+   * Converts a bas64 environment variable to ut8
+   */
+  convertFromBase64: () => IPresentVariable
+
+  /**
    * Attempt to parse the variable to a float. Throws an exception if parsing fails.
    */
   asFloat: () => number;
@@ -93,6 +98,11 @@ interface IPresentVariable {
 }
 
 interface IOptionalVariable {
+  /**
+   * Converts a bas64 environment variable to ut8
+   */
+  convertFromBase64: () => IOptionalVariable
+
   /**
    * Ensure the variable is set on process.env, if not an exception will be thrown.
    */

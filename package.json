@@ -1,7 +1,7 @@
 {
   "name": "env-var",
-  "version": "3.3.0",
-  "description": "Solution for loading and sanitizing environment variables in node.js with correct typings",
+  "version": "3.4.0",
+  "description": "Verification, sanatization, and type coercion for environment variables in Node.js",
   "main": "env-var.js",
   "typings": "env-var.d.ts",
   "scripts": {
@@ -30,7 +30,9 @@
     "env-var",
     "envvar",
     "config",
-    "configuration"
+    "configuration",
+    "typescript",
+    "ts"
   ],
   "author": "Evan Shortiss",
   "license": "MIT",

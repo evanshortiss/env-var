@@ -3,9 +3,10 @@
 [![Travis CI](https://travis-ci.org/evanshortiss/env-var.svg?branch=master)](https://travis-ci.org/evanshortiss/env-var)
 [![Coverage Status](https://coveralls.io/repos/github/evanshortiss/env-var/badge.svg?branch=master)](https://coveralls.io/github/evanshortiss/env-var?branch=master)
 [![npm version](https://badge.fury.io/js/env-var.svg)](https://badge.fury.io/js/env-var)
-[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/) [![Greenkeeper badge](https://badges.greenkeeper.io/evanshortiss/env-var.svg)](https://greenkeeper.io/)
+[![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/evanshortiss/env-var.svg)](https://greenkeeper.io/)
 
-solution for loading and sanitizing environment variables in node.js with correct typings
+Verification, sanatization, and type coercion for environment variables in Node.js
 
 ## Install
 
@@ -13,40 +14,43 @@ solution for loading and sanitizing environment variables in node.js with correc
 npm install env-var --save
 ```
 
-## Example
-In the example below we read the environment variable *PARALLEL_LIMIT*, ensure
-it is set, and parse it to an integer.
+## Usage
+In the example below we read the environment variable *DB_PASSWORD*
 
 ```js
-const LIMIT = env.get('LIMIT').required().asIntPositive();
+const env = require('env-var');
+
+const PASSWORD = env.get('DB_PASSWORD')
+  // Optional: Throws an error if the DB_PASSWORD variable is not set
+  .required()
+  // Optional: Convert DB_PASSWORD from base64 to a regular utf8 string
+  .convertFromBase64()
+  // Required: Call asString (or other methods) to get the value of the variable
+  .asString();
 ```
 
-Here's what each piece of this code means:
-
-1. If *LIMIT* is not set _required()_ will raise an exception.
-2. If it is set, but not a positive integer _asIntPositive()_ will raise an
-exception.
-3. If #1 and #2 do not raise an exception, the number will be returned as a
-valid JavaScript number type.
-
-
-## TypeScript
-To use with TypeScript, just import and use the same as JavaScript:
+## TypeScript / ES6
 
 ```ts
 import * as env from 'env-var';
 
-const LIMIT = env.get('LIMIT').required().asIntPositive();
+// Read a PORT environment variable and verify it's a positive integer
+const PORT = env.get('PORT').required().asIntPositive();
 ```
 
-## Overview
-Over time it became apparent that parsing environment variables is a
-repetitive task, and testing code that relies on can be cumbersome.
-
-Take this example:
+## Why use this?
+Because this:
 
 ```js
-var assert = require('assert');
+const env = require('env-var');
+
+const MAX_BATCH_SIZE = env.get('MAX_BATCH_SIZE').required().asInt();
+```
+
+Is nicer than this:
+
+```js
+const assert = require('assert');
 
 // Our program requires this var to be set
 assert.notEqual(
@@ -56,7 +60,7 @@ assert.notEqual(
 );
 
 // Read the var, and use parseInt to make it a number
-var MAX_BATCH_SIZE = parseInt(process.env.MAX_BATCH_SIZE, 10);
+const MAX_BATCH_SIZE = parseInt(process.env.MAX_BATCH_SIZE, 10);
 
 // Check the var is a valid number, if not throw
 assert(
@@ -65,36 +69,28 @@ assert(
 );
 ```
 
-With *env-var* the example above can be written cleanly as:
-
-```js
-var env = require('env-var');
-
-var MAX_BATCH_SIZE = env.get('MAX_BATCH_SIZE').required().asInt();
-```
-
-When it comes to testing code that relies on environment variables this is also
-great since you can mock out *env-var* using *proxyquire* to easily alter
-results returned without having to share state via *process.env*. A
-demonstration of this is at the bottom of the README.
-
-
 ## API
 
 ### env.get([varname, [default]])
 You can call this function 3 different ways:
 
-1. Calling without arguments will return the entire _process.env_ Object.
-2. Calling with _varname_ will return a _variable_ instance with utilities for
-parsing variables and is detailed below.
-3. Calling with _varname_, and _default_ will return the value for _varname_
-set on process.env, or if the variable is not set _default_ run through the
-variable instance functions as though it was set on *process.env*.
+```js
+const env = require('env-var')
+
+// #1 - Return the requested variable (we're also checking it's a positive int)
+const limit = env.get('SOME_LIMIT').asIntPositive()
+
+// #2 - Return the requested variable, or use the given default if it isn't set
+const limit = env.get('SOME_LIMIT', '10').asIntPositive()
+
+// #3 - Return the environment object (process.env)
+const allvars = env.get()
+```
 
 
 ### env.EnvVarError
-This is the error class used to represent errors raised by this module. You can
-use it like so:
+This is the error class used to represent errors raised by this module. Sample
+usage:
 
 ```js
 const env = require('env-var')
@@ -115,14 +111,13 @@ try {
 ```
 
 ### variable
-A returned variable has the following functions defined for parsing to the
-required format.
+A variable is returned by calling `env.get`. It has the exposes the following
+functions to validate and access the underlying value.
 
 #### required()
-Ensure the variable is set on *process.env*. If the variable is not set, then
-this function will throw an `EnvVarError`. Typically you will use this during
-the initialisation of your program in order to fail fast if a required variable
-is not set.
+Ensure the variable is set on *process.env*. If the variable is not set this
+function will throw an `EnvVarError`. If the variable is set it returns itself
+so you can access the underlying variable.
 
 For example:
 
@@ -136,6 +131,21 @@ const PORT = env.get('PORT').required().asIntPositive()
 
 app.listen(PORT)
 ```
+
+#### convertFromBase64()
+Sometimes environment variables need to be encoded as base64. You can use this
+function to convert them before reading their value.
+
+For example if we run the script script below, using the command `DB_PASSWORD=
+$(echo -n 'secret_password' | base64) node`, we'd get the following results:
+
+```js
+console.log(process.env.DB_PASSWORD) // prints "c2VjcmV0X3Bhc3N3b3Jk"
+
+// dbpass will contain the value "secret_password"
+const dbpass = env.get('DB_PASSWORD').convertFromBase64().asString()
+```
+
 #### asEnum(validValues: string[])
 Converts the value to a string, and matches against the list of valid values.
 If the value is not valid, an error will be raised describing valid input.
@@ -203,7 +213,21 @@ Verifies that the variable is a valid URL string, then parses it using
 `url.parse` from the Node.js core `url` module and returns the parsed Object.
 See the [Node.js docs](https://nodejs.org/api/url.html#url_url_parse_urlstring_parsequerystring_slashesdenotehost) for more info
 
-## Example
+#### mock(valuesMap)
+Can be used during testing for mocking of environment variables.
+
+```js
+const env = require('env-var')
+
+const mockedEnv = env.mock({
+  API_BASE_URL: 'https://my.api.com/'
+})
+
+// apiUrl will be 'https://my.api.com/'
+const apiUrl = mockedEnv.get('API_BASE_URL').asUrlString()
+```
+
+## Examples
 
 ```js
 const env = require('env-var');
@@ -240,67 +264,8 @@ const commaArray = env.get('COMMA_ARRAY').asArray();
 // Returns an array if defined, or undefined if not set
 const commaArray = env.get('DASH_ARRAY').asArray('-');
 
-// Returns the enum value if it's valid
-const enumVal = env.get('STRING').asEnum(['dev', 'test', 'live'])
-```
-
-
-## Testing Overview
-
-When testing code that relies on environment variables sometimes we need to
-mock out/set the environment variables. Having calls to _process.env_ strewn
-throughout a test is and can get confusing and modifies global state (not good).
-
-It's better to use *env-var* and its built-in `mock()` function. Using `mock()`
-will allow you to create a mocked version of env-var which will use a literal
-object **instead** of using _process.env_. You can use this mocked version with
-something like `proxyquire`. For example:
-
-```js
-/**
- * filename: concat.js
- * Reads in a var and constructs a string by adding the var name plus its value
- */
-
-var env = require('env-var');
-
-exports.concat = function (envVarToGet) {
-  return envVarToGet + ' ' + env.get(envVarToGet).required().asString();
-};
-```
-
-```js
-/**
- * filename: concat.test.js
- * Reads in a var and constructs a string by adding the var name plus its value
- */
-
-var expect = require('chai').expect;
-var proxyquire = require('proxyquire');
-var env = require('env-var');
-
-describe('concat.js', function () {
-
-  var mod;
-
-  beforeEach(function () {
-    // Require our concat file, but replace env-var with a mocked version.
-    // This mocked version will NOT use process.env
-    mod = proxyquire('./concat', {
-      'env-var': env.mock({
-        HELLO: 'WORLD'
-      })
-    });
-
-  });
-
-  describe('#concat', function () {
-    it('should combine our var name and its returned value', function () {
-      expect(mod.concat('HELLO')).to.equal('HELLO WORLD');
-    });
-  });
-});
-
+// Returns the enum value if it's one of dev, test, or live
+const enumVal = env.get('ENVIRONMENT').asEnum(['dev', 'test', 'live'])
 ```
 
 ## Contributors
@@ -310,12 +275,11 @@ describe('concat.js', function () {
 * @MikeyBurkman
 * @rmblstrp
 
-
 ## Contributing
 Contributions are welcomed. If you'd like to discuss an idea open an issue, or a
 PR with an initial implementation.
 
-If you want to add a new type it's pretty easy. Add a file to `lib/accessors`,
+If you want to add a new type it's easy. Add a file to `lib/accessors`,
 with the name of the type e.g add a file named `number-zero.js` into that folder
 and populate it with code following this structure:
 

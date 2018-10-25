@@ -4,6 +4,13 @@ import * as assert from 'assert';
 import * as url from 'url';
 
 function test () {
+  // BASE 64
+  process.env.BASE64 = 'aGVsbG8='
+  assert.equal(
+    env.get('BASE64').required().convertFromBase64().asString(),
+    process.env.STRING
+  )
+
   // STRINGS
   process.env.STRING = 'string'
   assert.equal(env.get('STRING').required().asString(), process.env.STRING)

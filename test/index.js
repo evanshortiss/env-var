@@ -7,6 +7,8 @@ var expect = require('chai').expect
 describe('env-var', function () {
   // Some default env vars for tests
   var TEST_VARS = {
+    VALID_BASE_64: 'aGVsbG8=', // "hello" in base64
+    INVALID_BASE_64: 'a|GV-sb*G8=',
     STRING: 'oh hai',
     FLOAT: '12.43',
     INTEGER: '5',
@@ -17,7 +19,7 @@ describe('env-var', function () {
     COMMA_ARRAY: '1,2,3',
     DASH_ARRAY: '1-2-3',
     URL: 'http://google.com',
-    ENUM: 'VALID',
+    ENUM: 'VALID'
   }
 
   var mod = require('../env-var.js')
@@ -49,7 +51,22 @@ describe('env-var', function () {
     })
   })
 
-  describe('#asEnum', function() {
+  describe('#convertFromBase64', function () {
+    it('should return a value from a converted base64 string', function () {
+      const res = mod.get('VALID_BASE_64').convertFromBase64().asString()
+
+      expect(res).to.be.a('string')
+      expect(res).to.equal('hello')
+    })
+
+    it('should throw an error due to malformed base64', function () {
+      expect(() => {
+        mod.get('INVALID_BASE_64').convertFromBase64().asString()
+      }).throw(/"INVALID_BASE_64" should be a valid base64 string if using convertFromBase64, but was "a|GV-sb*G8="/g)
+    })
+  })
+
+  describe('#asEnum', function () {
     it('should return a string', function () {
       expect(mod.get('ENUM').asEnum(['VALID'])).to.be.a('string')
       expect(mod.get('ENUM').asEnum(['VALID'])).to.equal('VALID')
