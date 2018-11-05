@@ -77,7 +77,7 @@ interface IPresentVariable {
    * Attempt to parse the variable to a Boolean. Throws an exception if parsing fails.
    * The var must be set to either "true" or "false" (upper or lowercase) to succeed.
    */
-  asStrictBool: () => boolean;
+  asBoolStrict: () => boolean;
 
   /**
    * Verifies that the environment variable being accessed is a valid URL and
@@ -176,7 +176,7 @@ interface IOptionalVariable {
    * Attempt to parse the variable to a Boolean. Throws an exception if parsing fails.
    * The var must be set to either "true" or "false" (upper or lowercase) to succeed.
    */
-  asStrictBool: () => boolean|undefined;
+  asBoolStrict: () => boolean|undefined;
 
   /**
    * Verifies that the environment variable being accessed is a valid URL and

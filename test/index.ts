@@ -50,7 +50,7 @@ function test () {
   process.env.BOOL_STRICT = 'true'
 
   const asBool = env.get('BOOL').required().asBool();
-  const asBoolStrict = env.get('BOOL_STRICT').asStrictBool();
+  const asBoolStrict = env.get('BOOL_STRICT').asBoolStrict();
 
   assert.equal(asBool, false)
   assert.equal(asBoolStrict, true)
