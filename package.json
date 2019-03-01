@@ -47,7 +47,7 @@
   },
   "homepage": "https://github.com/evanshortiss/env-var",
   "devDependencies": {
-    "@types/node": "~11.9.0",
+    "@types/node": "~11.10.0",
     "bluebird": "~3.5.1",
     "chai": "~4.2.0",
     "coveralls": "~3.0.0",
