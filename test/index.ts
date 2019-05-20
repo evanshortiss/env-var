@@ -78,6 +78,11 @@ function test () {
 
   assert.equal(env.get('URL_STRING').asUrlObject(), url.parse(process.env.URL_STRING))
   assert.equal(env.get('URL_STRING').asUrlString(), 'http://google.com')
+
+  // FROM
+  const newEnv = env.from(process.env)
+  assert.equal(newEnv.get('STRING').required().asString(), process.env.STRING)
+  assert.equal(newEnv.get('SOME_STRING').asString(), process.env.STRING)
 }
 
 export default test;
