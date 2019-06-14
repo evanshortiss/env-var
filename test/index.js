@@ -20,6 +20,7 @@ describe('env-var', function () {
     EMPTY_ARRAY: '',
     ARRAY_WITHOUT_DELIMITER: 'value',
     ARRAY_WITH_DELIMITER: 'value,',
+    ARRAY_WITH_DELIMITER_PREFIX: ',value',
     DASH_ARRAY: '1-2-3',
     URL: 'http://google.com',
     ENUM: 'VALID'
@@ -442,6 +443,10 @@ describe('env-var', function () {
 
     it('should return array with only one value if env var contain delimiter', function () {
       expect(mod.get('ARRAY_WITH_DELIMITER').asArray()).to.deep.equal(['value'])
+    })
+
+    it('should return array with only one value if env var contain delimiter as prefix', function () {
+      expect(mod.get('ARRAY_WITH_DELIMITER_PREFIX').asArray()).to.deep.equal(['value'])
     })
   })
 
