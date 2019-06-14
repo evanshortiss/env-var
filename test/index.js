@@ -2,7 +2,8 @@
 
 /* eslint-env mocha */
 
-var expect = require('chai').expect
+const expect = require('chai').expect
+const URL = require('url').URL
 
 describe('env-var', function () {
   // Some default env vars for tests
