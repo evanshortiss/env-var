@@ -17,6 +17,9 @@ describe('env-var', function () {
     JSON_OBJECT: '{"name":"value"}',
     JSON_ARRAY: '[1,2,3]',
     COMMA_ARRAY: '1,2,3',
+    EMPTY_ARRAY: '',
+    ARRAY_WITHOUT_DELIMITER: 'value',
+    ARRAY_WITH_DELIMITER: 'value,',
     DASH_ARRAY: '1-2-3',
     URL: 'http://google.com',
     ENUM: 'VALID'
@@ -421,20 +424,24 @@ describe('env-var', function () {
       expect(mod.get('.NOPE.').asArray()).to.equal(undefined)
     })
 
-    it('should raise an error if set incorrectly', function () {
-      process.env.COMMA_ARRAY = ''
-
-      expect(() => {
-        mod.get('COMMA_ARRAY').asArray()
-      }).to.throw('should include values separated with the delimeter ","')
-    })
-
     it('should return an array that was split on commas', function () {
       expect(mod.get('COMMA_ARRAY').asArray()).to.deep.equal(['1', '2', '3'])
     })
 
     it('should return an array that was split on dashes', function () {
       expect(mod.get('DASH_ARRAY').asArray('-')).to.deep.equal(['1', '2', '3'])
+    })
+
+    it('should return an empty array if empty env var was set', function () {
+      expect(mod.get('EMPTY_ARRAY').asArray()).to.deep.equal([])
+    })
+
+    it('should return array with only one value if env var doesn\'t contain delimiter', function () {
+      expect(mod.get('ARRAY_WITHOUT_DELIMITER').asArray()).to.deep.equal(['value'])
+    })
+
+    it('should return array with only one value if env var contain delimiter', function () {
+      expect(mod.get('ARRAY_WITH_DELIMITER').asArray()).to.deep.equal(['value'])
     })
   })
 
