@@ -1,4 +1,10 @@
-## 4.1.0 (11/06/19)
+## 5.0.0 (14/06/19)
+* Return values from `asArray()` are now more intuitive & consitent
+* `asUrlString()` and `asUrlObject`now use the built-in `URL` class in Node.js
+to perform validation
+* README updated in accordance with changes listed above
+
+## 4.1.0 (14/06/19)
 * Add `asPortNumber()` function
 * Update documentation structure
 

@@ -35,6 +35,9 @@ some functions to verify it satisfies our program's needs.
 ```js
 const env = require('env-var');
 
+// Or using import syntax:
+// import * as env from 'env-var'
+
 const PASSWORD = env.get('DB_PASSWORD')
   // Throws an error if the DB_PASSWORD variable is not set (optional)
   .required()
@@ -176,7 +179,7 @@ app.listen(PORT)
 
 #### convertFromBase64()
 Sometimes environment variables need to be encoded as base64. You can use this
-function to convert them before reading their value.
+function to convert them to UTF-8 strings before parsing them.
 
 For example if we run the script script below, using the command `DB_PASSWORD=
 $(echo -n 'secret_password' | base64) node`, we'd get the following results:
@@ -184,7 +187,7 @@ $(echo -n 'secret_password' | base64) node`, we'd get the following results:
 ```js
 console.log(process.env.DB_PASSWORD) // prints "c2VjcmV0X3Bhc3N3b3Jk"
 
-// dbpass will contain the value "secret_password"
+// dbpass will contain the converted value of "secret_password"
 const dbpass = env.get('DB_PASSWORD').convertFromBase64().asString()
 ```
 
@@ -249,16 +252,22 @@ The same as _asJson_ but checks that the data is a JSON Object, e.g {a: 1}.
 #### asArray([delimiter: string])
 Reads an environment variable as a string, then splits it on each occurence of
 the specified _delimiter_. By default a comma is used as the delimiter. For
-example a var set to "1,2,3" would become ['1', '2', '3'].
+example a var set to "1,2,3" would become ['1', '2', '3']. Example outputs for
+specific values are:
+
+* Reading `MY_ARRAY=''` results in `[]`
+* Reading `MY_ARRAY='1'` results in `['1']`
+* Reading `MY_ARRAY='1,2,3'` results in `['1', '2', '3']`
 
 #### asUrlString()
-Verifies that the variable is a valid URL string and returns that string. Uses
-`is-url` to perform validation, so check that module for validation rules.
+Verifies that the variable is a valid URL string and returns the validated
+string. The validation is performed by passing the URL string to the
+[Node.js URL Constructor](https://nodejs.org/docs/latest/api/url.html).
 
 #### asUrlObject()
-Verifies that the variable is a valid URL string, then parses it using
-`url.parse` from the Node.js core `url` module and returns the parsed Object.
-See the [Node.js docs](https://nodejs.org/api/url.html#url_url_parse_urlstring_parsequerystring_slashesdenotehost) for more info
+Verifies that the variable is a valid URL string using the same method as
+`asUrlString()`, but instead returns the resulting URL instance. For details
+see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html).
 
 ## Examples
 
@@ -300,15 +309,6 @@ const commaArray = env.get('DASH_ARRAY').asArray('-');
 // Returns the enum value if it's one of dev, test, or live
 const enumVal = env.get('ENVIRONMENT').asEnum(['dev', 'test', 'live'])
 ```
-
-## Contributors
-* @caccialdo
-* @evanshortiss
-* @hhravn
-* @itavy
-* @MikeyBurkman
-* @pepakriz
-* @rmblstrp
 
 ## Contributing
 Contributions are welcomed. If you'd like to discuss an idea open an issue, or a
@@ -353,3 +353,13 @@ Once you've done that, add some unit tests and use it like so:
 // Uses your new function to ensure the SOME_NUMBER is the integer 0
 env.get('SOME_NUMBER').asNumberZero()
 ```
+
+## Contributors
+* @caccialdo
+* @evanshortiss
+* @gabrieloczkowski
+* @hhravn
+* @itavy
+* @MikeyBurkman
+* @pepakriz
+* @rmblstrp

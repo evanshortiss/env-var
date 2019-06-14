@@ -22,7 +22,7 @@ describe('env-var', function () {
     ARRAY_WITH_DELIMITER: 'value,',
     ARRAY_WITH_DELIMITER_PREFIX: ',value',
     DASH_ARRAY: '1-2-3',
-    URL: 'http://google.com',
+    URL: 'http://google.com/',
     ENUM: 'VALID'
   }
 
@@ -107,8 +107,7 @@ describe('env-var', function () {
 
   describe('#asUrlObject', function () {
     it('should return a url object', function () {
-      expect(mod.get('URL').asUrlObject()).to.be.a('object')
-      expect(mod.get('URL').asUrlObject()).to.deep.equal(require('url').parse(process.env.URL))
+      expect(mod.get('URL').asUrlObject()).to.be.an.instanceOf(URL)
     })
 
     it('should throw due to bad url', function () {
