@@ -539,13 +539,26 @@ describe('env-var', function () {
       expect(gotten).not.to.have.property('asWhisper')
     })
 
-    it('allows overriding existing accessors', function () {
+    it('should allow overriding existing accessors', function () {
       fromMod.addAccessor('asString', function (raiseError, value) {
         // https://stackoverflow.com/a/959004
         return value.split('').reverse().join('')
       })
 
       expect(fromMod.get('STRING').asString()).to.equal('!dlrow ,olleH')
+    })
+
+    it('should not attach accessors to other env instances', function() {
+      var otherMod = mod.from({
+        STRING: 'Hola, mundo!'
+      })
+
+      fromMod.addAccessor('asNull', function (raiseError, value) {
+        return null
+      })
+
+      expect(fromMod.get('STRING')).to.have.property('asNull')
+      expect(otherMod.get('STRING')).not.to.have.property('asNull')
     })
   })
 })
