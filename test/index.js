@@ -507,18 +507,18 @@ describe('env-var', function () {
     })
   })
 
-  describe('#addAccessor', function() {
+  describe('#addAccessor', function () {
     // Use `from` to avoid polluting global env's namespace.
     var fromMod
 
-    beforeEach(function() {
+    beforeEach(function () {
       fromMod = mod.from({
         STRING: 'Hello, world!'
       })
     })
 
-    it('should add custom accessors to subsequent gotten values', function() {
-      fromMod.addAccessor('asShout', function(raiseError, value) {
+    it('should add custom accessors to subsequent gotten values', function () {
+      fromMod.addAccessor('asShout', function (raiseError, value) {
         return value.toUpperCase()
       })
 
@@ -528,19 +528,19 @@ describe('env-var', function () {
       expect(gotten.asShout()).to.equal('HELLO, WORLD!')
     })
 
-    it('should not affect previously-gotten values', function() {
+    it('should not affect previously-gotten values', function () {
       // Get the value before adding custom accessor.
       var gotten = fromMod.get('STRING')
 
-      fromMod.addAccessor('asWhisper', function(raiseError, value) {
+      fromMod.addAccessor('asWhisper', function (raiseError, value) {
         return value.toLowerCase()
       })
 
       expect(gotten).not.to.have.property('asWhisper')
     })
 
-    it('allows overriding existing accessors', function() {
-      fromMod.addAccessor('asString', function(raiseError, value) {
+    it('allows overriding existing accessors', function () {
+      fromMod.addAccessor('asString', function (raiseError, value) {
         // https://stackoverflow.com/a/959004
         return value.split('').reverse().join('')
       })
