@@ -548,7 +548,7 @@ describe('env-var', function () {
       expect(fromMod.get('STRING').asString()).to.equal('!dlrow ,olleH')
     })
 
-    it('should not attach accessors to other env instances', function() {
+    it('should not attach accessors to other env instances', function () {
       var otherMod = mod.from({
         STRING: 'Hola, mundo!'
       })
