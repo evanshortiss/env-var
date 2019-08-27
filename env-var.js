@@ -9,14 +9,26 @@ const variable = require('./lib/variable')
  * @return {Object} a new module instance
  */
 const from = (container) => {
+  var _extraAccessors = {}
+
   return {
     from: from,
 
     /**
      * This is the Error class used to generate exceptions. Can be used to identify
-     * exceptions adn handle them appropriatly.
+     * exceptions and handle them appropriatly.
      */
     EnvVarError: require('./lib/env-error'),
+
+    /**
+     * Adds a custom accessor to subsequent variables.
+     *
+     * @param  {String} name Name of the accessor (i.e., function name).
+     * @param  {Function} accessor Accessor function.
+     */
+    addAccessor: (name, accessor) => {
+      _extraAccessors[name] = accessor
+    },
 
     /**
      * Returns a variable instance with helper functions, or process.env
@@ -29,7 +41,7 @@ const from = (container) => {
         return container
       }
 
-      return variable(container, variableName, defaultValue)
+      return variable(container, variableName, defaultValue, _extraAccessors)
     }
   }
 }
