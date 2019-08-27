@@ -17,6 +17,7 @@ Verification, sanatization, and type coercion for environment variables in
 Node.js. Particularly useful in TypeScript environments.
 
 ## Install
+**Note:** env-var requires Node version 8 or later.
 
 ### npm
 ```
@@ -79,7 +80,7 @@ complex to understand as [demonstrated here](https://gist.github.com/evanshortis
       * [required()](#requiredisrequired--true)
       * [covertFromBase64()](#convertfrombase64)
       * [asArray()](#asarraydelimiter-string)
-      * [asBoolStrict()](#asBoolStrict)
+      * [asBoolStrict()](#asboolstrict)
       * [asBool()](#asbool)
       * [asPortNumer()](#asportnumber)
       * [asEnum()](#asenumvalidvalues-string)
@@ -95,6 +96,7 @@ complex to understand as [demonstrated here](https://gist.github.com/evanshortis
       * [asString()](#asstring)
       * [asUrlObject()](#asurlobject)
       * [asUrlString()](#asurlstring)
+  * [addAccessor()](#addaccessorname-accessor)
 
 ### EnvVarError()
 This is the error class used to represent errors raised by this module. Sample
@@ -269,6 +271,96 @@ Verifies that the variable is a valid URL string using the same method as
 `asUrlString()`, but instead returns the resulting URL instance. For details
 see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html).
 
+### addAccessor(name, accessor)
+Adds a custom accessor to an env-var instance.  This method takes two arguments:
+
+- `{String} name`: The name of the accessor method.  This will be the name used
+  to invoke the accessor on the [variable](#variable).
+- `{Function} accessor`: The corresponding accessor function.
+
+Accessor functions must accept at least two arguments:
+
+- `{Function} raiseError`: If the accessor fails to process a value, it must
+  call this function instead of throwing an exception.
+- `{*} value`: The value that the accessor should process.
+
+**Important:** Do not assume that `value` is a string!
+
+Example:
+```js
+const env = require('env-var')
+
+// Environment variable that we will use for this example:
+process.env.ADMIN = 'admin@example.com'
+
+// Add an accessor named 'checkEmail' that verifies that the value is a
+// valid-looking email address.
+env.addAccessor('checkEmail', (raiseError, value) => {
+  const split = String(value).split('@')
+
+  // Validating email addresses is hard.
+  if (split.length !== 2) {
+    raiseError('must contain exactly one "@"')
+  }
+
+  return value
+})
+
+// We specified 'checkEmail' as the name for the accessor when we called
+// `addAccessor()` above, so now we can call `checkEmail()` like any
+// other accessor.
+let validEmail = env.get('ADMIN').checkEmail()
+```
+
+The accessor function may accept additional arguments if desired; these must be
+provided explicitly when the accessor is invoked.
+
+For example, we can modify the `checkEmail()` accessor so that it optionally
+verifies the domain of the email address:
+```js
+const env = require('env-var')
+
+// Environment variable that we will use for this example:
+process.env.ADMIN = 'admin@example.com'
+
+// Add an accessor named 'checkEmail' that verifies that the value is a
+// valid-looking email address.
+//
+// Note that the accessor function also accepts an optional third
+// parameter `requiredDomain` which can be provided when the accessor is
+// invoked (see below).
+env.addAccessor('checkEmail', (raiseError, value, requiredDomain) => {
+  const split = String(value).split('@')
+
+  // Validating email addresses is hard.
+  if (split.length !== 2) {
+    raiseError('must contain exactly one "@"')
+  }
+
+  if (requiredDomain && (split[1] !== requiredDomain)) {
+    raiseError(`must end with @${requiredDomain}`)
+  }
+
+  return value
+})
+
+// We specified 'checkEmail' as the name for the accessor when we called
+// `addAccessor()` above, so now we can call `checkEmail()` like any
+// other accessor.
+//
+// `env-var` will provide the first two arguments for the accessor
+// function (`raiseError` and `value`), but we declared a third argument
+// `requiredDomain`, which we can provide when we invoke the accessor.
+
+// Calling the accessor without additional parameters accepts an email
+// address with any domain.
+let validEmail = env.get('ADMIN').checkEmail()
+
+// If we specify a parameter, then the email address must end with the
+// domain we specified.
+let invalidEmail = env.get('ADMIN').checkEmail('github.com')
+```
+
 ## Examples
 
 ```js
@@ -314,9 +406,9 @@ const enumVal = env.get('ENVIRONMENT').asEnum(['dev', 'test', 'live'])
 Contributions are welcomed. If you'd like to discuss an idea open an issue, or a
 PR with an initial implementation.
 
-If you want to add a new type it's easy. Add a file to `lib/accessors`,
-with the name of the type e.g add a file named `number-zero.js` into that folder
-and populate it with code following this structure:
+If you want to add a new global accessor, it's easy. Add a file to
+`lib/accessors`, with the name of the type e.g add a file named `number-zero.js`
+into that folder and populate it with code following this structure:
 
 ```js
 /**
