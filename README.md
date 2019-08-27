@@ -315,8 +315,8 @@ let validEmail = env.get('ADMIN').checkEmail()
 The accessor function may accept additional arguments if desired; these must be
 provided explicitly when the accessor is invoked.
 
-For example, we can modify the `checkEmail()` accessor so that it optionally
-verifies the domain of the email address:
+For example, we can modify the `checkEmail()` accessor from above so that it
+optionally verifies the domain of the email address:
 ```js
 const env = require('env-var')
 
