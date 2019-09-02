@@ -80,7 +80,7 @@ describe('env-var', function () {
     it('should throw when value is not expected', function () {
       expect(() => {
         expect(mod.get('ENUM').asEnum(['INVALID']))
-      }).to.throw('env-var: "ENUM" should be a one of [INVALID], but was "VALID"')
+      }).to.throw('env-var: "ENUM" should be one of [INVALID], but was "VALID"')
     })
   })
 
