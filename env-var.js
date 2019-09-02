@@ -6,11 +6,11 @@ const variable = require('./lib/variable')
  * Returns an "env-var" instance that reads from the given container of values.
  * By default, we export an instance that reads from process.env
  * @param  {Object} container target container to read values from
+ * @param  {Object} extraAccessors additional accessors to attach to the
+ * resulting object
  * @return {Object} a new module instance
  */
-const from = (container) => {
-  const _extraAccessors = {}
-
+const from = (container, extraAccessors) => {
   return {
     from: from,
 
@@ -19,16 +19,6 @@ const from = (container) => {
      * exceptions and handle them appropriately.
      */
     EnvVarError: require('./lib/env-error'),
-
-    /**
-     * Adds a custom accessor to subsequent variables.
-     *
-     * @param  {String} name Name of the accessor (i.e., function name).
-     * @param  {Function} accessor Accessor function.
-     */
-    addAccessor: (name, accessor) => {
-      _extraAccessors[name] = accessor
-    },
 
     /**
      * Returns a variable instance with helper functions, or process.env
@@ -41,7 +31,7 @@ const from = (container) => {
         return container
       }
 
-      return variable(container, variableName, defaultValue, _extraAccessors)
+      return variable(container, variableName, defaultValue, extraAccessors || {})
     }
   }
 }

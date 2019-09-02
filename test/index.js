@@ -505,60 +505,46 @@ describe('env-var', function () {
       expect(fromMod.get()).to.have.property('A_BOOL', 'true')
       expect(fromMod.get()).to.have.property('A_STRING', 'blah')
     })
-  })
 
-  describe('#addAccessor', function () {
-    // Use `from` to avoid polluting global env's namespace.
-    var fromMod
+    describe(':extraAccessors', function () {
+      it('should add custom accessors to subsequent gotten values', function () {
+        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
+          asShout: function (raiseError, value) {
+            return value.toUpperCase()
+          }
+        })
 
-    beforeEach(function () {
-      fromMod = mod.from({
-        STRING: 'Hello, world!'
-      })
-    })
+        var gotten = fromMod.get('STRING')
 
-    it('should add custom accessors to subsequent gotten values', function () {
-      fromMod.addAccessor('asShout', function (raiseError, value) {
-        return value.toUpperCase()
+        expect(gotten).to.have.property('asShout')
+        expect(gotten.asShout()).to.equal('HELLO, WORLD!')
       })
 
-      var gotten = fromMod.get('STRING')
+      it('should allow overriding existing accessors', function () {
+        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
+          asString: function (raiseError, value) {
+            // https://stackoverflow.com/a/959004
+            return value.split('').reverse().join('')
+          }
+        })
 
-      expect(gotten).to.have.property('asShout')
-      expect(gotten.asShout()).to.equal('HELLO, WORLD!')
-    })
-
-    it('should not affect previously-gotten values', function () {
-      // Get the value before adding custom accessor.
-      var gotten = fromMod.get('STRING')
-
-      fromMod.addAccessor('asWhisper', function (raiseError, value) {
-        return value.toLowerCase()
+        expect(fromMod.get('STRING').asString()).to.equal('!dlrow ,olleH')
       })
 
-      expect(gotten).not.to.have.property('asWhisper')
-    })
+      it('should not attach accessors to other env instances', function () {
+        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
+          asNull: function (raiseError, value) {
+            return null
+          }
+        })
 
-    it('should allow overriding existing accessors', function () {
-      fromMod.addAccessor('asString', function (raiseError, value) {
-        // https://stackoverflow.com/a/959004
-        return value.split('').reverse().join('')
+        var otherMod = mod.from({
+          STRING: 'Hola, mundo!'
+        })
+
+        expect(fromMod.get('STRING')).to.have.property('asNull')
+        expect(otherMod.get('STRING')).not.to.have.property('asNull')
       })
-
-      expect(fromMod.get('STRING').asString()).to.equal('!dlrow ,olleH')
-    })
-
-    it('should not attach accessors to other env instances', function () {
-      var otherMod = mod.from({
-        STRING: 'Hola, mundo!'
-      })
-
-      fromMod.addAccessor('asNull', function (raiseError, value) {
-        return null
-      })
-
-      expect(fromMod.get('STRING')).to.have.property('asNull')
-      expect(otherMod.get('STRING')).not.to.have.property('asNull')
     })
   })
 })
