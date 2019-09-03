@@ -509,7 +509,7 @@ describe('env-var', function () {
     describe(':extraAccessors', function () {
       it('should add custom accessors to subsequent gotten values', function () {
         const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asShout: function (raiseError, value) {
+          asShout: function (value) {
             return value.toUpperCase()
           }
         })
@@ -522,7 +522,7 @@ describe('env-var', function () {
 
       it('should allow overriding existing accessors', function () {
         const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asString: function (raiseError, value) {
+          asString: function (value) {
             // https://stackoverflow.com/a/959004
             return value.split('').reverse().join('')
           }
@@ -533,7 +533,7 @@ describe('env-var', function () {
 
       it('should not attach accessors to other env instances', function () {
         const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asNull: function (raiseError, value) {
+          asNull: function (value) {
             return null
           }
         })

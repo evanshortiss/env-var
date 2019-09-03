@@ -13,7 +13,7 @@
 
 </div>
 
-Verification, sanatization, and type coercion for environment variables in
+Verification, sanitization, and type coercion for environment variables in
 Node.js. Particularly useful in TypeScript environments.
 
 ## Install
@@ -140,10 +140,8 @@ When calling `from()` you can also pass an optional argument containing
 additional accessors that will be attached to any variables gotten by that
 env-var instance.
 
-Accessor functions must accept at least two arguments:
+Accessor functions must accept at least one argument:
 
-- `{Function} raiseError`: If the accessor fails to process a value, it must
-  call this function instead of throwing an exception.
 - `{*} value`: The value that the accessor should process.
 
 **Important:** Do not assume that `value` is a string!
@@ -158,12 +156,12 @@ process.env.ADMIN = 'admin@example.com'
 // Add an accessor named 'checkEmail' that verifies that the value is a
 // valid-looking email address.
 const env = from(process.env, {
-  checkEmail: (raiseError, value) => {
+  checkEmail: (value) => {
     const split = String(value).split('@')
 
     // Validating email addresses is hard.
     if (split.length !== 2) {
-      raiseError('must contain exactly one "@"')
+      throw new Error('must contain exactly one "@"')
     }
 
     return value
@@ -190,20 +188,20 @@ process.env.ADMIN = 'admin@example.com'
 // Add an accessor named 'checkEmail' that verifies that the value is a
 // valid-looking email address.
 //
-// Note that the accessor function also accepts an optional third
+// Note that the accessor function also accepts an optional second
 // parameter `requiredDomain` which can be provided when the accessor is
 // invoked (see below).
 const env = from(process.env, {
-  checkEmail: (raiseError, value, requiredDomain) => {
+  checkEmail: (value, requiredDomain) => {
     const split = String(value).split('@')
 
     // Validating email addresses is hard.
     if (split.length !== 2) {
-      raiseError('must contain exactly one "@"')
+      throw new Error('must contain exactly one "@"')
     }
 
     if (requiredDomain && (split[1] !== requiredDomain)) {
-      raiseError(`must end with @${requiredDomain}`)
+      throw new Error(`must end with @${requiredDomain}`)
     }
 
     return value
@@ -214,9 +212,9 @@ const env = from(process.env, {
 // `addAccessor()` above, so now we can call `checkEmail()` like any
 // other accessor.
 //
-// `env-var` will provide the first two arguments for the accessor
-// function (`raiseError` and `value`), but we declared a third argument
-// `requiredDomain`, which we can provide when we invoke the accessor.
+// `env-var` will provide the first argument for the accessor function
+// (`value`), but we declared a second argument `requiredDomain`, which
+// we can provide when we invoke the accessor.
 
 // Calling the accessor without additional parameters accepts an email
 // address with any domain.
