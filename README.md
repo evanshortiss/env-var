@@ -96,7 +96,6 @@ complex to understand as [demonstrated here](https://gist.github.com/evanshortis
       * [asString()](#asstring)
       * [asUrlObject()](#asurlobject)
       * [asUrlString()](#asurlstring)
-  * [addAccessor()](#addaccessorname-accessor)
 
 ### EnvVarError()
 This is the error class used to represent errors raised by this module. Sample
