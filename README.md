@@ -415,10 +415,9 @@ into that folder and populate it with code following this structure:
 ```js
 /**
  * Validate that the environment value is an integer and equals zero.
- * @param {Function} raiseError use this to raise a cleanly formatted error
  * @param {String}   environmentValue this is the string from process.env
  */
-module.exports = function numberZero (raiseError, environmentValue) {
+module.exports = function numberZero (environmentValue) {
 
   // Your custom code should go here...below code is an example
 
@@ -427,7 +426,7 @@ module.exports = function numberZero (raiseError, environmentValue) {
   if (val === 0) {
     return ret;
   } else {
-    raiseError('should be zero')
+    throw new Error('should be zero')
   }
 }
 ```
