@@ -167,9 +167,8 @@ const env = from(process.env, {
   }
 })
 
-// We specified 'checkEmail' as the name for the accessor when we called
-// `addAccessor()` above, so now we can call `checkEmail()` like any
-// other accessor.
+// We specified 'checkEmail' as the name for the accessor above, so now
+// we can call `checkEmail()` like any other accessor.
 let validEmail = env.get('ADMIN').checkEmail()
 ```
 
@@ -207,9 +206,8 @@ const env = from(process.env, {
   }
 })
 
-// We specified 'checkEmail' as the name for the accessor when we called
-// `addAccessor()` above, so now we can call `checkEmail()` like any
-// other accessor.
+// We specified 'checkEmail' as the name for the accessor above, so now
+// we can call `checkEmail()` like any other accessor.
 //
 // `env-var` will provide the first argument for the accessor function
 // (`value`), but we declared a second argument `requiredDomain`, which
