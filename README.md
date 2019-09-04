@@ -135,7 +135,7 @@ const apiUrl = mockedEnv.get('API_BASE_URL').asUrlString()
 ```
 
 #### extraAccessors
-When calling `from()` you can also pass an optional argument containing
+When calling `from()` you can also pass an optional parameter containing
 additional accessors that will be attached to any variables gotten by that
 env-var instance.
 
