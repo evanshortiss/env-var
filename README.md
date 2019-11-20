@@ -271,8 +271,8 @@ A variable is returned by calling `env.get`. It has the exposes the following
 functions to validate and access the underlying value.
 
 #### required(isRequired = true)
-Ensure the variable is set on *process.env*. If the variable is not set this
-function will throw an `EnvVarError`. If the variable is set it returns itself
+Ensure the variable is set on *process.env*. If the variable is not set or empty
+this function will throw an `EnvVarError`. If the variable is set it returns itself
 so you can access the underlying variable.
 
 Can be bypassed by passing `false`, i.e `required(false)`
@@ -283,8 +283,8 @@ Full example:
 const env = require('env-var')
 
 // Read PORT variable and ensure it's a positive integer. If it is not a
-// positive integer or is not set the process will exit with an error (unless
-// you catch it using a try/catch or "uncaughtException" handler)
+// positive integer, not set or empty the process will exit with an error 
+// (unless you catch it using a try/catch or "uncaughtException" handler)
 const NODE_ENV = env.get('NODE_ENV').asString()
 const PORT = env.get('PORT').required().asIntPositive()
 
@@ -402,7 +402,7 @@ process.env.DASH_ARRAY = '1-2-3';
 // The entire process.env object
 const allVars = env.get();
 
-// Returns a string. Throws an exception if not set
+// Returns a string. Throws an exception if not set or empty
 const stringVar = env.get('STRING').required().asString();
 
 // Returns an int, undefined if not set, or throws if set to a non integer value

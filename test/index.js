@@ -24,7 +24,9 @@ describe('env-var', function () {
     ARRAY_WITH_DELIMITER_PREFIX: ',value',
     DASH_ARRAY: '1-2-3',
     URL: 'http://google.com/',
-    ENUM: 'VALID'
+    ENUM: 'VALID',
+    EMPTY_STRING: '',
+    EMPTY_STRING_WITH_WHITESPACE: '  '
   }
 
   var mod = require('../env-var.js')
@@ -370,6 +372,22 @@ describe('env-var', function () {
 
       expect(function () {
         mod.get('JSON').required().asJson()
+      }).to.throw()
+    })
+
+    it('should throw an exception when required and set, but empty', function () {
+      expect(function () {
+        mod.get('EMPTY_STRING').required().asString()
+      }).to.throw()
+
+      expect(function () {
+        mod.get('EMPTY_STRING_WITH_WHITESPACE').required().asString()
+      }).to.throw()
+    })
+
+    it('should throw an exception when required, set, empty and empty default value', function () {
+      expect(function () {
+        mod.get('EMPTY_STRING', '').required().asString()
       }).to.throw()
     })
 
