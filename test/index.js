@@ -391,6 +391,10 @@ describe('env-var', function () {
       }).to.throw()
     })
 
+    it('should not throw if required, set, empty but has a default value', function () {
+      expect(mod.get('XXX_NOT_DEFINED', 'default').required().asString()).to.equal('default')
+    })
+
     it('should return undefined when not set and not required', function () {
       delete process.env.STRING
 
