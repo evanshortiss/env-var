@@ -65,30 +65,10 @@ describe('env-var', function () {
       expect(ret).to.equal('default')
     })
 
-    it('should support passing a number type', () => {
-      expect(mod.get('MISSING_NO').default(42).asString()).to.equal('42')
-    })
-
-    it('should support passing a number type and returning as a number', () => {
-      expect(mod.get('MISSING_NO').default(42).asIntPositive()).to.equal(42)
-    })
-
-    it('should support passing objects', () => {
-      const tpl = {
-        name: 'ok'
-      }
-      expect(mod.get('MISSING_OBJECT').default(tpl).asJsonObject()).to.deep.equal(tpl)
-    })
-
-    it('should support passing arrays', () => {
-      const tpl = [1, 2, 3]
-      expect(mod.get('MISSING_ARRAY').default(tpl).asJsonArray()).to.deep.equal(tpl)
-    })
-
-    it('should error on null', () => {
+    it('should throw an error if default is not passed as a string', () => {
       expect(() => {
-        expect(mod.get('MISSING_NULL_DEFAULT').default(null).asJsonArray())
-      }).to.throw('env-var: values passed to default() must be of Number, String, Array, or Object type')
+        mod.get('MISSING_NO').default(42).asString()
+      }).to.throw('env-var: values passed to default() must be of type string')
     })
   })
 
