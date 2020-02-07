@@ -56,6 +56,12 @@ describe('env-var', function () {
 
       expect(ret).to.equal('default')
     })
+
+    it('should throw an error if default is not passed as a string', () => {
+      expect(() => {
+        mod.get('MISSING_NO').default(42).asString()
+      }).to.throw('env-var: values passed to default() must be of type string')
+    })
   })
 
   describe('#convertFromBase64', function () {
