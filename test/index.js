@@ -52,7 +52,7 @@ describe('env-var', function () {
 
   describe('default values', function () {
     it('should return the default', function () {
-      const ret = mod.get('XXX_NOT_DEFINED', 'default').asString()
+      const ret = mod.get('XXX_NOT_DEFINED').default('default').asString()
 
       expect(ret).to.equal('default')
     })
@@ -69,7 +69,7 @@ describe('env-var', function () {
     it('should throw an error due to malformed base64', function () {
       expect(() => {
         mod.get('INVALID_BASE_64').convertFromBase64().asString()
-      }).throw(/"INVALID_BASE_64" should be a valid base64 string if using convertFromBase64, but was "a|GV-sb*G8="/g)
+      }).throw(/"INVALID_BASE_64" should be a valid base64 string if using convertFromBase64, but is set to "a|GV-sb*G8="/g)
     })
   })
 
@@ -82,7 +82,7 @@ describe('env-var', function () {
     it('should throw when value is not expected', function () {
       expect(() => {
         expect(mod.get('ENUM').asEnum(['INVALID']))
-      }).to.throw('env-var: "ENUM" should be one of [INVALID], but was "VALID"')
+      }).to.throw('env-var: "ENUM" should be one of [INVALID], but is set to "VALID"')
     })
   })
 
@@ -104,7 +104,7 @@ describe('env-var', function () {
 
       expect(() => {
         mod.get('URL').asUrlString()
-      }).to.throw('env-var: "URL" should be a valid URL, but was "not a url"')
+      }).to.throw('env-var: "URL" should be a valid URL, but is set to "not a url"')
     })
   })
 
@@ -118,7 +118,7 @@ describe('env-var', function () {
 
       expect(() => {
         mod.get('URL').asUrlObject()
-      }).to.throw('env-var: "URL" should be a valid URL, but was "not a url"')
+      }).to.throw('env-var: "URL" should be a valid URL, but is set to "not a url"')
     })
   })
 
@@ -387,12 +387,12 @@ describe('env-var', function () {
 
     it('should throw an exception when required, set, empty and empty default value', function () {
       expect(function () {
-        mod.get('EMPTY_STRING', '').required().asString()
+        mod.get('EMPTY_STRING').default('').required().asString()
       }).to.throw()
     })
 
     it('should not throw if required, set, empty but has a default value', function () {
-      expect(mod.get('XXX_NOT_DEFINED', 'default').required().asString()).to.equal('default')
+      expect(mod.get('XXX_NOT_DEFINED').default('default').required().asString()).to.equal('default')
     })
 
     it('should return undefined when not set and not required', function () {
@@ -478,20 +478,47 @@ describe('env-var', function () {
 
       expect(function () {
         mod.get('PORT_NUMBER').asPortNumber()
-      }).to.throw('should be a positive integer, but was "-2"')
+      }).to.throw('should be a positive integer, but is set to "-2"')
     })
     it('should raise an error for ports greater than 65535', function () {
       process.env.PORT_NUMBER = '700000'
 
       expect(function () {
         mod.get('PORT_NUMBER').asPortNumber()
-      }).to.throw('cannot assign a port number greater than 65535, but was "700000"')
+      }).to.throw('cannot assign a port number greater than 65535, but is set to "700000"')
     })
 
     it('should return a number for valid ports', function () {
       process.env.PORT_NUMBER = '8080'
 
       expect(mod.get('PORT_NUMBER').asPortNumber()).to.equal(8080)
+    })
+  })
+
+  describe('#example', () => {
+    let fromMod
+
+    beforeEach(() => {
+      fromMod = mod.from({
+        JSON_CONFIG: '{1,2]'
+      })
+    })
+
+    const sampleConfig = JSON.stringify({
+      maxConnections: 10,
+      enableSsl: true
+    })
+
+    it('should throw an error with a valid example message', () => {
+      expect(() => {
+        fromMod.get('JSON_CONFIG').example(sampleConfig).asJsonArray()
+      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON, but is set to "{1,2]". An example of a valid value would be "${sampleConfig}"`)
+    })
+
+    it('should throw an error with a valid example message', () => {
+      expect(() => {
+        fromMod.get('MISSING_JSON_CONFIG').required().example('[1,2,3]').asJsonArray()
+      }).to.throw('env-var: "MISSING_JSON_CONFIG" is a required variable, but it was not set. An example of a valid value would be "[1,2,3]"')
     })
   })
 

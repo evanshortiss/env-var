@@ -23,15 +23,14 @@ const from = (container, extraAccessors) => {
     /**
      * Returns a variable instance with helper functions, or process.env
      * @param  {String} variableName Name of the environment variable requested
-     * @param  {String} defaultValue Optional default to use as the value
      * @return {Object}
      */
-    get: (variableName, defaultValue) => {
+    get: (variableName) => {
       if (!variableName) {
         return container
       }
 
-      return variable(container, variableName, defaultValue, extraAccessors || {})
+      return variable(container, variableName, extraAccessors || {})
     }
   }
 }

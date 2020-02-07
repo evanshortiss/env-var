@@ -49,7 +49,7 @@ const PASSWORD = env.get('DB_PASSWORD')
 
 // Read in a port (checks that PORT is in the raneg 0 to 65535) or use a
 // default value of 5432 instead
-const PORT = env.get('PORT', 5432).asPortNumber()
+const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
 ## TypeScript
@@ -79,6 +79,8 @@ complex to understand as [demonstrated here](https://gist.github.com/evanshortis
     * [variable](#variable)
       * [required()](#requiredisrequired--true)
       * [covertFromBase64()](#convertfrombase64)
+      * [example(string)](#example)
+      * [default(string)](#default)
       * [asArray()](#asarraydelimiter-string)
       * [asBoolStrict()](#asboolstrict)
       * [asBool()](#asbool)
@@ -260,7 +262,7 @@ const env = require('env-var')
 const limit = env.get('SOME_LIMIT').asIntPositive()
 
 // #2 - Return the requested variable, or use the given default if it isn't set
-const limit = env.get('SOME_LIMIT', '10').asIntPositive()
+const limit = env.get('SOME_LIMIT').default('10').asIntPositive()
 
 // #3 - Return the environment object (process.env by default - see env.from() docs for more)
 const allvars = env.get()
@@ -269,6 +271,46 @@ const allvars = env.get()
 ### variable
 A variable is returned by calling `env.get`. It has the exposes the following
 functions to validate and access the underlying value.
+
+#### example(string)
+Allows a developer to provide an example of a valid value for the environment
+variable. If the variable is not set (and `required()` was called), or the
+variable is set incorrectly this will be included in error output to help
+developers diagnose the error.
+
+For example:
+
+```js
+const env = require('env-var')
+
+const sampleConfig = JSON.stringify({
+  maxConnections: 10,
+  enableSsl: true
+})
+// Use POOL_SIZE if set, else use a value of 10
+const JSON_CONFIG = env.get('JSON_CONFIG')
+  .required()
+  .example(sampleConfig)
+  .asJsonObject()
+```
+
+If *JSON_OBJECT* was not set this code would throw an error like so:
+
+```
+env-var: "JSON_CONFIG" is a required variable, but it was not set. An example
+of a valid value would be "{"maxConnections":10,"enableSsl":true}"
+```
+
+#### default(string)
+Allows a default value to be provided for use if the value is not set in the
+environment.
+
+```js
+const env = require('env-var')
+
+// Use POOL_SIZE if set, else use a value of 10
+const POOL_SIZE = env.get('POOL_SIZE').default('10').asIntPositive()
+```
 
 #### required(isRequired = true)
 Ensure the variable is set on *process.env*. If the variable is not set or empty
@@ -282,14 +324,16 @@ Full example:
 ```js
 const env = require('env-var')
 
-// Read PORT variable and ensure it's a positive integer. If it is not a
-// positive integer, not set or empty the process will exit with an error 
-// (unless you catch it using a try/catch or "uncaughtException" handler)
+// Get the value of NODE_ENV as a string. Could be undefined since we're
+// not calling required() before asString()
 const NODE_ENV = env.get('NODE_ENV').asString()
-const PORT = env.get('PORT').required().asIntPositive()
 
-// If mode is production then this is required, else use default
-const SECRET = env.get('SECRET', 'bad-secret').required(NODE_ENV === 'production').asString()
+// Read PORT variable and ensure it's in a valid port range. If it's not in
+// valid port ranges, not set, or empty an EnvVarError will be thrown
+const PORT = env.get('PORT').required().asPortNumber()
+
+// If mode is production then this is required
+const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()
 
 app.listen(PORT)
 ```
@@ -409,7 +453,7 @@ const stringVar = env.get('STRING').required().asString();
 const intVar = env.get('INTEGER').asInt();
 
 // Return a float, or 23.2 if not set
-const floatVar = env.get('FLOAT', '23.2').asFloat();
+const floatVar = env.get('FLOAT').default('23.2').asFloat();
 
 // Return a Boolean. Throws an exception if not set or parsing fails
 const boolVar = env.get('BOOL').required().asBool();
@@ -438,6 +482,7 @@ into that folder and populate it with code following this structure:
 ```js
 /**
  * Validate that the environment value is an integer and equals zero.
+ * This is a strange example, but hopefully demonstrates the idea.
  * @param {String}   environmentValue this is the string from process.env
  */
 module.exports = function numberZero (environmentValue) {

@@ -1,3 +1,9 @@
+## 6.0.0 (09/01/20)
+* Add support for setting an example value via the `example(string)` function.
+* Passing default values is now performed using the `default(string)` function.
+* Defer checks for `required()` until an accessor such as `asString()` is invoked.
+* Fix typings issue where `required()` was undefined on a `IPresentVariable`.
+
 ## 5.2.0 (22/11/19)
 * The `required()` function now verifies the variable is not an empty string
 

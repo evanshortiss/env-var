@@ -10,6 +10,24 @@ interface IPresentVariable {
   convertFromBase64: () => IPresentVariable
 
   /**
+   * Provide an example value that can be used in error output if the variable
+   * is not set, or is set to an invalid value
+   */
+  example: (example: string) => IPresentVariable
+
+  /**
+   * Set a default value for this variable. This will be used if a value is not
+   * set in the process environment
+   */
+  default: (value: string) => IPresentVariable;
+
+  /**
+   * Ensures the variable is set on process.env. If it's not set an exception
+   * will be thrown. Can pass false to bypass the check.
+   */
+  required: (isRequired?: boolean) => IPresentVariable;
+
+  /**
    * Converts a number to an integer and verifies it's in port ranges 0-65535
    */
   asPortNumber: () => number
@@ -106,10 +124,22 @@ interface IOptionalVariable {
   /**
    * Converts a bas64 environment variable to ut8
    */
-  convertFromBase64: () => IOptionalVariable
+  convertFromBase64: () => IOptionalVariable;
 
   /**
-   * Ensures the variable is set on process.env, if not an exception will be thrown.
+   * Provide an example value that can be used in error output if the variable
+   * is not set, or is set to an invalid value
+   */
+  example: (value: string) => IOptionalVariable;
+
+  /**
+   * Set a default value for this variable. This will be used if a value is not
+   * set in the process environment
+   */
+  default: (value: string) => IPresentVariable;
+
+  /**
+   * Ensures the variable is set on process.env. If it's not set an exception will be thrown.
    * Can pass false to bypass the check
    */
   required: (isRequired?: boolean) => IPresentVariable;
