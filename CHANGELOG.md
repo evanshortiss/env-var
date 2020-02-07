@@ -4,17 +4,6 @@
 * Defer checks for `required()` until an accessor such as `asString()` is invoked.
 * Fix typings issue where `required()` was undefined on a `IPresentVariable`.
 
-Migration from 5.x to 6.0.0 should be smooth. Change any instance of
-`env.get(target, default)` to `env.get(target).default(default)`. For example:
-
-```js
-// Old 5.x code
-const emailAddr = env.get('EMAIL_ADDR', 'admin@example.com').asString()
-
-// New 6.x compatible code
-const emailAddr = env.get('EMAIL_ADDR').default('admin@example.com').asString()
-```
-
 ## 5.2.0 (22/11/19)
 * The `required()` function now verifies the variable is not an empty string
 

@@ -55,8 +55,8 @@ const PASSWORD = env.get('DB_PASSWORD')
   // Call asString (or other APIs) to get the variable value (required)
   .asString();
 
-// Read in a port (checks that PORT is in the range 0 to 65535)
-// Alternatively, use amdefault value of 5432 if PORT is not defined
+// Read in a port (checks that PORT is in the raneg 0 to 65535) or use a
+// default value of 5432 instead
 const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
@@ -123,8 +123,8 @@ const myVar = env.get('MY_VAR').asString()
     * [variable](#variable)
       * [required()](#requiredisrequired--true)
       * [covertFromBase64()](#convertfrombase64)
-      * [example(string)](#examplestring)
-      * [default(string)](#defaultstring)
+      * [example(string)](#example)
+      * [default(string)](#default)
       * [asArray()](#asarraydelimiter-string)
       * [asBoolStrict()](#asboolstrict)
       * [asBool()](#asbool)
@@ -220,6 +220,56 @@ Example:
 ```js
 const env = require('env-var')
 
+// #1 - Return the requested variable (we're also checking it's a positive int)
+const limit = env.get('SOME_LIMIT').asIntPositive()
+
+// #2 - Return the requested variable, or use the given default if it isn't set
+const limit = env.get('SOME_LIMIT').default('10').asIntPositive()
+
+// #3 - Return the environment object (process.env by default - see env.from() docs for more)
+const allvars = env.get()
+```
+
+### variable
+A variable is returned by calling `env.get`. It has the exposes the following
+functions to validate and access the underlying value.
+
+#### example(string)
+Allows a developer to provide an example of a valid value for the environment
+variable. If the variable is not set (and `required()` was called), or the
+variable is set incorrectly this will be included in error output to help
+developers diagnose the error.
+
+For example:
+
+```js
+const env = require('env-var')
+
+const sampleConfig = JSON.stringify({
+  maxConnections: 10,
+  enableSsl: true
+})
+// Use POOL_SIZE if set, else use a value of 10
+const JSON_CONFIG = env.get('JSON_CONFIG')
+  .required()
+  .example(sampleConfig)
+  .asJsonObject()
+```
+
+If *JSON_OBJECT* was not set this code would throw an error like so:
+
+```
+env-var: "JSON_CONFIG" is a required variable, but it was not set. An example
+of a valid value would be "{"maxConnections":10,"enableSsl":true}"
+```
+
+#### default(string)
+Allows a default value to be provided for use if the value is not set in the
+environment.
+
+```js
+const env = require('env-var')
+
 // Use POOL_SIZE if set, else use a value of 10
 const POOL_SIZE = env.get('POOL_SIZE').default('10').asIntPositive()
 ```
@@ -244,6 +294,9 @@ const NODE_ENV = env.get('NODE_ENV').asString()
 // Read PORT variable and ensure it's in a valid port range. If it's not in
 // valid port ranges, not set, or empty an EnvVarError will be thrown
 const PORT = env.get('PORT').required().asPortNumber()
+
+// If mode is production then this is required
+const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()
 
 // If mode is production then this is required
 const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()

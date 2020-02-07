@@ -546,13 +546,13 @@ describe('env-var', function () {
     it('should throw an error with a valid example message', () => {
       expect(() => {
         fromMod.get('JSON_CONFIG').example(sampleConfig).asJsonArray()
-      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON, but is set to "{1,2]". An example of a valid value would be: ${sampleConfig}`)
+      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON, but is set to "{1,2]". An example of a valid value would be "${sampleConfig}"`)
     })
 
     it('should throw an error with a valid example message', () => {
       expect(() => {
         fromMod.get('MISSING_JSON_CONFIG').required().example('[1,2,3]').asJsonArray()
-      }).to.throw('env-var: "MISSING_JSON_CONFIG" is a required variable, but it was not set. An example of a valid value would be: [1,2,3]')
+      }).to.throw('env-var: "MISSING_JSON_CONFIG" is a required variable, but it was not set. An example of a valid value would be "[1,2,3]"')
     })
   })
 
