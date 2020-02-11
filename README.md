@@ -62,6 +62,43 @@ import * as env from 'env-var';
 const PORT: number = env.get('PORT').required().asIntPositive();
 ```
 
+## Usage with dotenv
+
+There is no tight coupling between [env-var](https://www.npmjs.com/package/env-var)
+[dotenv](https://www.npmjs.com/package/dotenv). This makes it easy to use
+dotenv in your preferred manner, and reduces package bloat too.
+
+You can use dotenv via a `require()` calls in your code or preloading it via
+the `--require` or `-r` flag in the `node` CLI.
+
+### Load dotenv via require()
+
+This is per the default usage described by [dotenv's README](https://www.npmjs.com/package/dotenv#usage).
+
+```js
+// Read in the .env file
+require('dotenv').config()
+
+// Read the MY_VAR entry that dotenv created
+const env = require('env-var')
+const myVar = env.get('MY_VAR').asString()
+```
+
+### Preload dotenv via CLI Args
+
+This is per the [preload section](https://www.npmjs.com/package/dotenv#preload)
+of the dotenv README.
+
+```js
+// This is just a regular node script, but we started it using the command
+// "node -r dotenv/config your_script.js" via the terminal. This tells node
+// to load our variables using dotenv before running the rest of our script!
+
+// Read the MY_VAR entry that dotenv created
+const env = require('env-var')
+const myVar = env.get('MY_VAR').asString()
+```
+
 ## Benefits
 Fail fast if your environment is misconfigured. Also,
 [this code](https://gist.github.com/evanshortiss/75d936665a2a240fa1966770a85fb137) without
