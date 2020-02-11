@@ -24,10 +24,10 @@ Node.js. Supports TypeScript!
 * 🎉 TypeScript support provides compile time safety and better developer experience
 
 
-* 🏋️‍♀️ Lightweight, at just 4.2kB when minified 🏋
-* 🔒 Helps prevent your program running in a misconfigured environment ✋
-* ⌨ TypeScript support provides compile time safety and better DevExp 🎉
-* 👨‍💻 Friendly error messages and example values improve DevExp 👩‍💻
+* 🏋 Lightweight, at just 4.2kB when minified
+* 🛑 Helps prevent your program running in a misconfigured environment
+* 🎉 TypeScript support provides compile time safety and better DevExp
+* 👩‍💻 Friendly error messages and example values improve DevExp
 
 
 ## Install
