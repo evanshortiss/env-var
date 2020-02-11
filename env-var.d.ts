@@ -122,7 +122,7 @@ interface IPresentVariable {
 
 interface IOptionalVariable {
   /**
-   * Converts a bas64 environment variable to ut8
+   * Decodes a base64-encoded environment variable
    */
   convertFromBase64: () => IOptionalVariable;
 
