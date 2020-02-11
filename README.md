@@ -74,15 +74,11 @@ const PORT: number = env.get('PORT').required().asIntPositive();
 ## Usage with dotenv
 
 There is no tight coupling between [env-var](https://www.npmjs.com/package/env-var)
-[dotenv](https://www.npmjs.com/package/dotenv). Just `npm install dotenv` and
-use it whatever way you're used to. This loose coupling is a good thing since
-it reduces package bloat - only install what you need!
+[dotenv](https://www.npmjs.com/package/dotenv). This makes it easy to use
+dotenv in your preferred manner, and reduces package bloat too.
 
-You can use `dotenv` with `env-var` via a `require()` calls in your code or
-preloading it with the `--require` or `-r` flag in the `node` CLI.
-
-Both examples below assume you have a `.env` file in your repository and it
-contains a line similar to `MY_VAR=a-string-value!`.
+You can use dotenv via a `require()` calls in your code or preloading it via
+the `--require` or `-r` flag in the `node` CLI.
 
 ### Load dotenv via require()
 
@@ -100,8 +96,7 @@ const myVar = env.get('MY_VAR').asString()
 ### Preload dotenv via CLI Args
 
 This is per the [preload section](https://www.npmjs.com/package/dotenv#preload)
-of the dotenv README. Run the following code by using the
-`node -r dotenv/config your_script.js` command.
+of the dotenv README.
 
 ```js
 // This is just a regular node script, but we started it using the command
@@ -112,6 +107,12 @@ of the dotenv README. Run the following code by using the
 const env = require('env-var')
 const myVar = env.get('MY_VAR').asString()
 ```
+
+## Benefits
+Fail fast if your environment is misconfigured. Also,
+[this code](https://gist.github.com/evanshortiss/75d936665a2a240fa1966770a85fb137) without
+`env-var` would require multiple `assert` calls, other logic, and be more
+complex to understand as [demonstrated here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d).
 
 ## API
 
