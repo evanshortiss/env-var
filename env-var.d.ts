@@ -136,18 +136,6 @@ interface IOptionalVariable {
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  convertFromBase64: () => IOptionalVariable;
-
-  /**
-   * Provide an example value that can be used in error output if the variable
-   * is not set, or is set to an invalid value
-   */
-  example: (value: string) => IOptionalVariable;
-
-  /**
-   * Set a default value for this variable. This will be used if a value is not
-   * set in the process environment
-   */
   default: (value: string) => IPresentVariable;
 
   /**
