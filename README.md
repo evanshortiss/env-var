@@ -283,22 +283,17 @@ For example:
 ```js
 const env = require('env-var')
 
-const sampleConfig = JSON.stringify({
-  maxConnections: 10,
-  enableSsl: true
-})
-// Use POOL_SIZE if set, else use a value of 10
-const JSON_CONFIG = env.get('JSON_CONFIG')
+const ADMIN_EMAIL = env.get('ADMIN_EMAIL')
   .required()
-  .example(sampleConfig)
-  .asJsonObject()
+  .example('admin@example.com')
+  .asString()
 ```
 
-If *JSON_OBJECT* was not set this code would throw an error like so:
+If *ADMIN_EMAIL* was not set this code would throw an error like so:
 
 ```
-env-var: "JSON_CONFIG" is a required variable, but it was not set. An example
-of a valid value would be "{"maxConnections":10,"enableSsl":true}"
+env-var: "ADMIN_EMAIL" is a required variable, but it was not set. An example
+of a valid value would be "admin@example.com"
 ```
 
 #### default(string)

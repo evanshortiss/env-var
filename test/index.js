@@ -57,10 +57,30 @@ describe('env-var', function () {
       expect(ret).to.equal('default')
     })
 
-    it('should throw an error if default is not passed as a string', () => {
+    it('should support passing a number type', () => {
+      expect(mod.get('MISSING_NO').default(42).asString()).to.equal('42')
+    })
+
+    it('should support passing a number type and returning as a number', () => {
+      expect(mod.get('MISSING_NO').default(42).asIntPositive()).to.equal(42)
+    })
+
+    it('should support passing objects', () => {
+      const tpl = {
+        name: 'ok'
+      }
+      expect(mod.get('MISSING_OBJECT').default(tpl).asJsonObject()).to.deep.equal(tpl)
+    })
+
+    it('should support passing arrays', () => {
+      const tpl = [1, 2, 3]
+      expect(mod.get('MISSING_ARRAY').default(tpl).asJsonArray()).to.deep.equal(tpl)
+    })
+
+    it('should error on null', () => {
       expect(() => {
-        mod.get('MISSING_NO').default(42).asString()
-      }).to.throw('env-var: values passed to default() must be of type string')
+        expect(mod.get('MISSING_NULL_DEFAULT').default(null).asJsonArray())
+      }).to.throw('env-var: values passed to default() must be of Number, String, Array, or Object type')
     })
   })
 
@@ -518,13 +538,13 @@ describe('env-var', function () {
     it('should throw an error with a valid example message', () => {
       expect(() => {
         fromMod.get('JSON_CONFIG').example(sampleConfig).asJsonArray()
-      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON, but is set to "{1,2]". An example of a valid value would be "${sampleConfig}"`)
+      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON, but is set to "{1,2]". An example of a valid value would be: ${sampleConfig}`)
     })
 
     it('should throw an error with a valid example message', () => {
       expect(() => {
         fromMod.get('MISSING_JSON_CONFIG').required().example('[1,2,3]').asJsonArray()
-      }).to.throw('env-var: "MISSING_JSON_CONFIG" is a required variable, but it was not set. An example of a valid value would be "[1,2,3]"')
+      }).to.throw('env-var: "MISSING_JSON_CONFIG" is a required variable, but it was not set. An example of a valid value would be: [1,2,3]')
     })
   })
 
