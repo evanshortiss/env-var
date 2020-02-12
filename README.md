@@ -55,8 +55,8 @@ const PASSWORD = env.get('DB_PASSWORD')
   // Call asString (or other APIs) to get the variable value (required)
   .asString();
 
-// Read in a port (checks that PORT is in the raneg 0 to 65535) or use a
-// default value of 5432 instead
+// Read in a port (checks that PORT is in the range 0 to 65535)
+// Alternatively, use amdefault value of 5432 if PORT is not defined
 const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
@@ -74,8 +74,9 @@ const PORT: number = env.get('PORT').required().asIntPositive();
 ## Usage with dotenv
 
 There is no tight coupling between [env-var](https://www.npmjs.com/package/env-var)
-[dotenv](https://www.npmjs.com/package/dotenv). This makes it easy to use
-`dotenv` in your preferred manner, and reduces package bloat too!
+[dotenv](https://www.npmjs.com/package/dotenv). Just `npm install dotenv` and
+use it whatever way you're used to. This loose coupling is a good thing since
+it reduces package bloat - only install what you need!
 
 You can use `dotenv` with `env-var` via a `require()` calls in your code or
 preloading it with the `--require` or `-r` flag in the `node` CLI.
@@ -111,12 +112,6 @@ of the dotenv README. Run the following code by using the
 const env = require('env-var')
 const myVar = env.get('MY_VAR').asString()
 ```
-
-## Benefits
-Fail fast if your environment is misconfigured. Also,
-[this code](https://gist.github.com/evanshortiss/75d936665a2a240fa1966770a85fb137) without
-`env-var` would require multiple `assert` calls, other logic, and be more
-complex to understand as [demonstrated here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d).
 
 ## API
 
@@ -164,32 +159,32 @@ const apiUrl = env.get('API_BASE_URL').asUrlString()
 ```
 
 When calling `env.from()` you can also pass an optional parameter containing
-custom accessors that will be attached to any variables gotten by that
+custom accessors that will be attached to any variables returned by that
 env-var instance. This feature is explained in the
 [extraAccessors section](#extraAccessors) of these docs.
 
-#### default(string)
-Allows a default value to be provided for use if the desired environment
-variable is not set in the program environment.
+### get(varname)
+This function has two behaviours:
 
-Example:
+1. Calling with a string argument will make it read that value from the environment
+2. If no string argument is passed it will return the entire environment object
+
+Examples:
 
 ```js
 const env = require('env-var')
 
-// #1 - Return the requested variable (we're also checking it's a positive int)
-const limit = env.get('SOME_LIMIT').asIntPositive()
+// #1 - Read the requested variable and parse it to a positive integer
+const limit = env.get('MAX_CONNECTIONS').asIntPositive()
 
-// #2 - Return the requested variable, or use the given default if it isn't set
-const limit = env.get('SOME_LIMIT').default('10').asIntPositive()
-
-// #3 - Return the environment object (process.env by default - see env.from() docs for more)
-const allvars = env.get()
+// #2 - Returns the entire process.env object
+const allVars = env.get()
 ```
 
 ### variable
-A variable is returned by calling `env.get`. It has the exposes the following
-functions to validate and access the underlying value.
+A variable is returned by calling `env.get(varname)`. It exposes the following
+functions to validate and access the underlying value, set a default, or set
+an example value:
 
 #### example(string)
 Allows a developer to provide an example of a valid value for the environment
@@ -208,7 +203,8 @@ const ADMIN_EMAIL = env.get('ADMIN_EMAIL')
   .asString()
 ```
 
-If *ADMIN_EMAIL* was not set this code would throw an error like so:
+If *ADMIN_EMAIL* was not set this code would throw an error similar to that
+below to help a developer diagnose the issue:
 
 ```
 env-var: "ADMIN_EMAIL" is a required variable, but it was not set. An example
@@ -216,8 +212,10 @@ of a valid value would be "admin@example.com"
 ```
 
 #### default(string)
-Allows a default value to be provided for use if the value is not set in the
-environment.
+Allows a default value to be provided for use if the desired environment
+variable is not set in the program environment.
+
+Example:
 
 ```js
 const env = require('env-var')
@@ -246,9 +244,6 @@ const NODE_ENV = env.get('NODE_ENV').asString()
 // Read PORT variable and ensure it's in a valid port range. If it's not in
 // valid port ranges, not set, or empty an EnvVarError will be thrown
 const PORT = env.get('PORT').required().asPortNumber()
-
-// If mode is production then this is required
-const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()
 
 // If mode is production then this is required
 const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()
