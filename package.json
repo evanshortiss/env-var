@@ -55,7 +55,7 @@
     "bluebird": "~3.7.0",
     "chai": "~4.2.0",
     "coveralls": "~3.0.0",
-    "husky": "~4.1.0",
+    "husky": "~4.2.2",
     "mocha": "~7.0.1",
     "mocha-lcov-reporter": "~1.3.0",
     "nyc": "~15.0.0",
