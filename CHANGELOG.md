@@ -1,3 +1,6 @@
+## 6.0.1 (09/01/20)
+* Fix typings for the `default(value)` function.
+
 ## 6.0.0 (09/01/20)
 * Add support for setting an example value via the `example(string)` function.
 * Passing default values is now performed using the `default(string)` function.
