@@ -17,9 +17,10 @@ Verification, sanitization, and type coercion for environment variables in
 Node.js. Particularly useful in TypeScript environments.
 
 * 🏋 Lightweight, at just 4.2kB when minified
-* 🚫 Helps prevent your program running in a misconfigured environment
-* 🎉 TypeScript support provides compile time safety and better DevExp
-* 👩‍💻 Friendly error messages and example values improve DevExp
+* 🧹 Cleaner code, as [shown here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d)
+* 🚫 [Fail fast](https://en.wikipedia.org/wiki/Fail-fast) if your environment is misconfigured
+* 👩‍💻 Friendly error messages and example values improve developer experience
+* 🎉 TypeScript support provides compile time safety and better developer experience
 
 
 ## Install
@@ -76,6 +77,9 @@ There is no tight coupling between [env-var](https://www.npmjs.com/package/env-v
 
 You can use `dotenv` with `env-var` via a `require()` calls in your code or
 preloading it with the `--require` or `-r` flag in the `node` CLI.
+
+Both examples below assume you have a `.env` file in your repository and it
+contains a line similar to `MY_VAR=a-string-value!`.
 
 ### Load dotenv via require()
 
