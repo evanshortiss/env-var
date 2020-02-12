@@ -13,15 +13,7 @@
 
 Verification, sanitization, and type coercion for environment variables in
 Node.js. Supports TypeScript!
-<br>
-<br>
 </div>
-
-* 🏋 Lightweight, at just 4.2kB when minified
-* 🧹 Cleaner code, as [shown here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d)
-* 🚫 [Fail fast](https://en.wikipedia.org/wiki/Fail-fast) if your environment is misconfigured
-* 👩‍💻 Friendly error messages and example values improve developer experience
-* 🎉 TypeScript support provides compile time safety and better developer experience
 
 
 * 🏋 Lightweight, at just 4.2kB when minified
