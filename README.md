@@ -11,10 +11,10 @@
 [![Known Vulnerabilities](https://snyk.io//test/github/evanshortiss/env-var/badge.svg?targetFile=package.json)](https://snyk.io//test/github/evanshortiss/env-var?targetFile=package.json)
 [![Greenkeeper badge](https://badges.greenkeeper.io/evanshortiss/env-var.svg)](https://greenkeeper.io/)
 
+Verification, sanitization, and type coercion for environment variables in
+Node.js. Supports TypeScript!
 </div>
 
-Verification, sanitization, and type coercion for environment variables in
-Node.js. Particularly useful in TypeScript environments.
 
 * 🏋 Lightweight, at just 4.2kB when minified
 * 🧹 Cleaner code, as [shown here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d)
