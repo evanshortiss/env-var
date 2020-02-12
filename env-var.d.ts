@@ -251,11 +251,6 @@ interface IEnv<PresentVariable, OptionalVariable> {
   get (varName: string): OptionalVariable;
 
   /**
-   * Gets an environment variable, using the default value if it is not already set
-   */
-  get (varName: string, defaultValue: string): PresentVariable;
-
-  /**
    * Returns a new env-var instance, where the given object is used for the environment variable mapping.
    * Use this when writing unit tests or in environments outside node.js.
    */
@@ -279,7 +274,6 @@ export type ExtensionFn<T> = (value: string, ...args: any[]) => T
 
 export function get(): {[varName: string]: string}
 export function get(varName: string): IOptionalVariable;
-export function get(varName: string, defaultValue: string): IPresentVariable;
 export function from<T extends Extensions, K extends keyof T>(values: NodeJS.ProcessEnv, extensions?: T): IEnv<
   IPresentVariable & Record<K, (...args: any[]) => ReturnType<T[K]>>,
   IOptionalVariable & Record<K, (...args: any[]) => ReturnType<T[K]>|undefined>

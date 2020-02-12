@@ -50,6 +50,14 @@ describe('env-var', function () {
     })
   })
 
+  describe('#get(target, default) deprecation message', () => {
+    it('should throw an error if using pre 6.x syntax', () => {
+      expect(() => {
+        mod.get('SOMETHING', 'default somthing value').asString()
+      }).to.throw('env-var: It looks like you passed more than one argument to env.get(). Since env-var@6.0.0 this is no longer supported. To set a default value use env.get(TARGET).default(DEFAULT)')
+    })
+  })
+
   describe('default values', function () {
     it('should return the default', function () {
       const ret = mod.get('XXX_NOT_DEFINED').default('default').asString()
