@@ -25,7 +25,7 @@ Node.js. Supports TypeScript!
 
 
 * 🏋 Lightweight, at just 4.2kB when minified
-* 🛑 Helps prevent your program running in a misconfigured environment
+* 🚫 Helps prevent your program running in a misconfigured environment
 * 🎉 TypeScript support provides compile time safety and better DevExp
 * 👩‍💻 Friendly error messages and example values improve DevExp
 
@@ -81,10 +81,10 @@ const PORT: number = env.get('PORT').required().asIntPositive();
 
 There is no tight coupling between [env-var](https://www.npmjs.com/package/env-var)
 [dotenv](https://www.npmjs.com/package/dotenv). This makes it easy to use
-dotenv in your preferred manner, and reduces package bloat too.
+`dotenv` in your preferred manner, and reduces package bloat too!
 
-You can use dotenv via a `require()` calls in your code or preloading it via
-the `--require` or `-r` flag in the `node` CLI.
+You can use `dotenv` with `env-var` via a `require()` calls in your code or
+preloading it with the `--require` or `-r` flag in the `node` CLI.
 
 ### Load dotenv via require()
 
@@ -102,7 +102,8 @@ const myVar = env.get('MY_VAR').asString()
 ### Preload dotenv via CLI Args
 
 This is per the [preload section](https://www.npmjs.com/package/dotenv#preload)
-of the dotenv README.
+of the dotenv README. Run the following code by using the
+`node -r dotenv/config your_script.js` command.
 
 ```js
 // This is just a regular node script, but we started it using the command
@@ -130,8 +131,8 @@ complex to understand as [demonstrated here](https://gist.github.com/evanshortis
     * [variable](#variable)
       * [required()](#requiredisrequired--true)
       * [covertFromBase64()](#convertfrombase64)
-      * [example(string)](#example)
-      * [default(string)](#default)
+      * [example(string)](#examplestring)
+      * [default(string)](#defaultstring)
       * [asArray()](#asarraydelimiter-string)
       * [asBoolStrict()](#asboolstrict)
       * [asBool()](#asbool)
@@ -179,19 +180,59 @@ This function has two behaviours:
 Examples:
 
 ```js
-const env = require('env-var')
+const { from } = require('env-var')
+
+// Environment variable that we will use for this example:
+process.env.ADMIN = 'admin@example.com'
+
+// Add an accessor named 'asEmail' that verifies that the value is a
+// valid-looking email address.
+const env = from(process.env, {
+  asEmail: (value) => {
+    const split = String(value).split('@')
+
+    // Validating email addresses is hard.
+    if (split.length !== 2) {
+      throw new Error('must contain exactly one "@"')
+    }
 
 // #1 - Read the requested variable and parse it to a positive integer
 const limit = env.get('MAX_CONNECTIONS').asIntPositive()
 
-// #2 - Returns the entire process.env object
-const allVars = env.get()
+// We specified 'asEmail' as the name for the accessor above, so now
+// we can call `asEmail()` like any other accessor.
+let validEmail = env.get('ADMIN').asEmail()
 ```
 
-### variable
-A variable is returned by calling `env.get(varname)`. It exposes the following
-functions to validate and access the underlying value, set a default, or set
-an example value:
+The accessor function may accept additional arguments if desired; these must be
+provided explicitly when the accessor is invoked.
+
+For example, we can modify the `asEmail()` accessor from above so that it
+optionally verifies the domain of the email address:
+```js
+const { from } = require('env-var')
+
+// Environment variable that we will use for this example:
+process.env.ADMIN = 'admin@example.com'
+
+// Add an accessor named 'asEmail' that verifies that the value is a
+// valid-looking email address.
+//
+// Note that the accessor function also accepts an optional second
+// parameter `requiredDomain` which can be provided when the accessor is
+// invoked (see below).
+const env = from(process.env, {
+  asEmail: (value, requiredDomain) => {
+    const split = String(value).split('@')
+
+    // Validating email addresses is hard.
+    if (split.length !== 2) {
+      throw new Error('must contain exactly one "@"')
+    }
+
+    if (requiredDomain && (split[1] !== requiredDomain)) {
+      throw new Error(`must end with @${requiredDomain}`)
+    }
 
 #### example(string)
 Allows a developer to provide an example of a valid value for the environment
@@ -199,23 +240,48 @@ variable. If the variable is not set (and `required()` was called), or the
 variable is set incorrectly this will be included in error output to help
 developers diagnose the error.
 
-For example:
+// We specified 'asEmail' as the name for the accessor above, so now
+// we can call `asEmail()` like any other accessor.
+//
+// `env-var` will provide the first argument for the accessor function
+// (`value`), but we declared a second argument `requiredDomain`, which
+// we can provide when we invoke the accessor.
 
-```js
-const env = require('env-var')
+// Calling the accessor without additional parameters accepts an email
+// address with any domain.
+let validEmail = env.get('ADMIN').asEmail()
 
-const ADMIN_EMAIL = env.get('ADMIN_EMAIL')
-  .required()
-  .example('admin@example.com')
-  .asString()
+// If we specify a parameter, then the email address must end with the
+// domain we specified.
+let invalidEmail = env.get('ADMIN').asEmail('github.com')
 ```
 
-If *ADMIN_EMAIL* was not set this code would throw an error similar to that
-below to help a developer diagnose the issue:
+This feature is also available for TypeScript users. The `ExtensionFn` type is
+expoed to help in the creation of these new accessors.
 
-```
-env-var: "ADMIN_EMAIL" is a required variable, but it was not set. An example
-of a valid value would be "admin@example.com"
+```ts
+import { from, ExtensionFn, EnvVarError } from 'env-var'
+
+// Environment variable that we will use for this example:
+process.env.ADMIN = 'admin@example.com'
+
+const asEmail: ExtensionFn<string> = (value) => {
+  const split = String(value).split('@')
+
+  // Validating email addresses is hard.
+  if (split.length !== 2) {
+    throw new Error('must contain exactly one "@"')
+  }
+
+  return value
+}
+
+const env = from(process.env, {
+  asEmail
+})
+
+// Returns the email string if it's valid, otherwise it will throw
+env.get('ADMIN').asEmail()
 ```
 
 #### default(string)
