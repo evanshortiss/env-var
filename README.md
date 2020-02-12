@@ -50,13 +50,13 @@ const env = require('env-var');
 const PASSWORD = env.get('DB_PASSWORD')
   // Throws an error if the DB_PASSWORD variable is not set (optional)
   .required()
-  // Convert DB_PASSWORD from base64 to a regular utf8 string (optional)
+  // Decode DB_PASSWORD from base64 to a utf8 string (optional)
   .convertFromBase64()
-  // Call asString (or other methods) to get the variable value (required)
+  // Call asString (or other APIs) to get the variable value (required)
   .asString();
 
-// Read in a port (checks that PORT is in the raneg 0 to 65535) or use a
-// default value of 5432 instead
+// Read in a port (checks that PORT is in the range 0 to 65535)
+// Alternatively, use amdefault value of 5432 if PORT is not defined
 const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
@@ -65,16 +65,18 @@ const PORT = env.get('PORT').default('5432').asPortNumber()
 ```ts
 import * as env from 'env-var';
 
-// Read a PORT environment variable and ensure it's a positive number
-// An EnvVarError will be thrown if the variable is not set, or is not a number
+// Read a PORT environment variable and ensure it's a positive integer.
+// An EnvVarError will be thrown if the variable is not set, or if it
+// is not a positive integer.
 const PORT: number = env.get('PORT').required().asIntPositive();
 ```
 
 ## Usage with dotenv
 
 There is no tight coupling between [env-var](https://www.npmjs.com/package/env-var)
-[dotenv](https://www.npmjs.com/package/dotenv). This makes it easy to use
-`dotenv` in your preferred manner, and reduces package bloat too!
+[dotenv](https://www.npmjs.com/package/dotenv). Just `npm install dotenv` and
+use it whatever way you're used to. This loose coupling is a good thing since
+it reduces package bloat - only install what you need!
 
 You can use `dotenv` with `env-var` via a `require()` calls in your code or
 preloading it with the `--require` or `-r` flag in the `node` CLI.
@@ -111,20 +113,13 @@ const env = require('env-var')
 const myVar = env.get('MY_VAR').asString()
 ```
 
-## Benefits
-Fail fast if your environment is misconfigured. Also,
-[this code](https://gist.github.com/evanshortiss/75d936665a2a240fa1966770a85fb137) without
-`env-var` would require multiple `assert` calls, other logic, and be more
-complex to understand as [demonstrated here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d).
-
 ## API
 
 ### Structure:
 
 * module (env-var)
-  * [EnvVarError()](#envvarerror)
   * [from()](#fromvalues-extraaccessors)
-  * [get()](#getvarname-default)
+  * [get()](#getvarname)
     * [variable](#variable)
       * [required()](#requiredisrequired--true)
       * [covertFromBase64()](#convertfrombase64)
@@ -147,34 +142,12 @@ complex to understand as [demonstrated here](https://gist.github.com/evanshortis
       * [asString()](#asstring)
       * [asUrlObject()](#asurlobject)
       * [asUrlString()](#asurlstring)
-
-### EnvVarError()
-This is the error class used to represent errors raised by this module. Sample
-usage:
-
-```js
-const env = require('env-var')
-let value = null
-
-try {
-  // will throw if you have not set this variable
-  value = env.get('MISSING_VARIABLE').required().asString()
-
-  // if catch error is set, we'll end up throwing here instead
-  throw new Error('some other error')
-} catch (e) {
-  if (e instanceof env.EnvVarError) {
-    console.log('we got an env-var error', e)
-  } else {
-    console.log('we got some error that wasn\'t an env-var error', e)
-  }
-}
-```
+  * [EnvVarError()](#envvarerror)
 
 ### from(values, extraAccessors)
 This function is useful if you're not in a typical Node.js environment, or for
 testing. It allows you to generate an env-var instance that reads from the
-given `values` instead of the default `process.env`.
+given `values` instead of the default `process.env` Object.
 
 ```js
 const env = require('env-var').from({
@@ -182,33 +155,36 @@ const env = require('env-var').from({
 })
 
 // apiUrl will be 'https://my.api.com/'
-const apiUrl = mockedEnv.get('API_BASE_URL').asUrlString()
+const apiUrl = env.get('API_BASE_URL').asUrlString()
 ```
 
 When calling `env.from()` you can also pass an optional parameter containing
-custom accessors that will be attached to any variables gotten by that
+custom accessors that will be attached to any variables returned by that
 env-var instance. This feature is explained in the
 [extraAccessors section](#extraAccessors) of these docs.
 
-### get([varname, [default]])
-You can call this function 3 different ways:
+### get(varname)
+This function has two behaviours:
+
+1. Calling with a string argument will make it read that value from the environment
+2. If no string argument is passed it will return the entire environment object
+
+Examples:
 
 ```js
 const env = require('env-var')
 
-// #1 - Return the requested variable (we're also checking it's a positive int)
-const limit = env.get('SOME_LIMIT').asIntPositive()
+// #1 - Read the requested variable and parse it to a positive integer
+const limit = env.get('MAX_CONNECTIONS').asIntPositive()
 
-// #2 - Return the requested variable, or use the given default if it isn't set
-const limit = env.get('SOME_LIMIT').default('10').asIntPositive()
-
-// #3 - Return the environment object (process.env by default - see env.from() docs for more)
-const allvars = env.get()
+// #2 - Returns the entire process.env object
+const allVars = env.get()
 ```
 
 ### variable
-A variable is returned by calling `env.get`. It has the exposes the following
-functions to validate and access the underlying value.
+A variable is returned by calling `env.get(varname)`. It exposes the following
+functions to validate and access the underlying value, set a default, or set
+an example value:
 
 #### example(string)
 Allows a developer to provide an example of a valid value for the environment
@@ -227,7 +203,8 @@ const ADMIN_EMAIL = env.get('ADMIN_EMAIL')
   .asString()
 ```
 
-If *ADMIN_EMAIL* was not set this code would throw an error like so:
+If *ADMIN_EMAIL* was not set this code would throw an error similar to that
+below to help a developer diagnose the issue:
 
 ```
 env-var: "ADMIN_EMAIL" is a required variable, but it was not set. An example
@@ -235,8 +212,10 @@ of a valid value would be "admin@example.com"
 ```
 
 #### default(string)
-Allows a default value to be provided for use if the value is not set in the
-environment.
+Allows a default value to be provided for use if the desired environment
+variable is not set in the program environment.
+
+Example:
 
 ```js
 const env = require('env-var')
@@ -246,13 +225,14 @@ const POOL_SIZE = env.get('POOL_SIZE').default('10').asIntPositive()
 ```
 
 #### required(isRequired = true)
-Ensure the variable is set on *process.env*. If the variable is not set or empty
-this function will throw an `EnvVarError`. If the variable is set it returns itself
-so you can access the underlying variable.
+Ensure the variable is set on *process.env*. If the variable is not set, or is
+set to an empty value, this function will cause an `EnvVarError` to be thrown
+when you attempt to read the value using `asString` or a similar function.
 
-Can be bypassed by passing `false`, i.e `required(false)`
+The `required()` check can be bypassed by passing `false`, i.e
+`required(false)`
 
-Full example:
+Example:
 
 ```js
 const env = require('env-var')
@@ -267,13 +247,11 @@ const PORT = env.get('PORT').required().asPortNumber()
 
 // If mode is production then this is required
 const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()
-
-app.listen(PORT)
 ```
 
 #### convertFromBase64()
-Sometimes environment variables need to be encoded as base64. You can use this
-function to convert them to UTF-8 strings before parsing them.
+It's a common need to set an environment variable in base64 format. This
+function can be used to decode a base64 environment variable to UTF8.
 
 For example if we run the script script below, using the command `DB_PASSWORD=
 $(echo -n 'secret_password' | base64) node`, we'd get the following results:
@@ -286,7 +264,7 @@ const dbpass = env.get('DB_PASSWORD').convertFromBase64().asString()
 ```
 
 #### asPortNumber()
-Converts the value of the environment variable to a string and verifies it's
+Converts the value of the environment variable to an integer and verifies it's
 within the valid port range of 0-65535. As a result well known ports are
 considered valid by this function.
 
@@ -362,6 +340,29 @@ string. The validation is performed by passing the URL string to the
 Verifies that the variable is a valid URL string using the same method as
 `asUrlString()`, but instead returns the resulting URL instance. For details
 see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html).
+
+### EnvVarError()
+This is the error class used to represent errors raised by this module. Sample
+usage:
+
+```js
+const env = require('env-var')
+let value = null
+
+try {
+  // will throw if you have not set this variable
+  value = env.get('MISSING_VARIABLE').required().asString()
+
+  // if catch error is set, we'll end up throwing here instead
+  throw new Error('some other error')
+} catch (e) {
+  if (e instanceof env.EnvVarError) {
+    console.log('we got an env-var error', e)
+  } else {
+    console.log('we got some error that wasn\'t an env-var error', e)
+  }
+}
+```
 
 ## Examples
 
@@ -573,3 +574,6 @@ env.get('SOME_NUMBER').asNumberZero()
 * @MikeyBurkman
 * @pepakriz
 * @rmblstrp
+* @shawnmclean
+* @todofixthis
+* @xuo
