@@ -525,9 +525,9 @@ env.get('ADMIN').asEmail()
 Contributions are welcomed. If you'd like to discuss an idea open an issue, or a
 PR with an initial implementation.
 
-If you want to add a new global accessor, it's easy. Add a file to
-`lib/accessors`, with the name of the type e.g add a file named `number-zero.js`
-into that folder and populate it with code following this structure:
+If you want to add a new global accessor add a file to `lib/accessors`, with
+the name of the type e.g add a file named `number-zero.js` into that folder
+and populate it with code following this structure:
 
 ```js
 /**
