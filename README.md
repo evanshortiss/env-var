@@ -17,7 +17,7 @@ Verification, sanitization, and type coercion for environment variables in
 Node.js. Particularly useful in TypeScript environments.
 
 * 🏋 Lightweight, at just 4.2kB when minified
-* 🛑 Helps prevent your program running in a misconfigured environment
+* 🚫 Helps prevent your program running in a misconfigured environment
 * 🎉 TypeScript support provides compile time safety and better DevExp
 * 👩‍💻 Friendly error messages and example values improve DevExp
 
@@ -72,10 +72,10 @@ const PORT: number = env.get('PORT').required().asIntPositive();
 
 There is no tight coupling between [env-var](https://www.npmjs.com/package/env-var)
 [dotenv](https://www.npmjs.com/package/dotenv). This makes it easy to use
-dotenv in your preferred manner, and reduces package bloat too.
+`dotenv` in your preferred manner, and reduces package bloat too!
 
-You can use dotenv via a `require()` calls in your code or preloading it via
-the `--require` or `-r` flag in the `node` CLI.
+You can use `dotenv` with `env-var` via a `require()` calls in your code or
+preloading it with the `--require` or `-r` flag in the `node` CLI.
 
 ### Load dotenv via require()
 
@@ -93,7 +93,8 @@ const myVar = env.get('MY_VAR').asString()
 ### Preload dotenv via CLI Args
 
 This is per the [preload section](https://www.npmjs.com/package/dotenv#preload)
-of the dotenv README.
+of the dotenv README. Run the following code by using the
+`node -r dotenv/config your_script.js` command.
 
 ```js
 // This is just a regular node script, but we started it using the command
@@ -122,8 +123,8 @@ complex to understand as [demonstrated here](https://gist.github.com/evanshortis
     * [variable](#variable)
       * [required()](#requiredisrequired--true)
       * [covertFromBase64()](#convertfrombase64)
-      * [example(string)](#example)
-      * [default(string)](#default)
+      * [example(string)](#examplestring)
+      * [default(string)](#defaultstring)
       * [asArray()](#asarraydelimiter-string)
       * [asBoolStrict()](#asboolstrict)
       * [asBool()](#asbool)
@@ -197,10 +198,10 @@ const { from } = require('env-var')
 // Environment variable that we will use for this example:
 process.env.ADMIN = 'admin@example.com'
 
-// Add an accessor named 'checkEmail' that verifies that the value is a
+// Add an accessor named 'asEmail' that verifies that the value is a
 // valid-looking email address.
 const env = from(process.env, {
-  checkEmail: (value) => {
+  asEmail: (value) => {
     const split = String(value).split('@')
 
     // Validating email addresses is hard.
@@ -212,15 +213,15 @@ const env = from(process.env, {
   }
 })
 
-// We specified 'checkEmail' as the name for the accessor above, so now
-// we can call `checkEmail()` like any other accessor.
-let validEmail = env.get('ADMIN').checkEmail()
+// We specified 'asEmail' as the name for the accessor above, so now
+// we can call `asEmail()` like any other accessor.
+let validEmail = env.get('ADMIN').asEmail()
 ```
 
 The accessor function may accept additional arguments if desired; these must be
 provided explicitly when the accessor is invoked.
 
-For example, we can modify the `checkEmail()` accessor from above so that it
+For example, we can modify the `asEmail()` accessor from above so that it
 optionally verifies the domain of the email address:
 ```js
 const { from } = require('env-var')
@@ -228,14 +229,14 @@ const { from } = require('env-var')
 // Environment variable that we will use for this example:
 process.env.ADMIN = 'admin@example.com'
 
-// Add an accessor named 'checkEmail' that verifies that the value is a
+// Add an accessor named 'asEmail' that verifies that the value is a
 // valid-looking email address.
 //
 // Note that the accessor function also accepts an optional second
 // parameter `requiredDomain` which can be provided when the accessor is
 // invoked (see below).
 const env = from(process.env, {
-  checkEmail: (value, requiredDomain) => {
+  asEmail: (value, requiredDomain) => {
     const split = String(value).split('@')
 
     // Validating email addresses is hard.
@@ -251,8 +252,8 @@ const env = from(process.env, {
   }
 })
 
-// We specified 'checkEmail' as the name for the accessor above, so now
-// we can call `checkEmail()` like any other accessor.
+// We specified 'asEmail' as the name for the accessor above, so now
+// we can call `asEmail()` like any other accessor.
 //
 // `env-var` will provide the first argument for the accessor function
 // (`value`), but we declared a second argument `requiredDomain`, which
@@ -260,11 +261,11 @@ const env = from(process.env, {
 
 // Calling the accessor without additional parameters accepts an email
 // address with any domain.
-let validEmail = env.get('ADMIN').checkEmail()
+let validEmail = env.get('ADMIN').asEmail()
 
 // If we specify a parameter, then the email address must end with the
 // domain we specified.
-let invalidEmail = env.get('ADMIN').checkEmail('github.com')
+let invalidEmail = env.get('ADMIN').asEmail('github.com')
 ```
 
 This feature is also available for TypeScript users. The `ExtensionFn` type is
@@ -276,7 +277,7 @@ import { from, ExtensionFn, EnvVarError } from 'env-var'
 // Environment variable that we will use for this example:
 process.env.ADMIN = 'admin@example.com'
 
-const checkEmail: ExtensionFn<string> = (value) => {
+const asEmail: ExtensionFn<string> = (value) => {
   const split = String(value).split('@')
 
   // Validating email addresses is hard.
@@ -288,11 +289,11 @@ const checkEmail: ExtensionFn<string> = (value) => {
 }
 
 const env = from(process.env, {
-  checkEmail
+  asEmail
 })
 
 // Returns the email string if it's valid, otherwise it will throw
-env.get('ADMIN').checkEmail()
+env.get('ADMIN').asEmail()
 ```
 
 ### get([varname, [default]])
