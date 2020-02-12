@@ -5,7 +5,8 @@
     "target": "es5",
     "moduleResolution": "node",
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "strictNullChecks": true
   },
-  "files": ["test/types/index.ts"]
+  "files": ["test/types/index.ts", "example/typescript.ts"]
 }

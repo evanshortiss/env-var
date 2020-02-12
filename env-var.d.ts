@@ -19,7 +19,7 @@ interface IPresentVariable {
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string) => IPresentVariable;
+  default: (value: string|number|Record|Array) => IPresentVariable;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception
@@ -136,7 +136,7 @@ interface IOptionalVariable {
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string) => IPresentVariable;
+  default: (value: string|number|Record|Array) => IPresentVariable;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception will be thrown.

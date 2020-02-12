@@ -20,6 +20,6 @@ if (!url) {
 console.log('url is', url)
 
 // Integers
-const requiredInt = env.get('AN_INTEGER').required().asInt()
+const requiredInt = env.get('AN_INTEGER').default(10).required().asInt()
 
 console.log('the integer was', requiredInt)
