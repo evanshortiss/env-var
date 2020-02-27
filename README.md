@@ -279,22 +279,22 @@ an exception will be raised rather than rounding up/down.
 
 #### asIntPositive()
 Performs the same task as _asInt()_, but also verifies that the number is
-positive (greater than zero).
+positive (greater than or equal to zero).
 
 #### asIntNegative()
 Performs the same task as _asInt()_, but also verifies that the number is
-negative (less than zero).
+negative (less than or equal to zero).
 
 #### asFloat()
 Attempt to parse the variable to a float. Throws an exception if parsing fails.
 
 #### asFloatPositive()
 Performs the same task as _asFloat()_, but also verifies that the number is
-positive (greater than zero).
+positive (greater than or equal to zero).
 
 #### asFloatNegative()
 Performs the same task as _asFloat()_, but also verifies that the number is
-negative (less than zero).
+negative (less than or equal to zero).
 
 #### asString()
 Return the variable value as a String. Throws an exception if value is not a
