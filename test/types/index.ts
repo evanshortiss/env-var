@@ -77,7 +77,7 @@ describe('typescript tests', () => {
 
   describe('asEnum', () => {
     const e = env.from({
-      'ENUM': 'a'
+      ENUM: 'a'
     })
 
     it('should work with generic defaults', () => {
