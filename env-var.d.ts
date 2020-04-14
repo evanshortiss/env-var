@@ -117,7 +117,7 @@ interface IPresentVariable<Extensions = {}> {
   /**
    * Verifies that the var being accessed is one of the given values
    */
-  asEnum: (validValues: string[]) => string;
+  asEnum: <T extends string>(validValues: T[]) => T;
 }
 
 interface IOptionalVariable<Extensions = {}> {

@@ -3,6 +3,7 @@ import * as env from '../../';
 import { expect } from 'chai'
 import * as url from 'url';
 import 'mocha'
+import { assert, IsExact } from 'conditional-type-checks'
 
 describe('typescript tests', () => {
   describe('#from', () => {
@@ -71,6 +72,24 @@ describe('typescript tests', () => {
       expect(() => {
         extendedEnv.get('INVALID_EMAIL').asEmailComponents()
       }).to.throw('env-var: "INVALID_EMAIL" should be an email, but is set to "oops-example.com"')
+    })
+  })
+
+  describe('asEnum', () => {
+    const e = env.from({
+      'ENUM': 'a'
+    })
+
+    it('should work with generic defaults', () => {
+      const enums = e.get('ENUM').required().asEnum(['a', 'b'])
+
+      assert<IsExact<typeof enums, 'a' | 'b'>>(true);
+    })
+
+    it('should work with generic params', () => {
+      const enums = e.get('ENUM').required().asEnum<'a' | 'b'>(['a', 'b'])
+
+      assert<IsExact<typeof enums, 'a' | 'b'>>(true);
     })
   })
 })
