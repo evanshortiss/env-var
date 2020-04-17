@@ -53,7 +53,7 @@
   "devDependencies": {
     "@types/chai": "~4.2.10",
     "@types/mocha": "~7.0.1",
-    "@types/node": "~13.7.0",
+    "@types/node": "~13.13.0",
     "bluebird": "~3.7.0",
     "chai": "~4.2.0",
     "conditional-type-checks": "1.0.5",
