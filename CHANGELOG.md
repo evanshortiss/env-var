@@ -1,3 +1,6 @@
+## 6.1.1 (22/04/20)
+* Fix TS error with *ExtenderTypeOptional* and *ExtenderType* typings (#119)
+
 ## 6.1.0 (20/04/20)
 * Fix TS error with *extraAccessor* typings (#114)
 * Add support for generic types in *asEnum* (#116)

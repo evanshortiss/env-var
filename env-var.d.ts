@@ -3,29 +3,29 @@
 
 import { Url } from 'url';
 
-interface IPresentVariable<Extensions = {}> {
+interface IPresentVariable<Exs extends Extensions = {}> {
   /**
    * Converts a bas64 environment variable to ut8
    */
-  convertFromBase64: () => IPresentVariable<Extensions> & Extensions
+  convertFromBase64: () => IPresentVariable<Exs> & Exs
 
   /**
    * Provide an example value that can be used in error output if the variable
    * is not set, or is set to an invalid value
    */
-  example: (example: string) => IPresentVariable<Extensions> & Extensions
+  example: (example: string) => IPresentVariable<Exs> & Exs
 
   /**
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Extensions> & Extensions;
+  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Exs> & Exs;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception
    * will be thrown. Can pass false to bypass the check.
    */
-  required: (isRequired?: boolean) => IPresentVariable & ExtenderType<Extensions>;
+  required: (isRequired?: boolean) => IPresentVariable & ExtenderType<Exs>;
 
   /**
    * Converts a number to an integer and verifies it's in port ranges 0-65535
@@ -120,29 +120,29 @@ interface IPresentVariable<Extensions = {}> {
   asEnum: <T extends string>(validValues: T[]) => T;
 }
 
-interface IOptionalVariable<Extensions = {}> {
+interface IOptionalVariable<Exs extends Extensions = {}> {
   /**
    * Decodes a base64-encoded environment variable
    */
-  convertFromBase64: () => IOptionalVariable<Extensions> & Extensions;
+  convertFromBase64: () => IOptionalVariable<Exs> & Exs;
 
   /**
    * Provide an example value that can be used in error output if the variable
    * is not set, or is set to an invalid value
    */
-  example: (value: string) => IOptionalVariable<Extensions> & Extensions;
+  example: (value: string) => IOptionalVariable<Exs> & Exs;
 
   /**
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Extensions> & Extensions;
+  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Exs> & Exs;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception will be thrown.
    * Can pass false to bypass the check
    */
-  required: (isRequired?: boolean) => IPresentVariable & ExtenderType<Extensions>;
+  required: (isRequired?: boolean) => IPresentVariable & ExtenderType<Exs>;
 
   /**
    * Converts a number to an integer and verifies it's in port ranges 0-65535
@@ -267,8 +267,8 @@ interface IEnv<PresentVariable, OptionalVariable> {
 }
 
 // Used internally only to support extension fns
-type ExtenderType<T> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]> }
-type ExtenderTypeOptional<T> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]>|undefined }
+type ExtenderType<T extends Extensions> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]> }
+type ExtenderTypeOptional<T extends Extensions> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]>|undefined }
 
 export type Extensions = {
   [key: string]: ExtensionFn<any>
