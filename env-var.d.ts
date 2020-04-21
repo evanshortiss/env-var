@@ -3,29 +3,29 @@
 
 import { Url } from 'url';
 
-interface IPresentVariable {
+interface IPresentVariable<Extensions = {}> {
   /**
    * Converts a bas64 environment variable to ut8
    */
-  convertFromBase64: () => IPresentVariable
+  convertFromBase64: () => IPresentVariable<Extensions> & Extensions
 
   /**
    * Provide an example value that can be used in error output if the variable
    * is not set, or is set to an invalid value
    */
-  example: (example: string) => IPresentVariable
+  example: (example: string) => IPresentVariable<Extensions> & Extensions
 
   /**
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable;
+  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Extensions> & Extensions;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception
    * will be thrown. Can pass false to bypass the check.
    */
-  required: (isRequired?: boolean) => IPresentVariable;
+  required: (isRequired?: boolean) => IPresentVariable & ExtenderType<Extensions>;
 
   /**
    * Converts a number to an integer and verifies it's in port ranges 0-65535
@@ -85,7 +85,7 @@ interface IPresentVariable {
   asJsonObject: () => Object;
 
   /**
-   * Reads an environment variable as a string, then splits it on each occurence of the specified delimiter.
+   * Reads an environment variable as a string, then splits it on each occurrence of the specified delimiter.
    * By default a comma is used as the delimiter. For example a var set to "1,2,3" would become ['1', '2', '3'].
    */
   asArray: (delimiter?: string) => Array<string>;
@@ -117,32 +117,32 @@ interface IPresentVariable {
   /**
    * Verifies that the var being accessed is one of the given values
    */
-  asEnum: (validValues: string[]) => string;
+  asEnum: <T extends string>(validValues: T[]) => T;
 }
 
-interface IOptionalVariable {
+interface IOptionalVariable<Extensions = {}> {
   /**
    * Decodes a base64-encoded environment variable
    */
-  convertFromBase64: () => IOptionalVariable;
+  convertFromBase64: () => IOptionalVariable<Extensions> & Extensions;
 
   /**
    * Provide an example value that can be used in error output if the variable
    * is not set, or is set to an invalid value
    */
-  example: (value: string) => IOptionalVariable;
+  example: (value: string) => IOptionalVariable<Extensions> & Extensions;
 
   /**
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable;
+  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Extensions> & Extensions;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception will be thrown.
    * Can pass false to bypass the check
    */
-  required: (isRequired?: boolean) => IPresentVariable;
+  required: (isRequired?: boolean) => IPresentVariable & ExtenderType<Extensions>;
 
   /**
    * Converts a number to an integer and verifies it's in port ranges 0-65535
@@ -202,7 +202,7 @@ interface IOptionalVariable {
   asJsonObject: () => Object|undefined;
 
   /**
-   * Reads an environment variable as a string, then splits it on each occurence of the specified delimiter.
+   * Reads an environment variable as a string, then splits it on each occurrence of the specified delimiter.
    * By default a comma is used as the delimiter. For example a var set to "1,2,3" would become ['1', '2', '3'].
    */
   asArray: (delimiter?: string) => Array<string>|undefined;
@@ -254,9 +254,9 @@ interface IEnv<PresentVariable, OptionalVariable> {
    * Returns a new env-var instance, where the given object is used for the environment variable mapping.
    * Use this when writing unit tests or in environments outside node.js.
    */
-  from<T extends Extensions, K extends keyof T>(values: NodeJS.ProcessEnv, extensions?: T): IEnv<
-    IPresentVariable & Record<K, (...args: any[]) => ReturnType<T[K]>>,
-    IOptionalVariable & Record<K, (...args: any[]) => ReturnType<T[K]>|undefined>
+  from<T extends Extensions>(values: NodeJS.ProcessEnv, extensions?: T): IEnv<
+    IPresentVariable<T> & ExtenderType<T>,
+    IOptionalVariable<T> & ExtenderTypeOptional<T>
   >;
 
   /**
@@ -266,15 +266,18 @@ interface IEnv<PresentVariable, OptionalVariable> {
   EnvVarError: EnvVarError
 }
 
+// Used internally only to support extension fns
+type ExtenderType<T> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]> }
+type ExtenderTypeOptional<T> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]>|undefined }
+
 export type Extensions = {
   [key: string]: ExtensionFn<any>
 }
 export type RaiseErrorFn = (error: string) => void
 export type ExtensionFn<T> = (value: string, ...args: any[]) => T
-
 export function get(): {[varName: string]: string}
 export function get(varName: string): IOptionalVariable;
-export function from<T extends Extensions, K extends keyof T>(values: NodeJS.ProcessEnv, extensions?: T): IEnv<
-  IPresentVariable & Record<K, (...args: any[]) => ReturnType<T[K]>>,
-  IOptionalVariable & Record<K, (...args: any[]) => ReturnType<T[K]>|undefined>
+export function from<T extends Extensions>(values: NodeJS.ProcessEnv, extensions?: T): IEnv<
+  IPresentVariable<T> & ExtenderType<T>,
+  IOptionalVariable<T> & ExtenderTypeOptional<T>
 >;

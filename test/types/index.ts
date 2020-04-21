@@ -1,125 +1,165 @@
 
 import * as env from '../../';
-import * as assert from 'assert';
-import * as url from 'url';
+import { expect } from 'chai'
+import 'mocha'
+import { assert, IsExact } from 'conditional-type-checks'
 
-function test () {
-  // BASE 64
-  process.env.BASE64 = 'aGVsbG8='
-  assert.equal(
-    env.get('BASE64').required().convertFromBase64().asString(),
-    'hello'
-  )
+describe('typescript tests', () => {
+  describe('#from', () => {
+    it('should return an env-var instance and read with asString()', () => {
+      const A_STRING = 'hello, world!'
+      const e = env.from({
+        A_STRING
+      })
 
-  // STRINGS
-  process.env.STRING = 'string'
-  assert.equal(env.get('STRING').required().asString(), process.env.STRING)
-  assert.equal(env.get('SOME_STRING').asString(), undefined)
+      expect(e.get('A_STRING').asString()).to.equal(A_STRING)
+    })
 
+    it('should return an env-var instance be missing system vars', () => {
+      // env-var instance with no vars
+      const e = env.from({})
 
-  // INTEGERS
-  process.env.INT = '0'
-  process.env.INT_POSITIVE = '2'
-  process.env.INT_NEGATIVE = '-2'
-
-  const intVal = env.get('INT').required().asInt();
-  const intValPositive = env.get('INT_POSITIVE').asIntPositive();
-  const intValNegative = env.get('INT_NEGATIVE').asIntNegative();
-
-  assert.equal(intVal, 0)
-  assert.equal(intValPositive, 2)
-  assert.equal(intValNegative, -2)
-
-
-  // FLOATs
-  process.env.FLOAT = '13.234234'
-  process.env.FLOAT_POSITIVE = '13.234234'
-  process.env.FLOAT_NEGATIVE = '-13.234234'
-
-  const floatVal = env.get('FLOAT').required().asFloat();
-  const floatValPositive = env.get('FLOAT_POSITIVE').asFloatPositive();
-  const floatValNegative = env.get('FLOAT_NEGATIVE').asFloatNegative();
-
-  assert.equal(floatVal, 13.234234)
-  assert.equal(floatValPositive, 13.234234)
-  assert.equal(floatValNegative, -13.234234)
-
-
-  // BOOLEAN
-  process.env.BOOL = '0'
-  process.env.BOOL_STRICT = 'true'
-
-  const asBool = env.get('BOOL').required().asBool();
-  const asBoolStrict = env.get('BOOL_STRICT').asBoolStrict();
-
-  assert.equal(asBool, false)
-  assert.equal(asBoolStrict, true)
-
-
-  // ARRAY
-  process.env.ARRAY_COMMA = '1,2,3'
-  process.env.ARRAY_HYPHEN = '1-2-3'
-
-  assert.deepEqual(env.get('ARRAY_COMMA').asArray(), ['1', '2', '3'])
-  assert.deepEqual(env.get('ARRAY_HYPHEN').asArray('-'), ['1', '2', '3'])
-
-
-  // JSON
-  process.env.JSON_OBJECT = JSON.stringify({ test: 'testing' })
-  process.env.JSON_ARRAY = JSON.stringify([1,2,3])
-
-  assert.deepEqual(env.get('JSON_OBJECT').asJson(), { test: 'testing' })
-  assert.deepEqual(env.get('JSON_OBJECT').asJsonObject(), { test: 'testing' })
-  assert.deepEqual(env.get('JSON_ARRAY').asJsonArray(), [1,2,3])
-
-
-  // URLS
-  process.env.URL_STRING = 'http://google.com/'
-
-  assert.deepEqual(env.get('URL_STRING').asUrlObject(), new url.URL(process.env.URL_STRING))
-  assert.equal(env.get('URL_STRING').asUrlString(), 'http://google.com/')
-
-  // FROM
-  const newEnv = env.from(process.env)
-  assert.equal(newEnv.get('STRING').required().asString(), process.env.STRING)
-  assert.equal(newEnv.get('SOME_STRING').asString(), undefined)
-
-  // FROM WITH EXTENSIONS
-  interface EmailParts {
-    username: string
-    domain: string
-  }
-
-  const asEmailComponents: env.ExtensionFn<EmailParts> = (value) => {
-    const parts = value.split('@')
-
-    if (parts.length != 2) {
-      throw new env.EnvVarError('probably not an email')
-    } else {
-      return {
-        username: parts[0],
-        domain: parts[1]
-      }
-    }
-  }
-
-  const extrasEnv = env.from({
-    EMAIL: 'hello@example.com'
-  }, {
-    asEmailComponents
+      expect(e.get('PATH').asString()).to.equal(undefined)
+    })
   })
 
-  assert.equal(
-    extrasEnv.get('MISSING_EMAIL').asEmailComponents(),
-    undefined
-  )
-  assert.deepEqual(
-    extrasEnv.get('EMAIL').asEmailComponents(),
-    {
-      domain: 'example.com',
-      username: 'hello'
-    }
-  )
-}
+  describe('#accessors', () => {
+    it('required().asString() should throw if missing', () => {
+      const e = env.from({})
 
-test()
+      expect(() => {
+        e.get('A_MISSING_VARIABLE').required().asString()
+      }).to.throw('env-var: "A_MISSING_VARIABLE" is a required variable, but it was not set')
+    })
+  })
+
+  describe('#ExtensionFn', () => {
+    interface EmailComponents {
+      username: string
+      domain: string
+    }
+    const asEmailComponents: env.ExtensionFn<EmailComponents> = (value) => {
+      const parts = value.split('@')
+
+      if (parts.length != 2) {
+        throw new Error('should be an email')
+      } else {
+        return {
+          username: parts[0],
+          domain: parts[1]
+        }
+      }
+    }
+
+    it('should return the email parts for a valid email, throw for invalid', () => {
+      const extendedEnv = env.from({
+        VALID_EMAIL: 'hello@example.com',
+        INVALID_EMAIL: 'oops-example.com'
+      }, {
+        asEmailComponents
+      })
+
+      // We use required() here to verify chaining typings work
+      expect(
+        extendedEnv.get('VALID_EMAIL').required().asEmailComponents()
+      ).to.deep.equal({
+        username: 'hello',
+        domain: 'example.com'
+      })
+
+      expect(() => {
+        extendedEnv.get('INVALID_EMAIL').asEmailComponents()
+      }).to.throw('env-var: "INVALID_EMAIL" should be an email, but is set to "oops-example.com"')
+    })
+
+    it('should support multiple extensions (with correct types)', () => {
+      const asNumberZero: env.ExtensionFn<number> = (value) => {
+        const n = parseInt(value)
+
+        if (n === 0) {
+          return 0
+        }
+
+        throw new env.EnvVarError('was not zero')
+      }
+
+      const extendedEnv = env.from({
+        EMAIL: 'hello@example.com',
+        ZERO: '0'
+      }, {
+        asEmailComponents,
+        asNumberZero
+      })
+
+      expect(
+        extendedEnv.get('ZERO').required().asNumberZero()
+      ).to.equal(0)
+
+      expect(
+        extendedEnv.get('ZERO').asNumberZero()
+      ).to.equal(0)
+
+      expect(
+        extendedEnv.get('EMAIL').required().asEmailComponents()
+      ).to.deep.equal({
+        username: 'hello',
+        domain: 'example.com'
+      })
+
+      expect(
+        extendedEnv.get('EMAIL').asEmailComponents()
+      ).to.deep.equal({
+        username: 'hello',
+        domain: 'example.com'
+      })
+    })
+
+    it('should carry extension functions to a child with from()', () => {
+      const asNumberZero: env.ExtensionFn<number> = (value) => {
+        const n = parseInt(value)
+
+        if (n === 0) {
+          return 0
+        }
+
+        throw new env.EnvVarError('was not zero')
+      }
+
+      const extendedEnvA = env.from({
+        ZERO: '0'
+      })
+
+      const extendedEnvB = extendedEnvA.from({
+        ZERO: '0'
+      }, {
+        asNumberZero
+      })
+
+      expect(
+        extendedEnvB.get('ZERO').required().asNumberZero()
+      ).to.equal(0)
+
+      expect(
+        extendedEnvB.get('ZERO').asNumberZero()
+      ).to.equal(0)
+    })
+  })
+
+  describe('asEnum', () => {
+    const e = env.from({
+      ENUM: 'a'
+    })
+
+    it('should work with generic defaults', () => {
+      const enums = e.get('ENUM').required().asEnum(['a', 'b'])
+
+      assert<IsExact<typeof enums, 'a' | 'b'>>(true);
+    })
+
+    it('should work with generic params', () => {
+      const enums = e.get('ENUM').required().asEnum<'a' | 'b'>(['a', 'b'])
+
+      assert<IsExact<typeof enums, 'a' | 'b'>>(true);
+    })
+  })
+})

@@ -15,15 +15,16 @@ There are just a few things to be aware of when making a contribution. If you ha
 
 ### Adding an Accessor
 
-If you want to add a new accessor it's pretty straightforward, and an example is outlined below - just make sure it's a  reasonably generic use case! 
+If you want to add a new accessor it's pretty straightforward, and an example is outlined below - just make sure it's a reasonably generic use case!
 
-If you want to add a new global accessor, it's easy. Add a file to
-`lib/accessors`, with the name of the type e.g add a file named `number-zero.js`
-into that folder and populate it with code following this structure:
+Start by adding a file to `lib/accessors`, with the name of the type e.g add a
+file named `number-zero.js` into that folder and populate it with code
+following this structure:
 
 ```js
 /**
  * Validate that the environment value is an integer and equals zero.
+ * This is a strange example, but hopefully demonstrates the idea.
  * @param {String}   environmentValue this is the string from process.env
  */
 module.exports = function numberZero (environmentValue) {

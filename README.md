@@ -2,11 +2,11 @@
 
 <div align="center">
 
+[![NPM version](https://img.shields.io/npm/v/env-var.svg?style=flat)](https://www.npmjs.com/package/env-var)
+[![TypeScript](https://badgen.net/npm/types/env-var)](http://www.typescriptlang.org/)
+[![License](https://badgen.net/npm/license/env-var)](https://opensource.org/licenses/MIT)
 [![Travis CI](https://travis-ci.org/evanshortiss/env-var.svg?branch=master)](https://travis-ci.org/evanshortiss/env-var)
 [![Coverage Status](https://coveralls.io/repos/github/evanshortiss/env-var/badge.svg?branch=master)](https://coveralls.io/github/evanshortiss/env-var?branch=master)
-[![NPM version](https://img.shields.io/npm/v/env-var.svg?style=flat)](https://www.npmjs.com/package/env-var)
-[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](http://www.typescriptlang.org/)
-
 [![npm downloads](https://img.shields.io/npm/dm/env-var.svg?style=flat)](https://www.npmjs.com/package/env-var)
 [![Known Vulnerabilities](https://snyk.io//test/github/evanshortiss/env-var/badge.svg?targetFile=package.json)](https://snyk.io//test/github/evanshortiss/env-var?targetFile=package.json)
 [![Greenkeeper badge](https://badges.greenkeeper.io/evanshortiss/env-var.svg)](https://greenkeeper.io/)
@@ -17,7 +17,7 @@ Node.js. Supports TypeScript!
 <br>
 </div>
 
-* 🏋 Lightweight, at just 4.2kB when minified
+* 🏋 Lightweight. Zero dependencies and just ~4.7kB when minified!
 * 🧹 Cleaner code, as [shown here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d)
 * 🚫 [Fail fast](https://en.wikipedia.org/wiki/Fail-fast) if your environment is misconfigured
 * 👩‍💻 Friendly error messages and example values improve developer experience
@@ -74,9 +74,9 @@ const PORT: number = env.get('PORT').required().asIntPositive();
 ## Usage with dotenv
 
 There is no tight coupling between [env-var](https://www.npmjs.com/package/env-var)
-[dotenv](https://www.npmjs.com/package/dotenv). Just `npm install dotenv` and
-use it whatever way you're used to. This loose coupling is a good thing since
-it reduces package bloat - only install what you need!
+and [dotenv](https://www.npmjs.com/package/dotenv). Just `npm install dotenv`
+and use it whatever way you're used to. This loose coupling is a good thing
+since it reduces package bloat - only install what you need!
 
 You can use `dotenv` with `env-var` via a `require()` calls in your code or
 preloading it with the `--require` or `-r` flag in the `node` CLI.
@@ -279,22 +279,22 @@ an exception will be raised rather than rounding up/down.
 
 #### asIntPositive()
 Performs the same task as _asInt()_, but also verifies that the number is
-positive (greater than zero).
+positive (greater than or equal to zero).
 
 #### asIntNegative()
 Performs the same task as _asInt()_, but also verifies that the number is
-negative (less than zero).
+negative (less than or equal to zero).
 
 #### asFloat()
 Attempt to parse the variable to a float. Throws an exception if parsing fails.
 
 #### asFloatPositive()
 Performs the same task as _asFloat()_, but also verifies that the number is
-positive (greater than zero).
+positive (greater than or equal to zero).
 
 #### asFloatNegative()
 Performs the same task as _asFloat()_, but also verifies that the number is
-negative (less than zero).
+negative (less than or equal to zero).
 
 #### asString()
 Return the variable value as a String. Throws an exception if value is not a
@@ -522,48 +522,9 @@ env.get('ADMIN').asEmail()
 ```
 
 ## Contributing
-Contributions are welcomed. If you'd like to discuss an idea open an issue, or a
-PR with an initial implementation.
-
-If you want to add a new global accessor add a file to `lib/accessors`, with
-the name of the type e.g add a file named `number-zero.js` into that folder
-and populate it with code following this structure:
-
-```js
-/**
- * Validate that the environment value is an integer and equals zero.
- * This is a strange example, but hopefully demonstrates the idea.
- * @param {String}   environmentValue this is the string from process.env
- */
-module.exports = function numberZero (environmentValue) {
-
-  // Your custom code should go here...below code is an example
-
-  const val = parseInt(environmentValue)
-
-  if (val === 0) {
-    return ret;
-  } else {
-    throw new Error('should be zero')
-  }
-}
-```
-
-Next update the `accessors` Object in `getVariableAccessors()` in
-`lib/variable.js` to include your new module. The naming convention should be of
-the format "asTypeSubtype", so for our `number-zero` example it would be done
-like so:
-
-```js
-asNumberZero: generateAccessor(container, varName, defValue, require('./accessors/number-zero')),
-```
-
-Once you've done that, add some unit tests and use it like so:
-
-```js
-// Uses your new function to ensure the SOME_NUMBER is the integer 0
-env.get('SOME_NUMBER').asNumberZero()
-```
+Contributions are welcomed and discussed in the `CONTRIBUTING.md` file in this
+repo. If you'd like to discuss an idea open an issue, or a PR with an initial
+implementation.
 
 ## Contributors
 * @caccialdo
@@ -571,6 +532,7 @@ env.get('SOME_NUMBER').asNumberZero()
 * @gabrieloczkowski
 * @hhravn
 * @itavy
+* @joh-klein
 * @MikeyBurkman
 * @pepakriz
 * @rmblstrp

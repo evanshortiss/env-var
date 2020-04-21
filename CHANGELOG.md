@@ -1,11 +1,26 @@
-## 6.0.1 (09/01/20)
+## 6.1.0 (20/04/20)
+* Fix TS error with *extraAccessor* typings (#114)
+* Add support for generic types in *asEnum* (#116)
+
+## 6.0.4 (04/03/20)
+* Fix compilation error caused by typings generic issue.
+
+## 6.0.3 (03/03/20)
+* Fix typings to support `required()`, `convertFromBase64()`, etc. with `ExtensionFn`.
+
+## 6.0.2 (29/02/20)
+* Fix `default()` so that it correctly returns an empty string value if provided.
+* README improvement by @joh-klein for positive/negative number parsing rules.
+
+## 6.0.1 (12/02/20)
 * Fix typings for the `default(value)` function.
 
-## 6.0.0 (09/01/20)
+## 6.0.0 (12/02/20)
 * Add support for setting an example value via the `example(string)` function.
 * Passing default values is now performed using the `default(string)` function.
 * Defer checks for `required()` until an accessor such as `asString()` is invoked.
 * Fix typings issue where `required()` was undefined on a `IPresentVariable`.
+* Improve error message output.
 
 Migration from 5.x to 6.0.0 should be smooth. Change any instance of
 `env.get(target, default)` to `env.get(target).default(default)`. For example:

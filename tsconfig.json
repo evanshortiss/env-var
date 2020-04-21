@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "noImplicitAny": true,
+    "sourceMap": false,
     "target": "es5",
     "moduleResolution": "node",
     "skipLibCheck": true,
     "strict": true,
+    "noImplicitAny": true,
     "strictNullChecks": true
   },
   "files": ["test/types/index.ts", "example/typescript.ts"]

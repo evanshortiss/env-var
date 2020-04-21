@@ -59,6 +59,12 @@ describe('env-var', function () {
   })
 
   describe('default values', function () {
+    it('should return the default empty string value', () => {
+      const ret = mod.get('XXX_NOT_DEFINED').default('').asString()
+
+      expect(ret).to.equal('')
+    })
+
     it('should return the default', function () {
       const ret = mod.get('XXX_NOT_DEFINED').default('default').asString()
 
