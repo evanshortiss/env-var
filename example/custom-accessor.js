@@ -16,9 +16,17 @@ const { from, accessors } = env;
 // between the specified min and max values, inclusive
 const envInstance = from(process.env, {
   asIntBetween: (value, min, max) => {
-    const ret = accessors.asInt(value);
+    let ret, minInt, maxInt;
 
-    if (ret < min || ret > max) {
+    try {
+      ret = accessors.asInt(value);
+      minInt = accessors.asInt(min);
+      maxInt = accessors.asInt(max);
+    } catch {
+      throw new Error(`value, min, max must be integers`);
+    }
+
+    if (ret < minInt || ret > maxInt) {
       throw new Error(
         `should be an integer between the range of [${min}, ${max}]`
       );
@@ -38,7 +46,11 @@ try {
   process.env['SERVER_INSTANCES'] = 10;
   let serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween(1, 10);
 
-  // This will fail
+  // This will fail because min is not an integer
+  /*process.env['SERVER_INSTANCES'] = 1;
+  serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween('one', 10);*/
+
+  // This will fail because out of range
   process.env['SERVER_INSTANCES'] = 0;
   serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween(1, 10);
 
