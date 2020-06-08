@@ -527,6 +527,9 @@ const env = from(process.env, {
 env.get('ADMIN').asEmail()
 ```
 
+You can view an example of composing built-in accessors made available by 
+`env.accessors` in an extra accessor at *examples/custom-accessor.js*.
+
 ## Contributing
 Contributions are welcomed and discussed in the `CONTRIBUTING.md` file in this
 repo. If you'd like to discuss an idea open an issue, or a PR with an initial
