@@ -1,7 +1,7 @@
 
 /// <reference types="node" />
 
-import { Url } from 'url';
+import { URL } from 'url';
 
 interface IPresentVariable<Exs extends Extensions = {}> {
   /**
@@ -103,16 +103,22 @@ interface IPresentVariable<Exs extends Extensions = {}> {
   asBoolStrict: () => boolean;
 
   /**
-   * Verifies that the environment variable being accessed is a valid URL and
-   * returns it as a string. Uses the "is-url" module
+   * Verifies that the variable is a valid URL string and returns the validated
+   * string. The validation is performed by passing the URL string to the
+   * Node.js URL constructor.
+   *
+   * Note that URLs without paths will have a default path `/` appended when read, e.g.
+   * `https://api.acme.org` would become `https://api.acme.org/`. Always use URL
+   * safe utilities included in the Node.js URL module to create
+   * valid URL strings, instead of error prone string concatenation.
    */
   asUrlString: () => string;
 
   /**
-   * Verifies that the environment variable being accessed is a valid URL and
-   * returns it as a core URL object. Uses the "is-url" module.
+   * Verifies that the variable is a valid URL string using the same method as
+   * `asUrlString()`, but instead returns the resulting URL instance.
    */
-  asUrlObject: () => Url;
+  asUrlObject: () => URL;
 
   /**
    * Verifies that the var being accessed is one of the given values
@@ -220,16 +226,22 @@ interface IOptionalVariable<Exs extends Extensions = {}> {
   asBoolStrict: () => boolean|undefined;
 
   /**
-   * Verifies that the environment variable being accessed is a valid URL and
-   * returns it as a string. Uses the "is-url" module
+   * Verifies that the variable is a valid URL string and returns the validated
+   * string. The validation is performed by passing the URL string to the
+   * Node.js URL constructor.
+   *
+   * Note that URLs without paths will have a default path `/` appended when read, e.g.
+   * `https://api.acme.org` would become `https://api.acme.org/`. Always use URL
+   * safe utilities included in the Node.js URL module to create
+   * valid URL strings, instead of error prone string concatenation.
    */
   asUrlString: () => string|undefined;
 
   /**
-   * Verifies that the environment variable being accessed is a valid URL and
-   * returns it as a core URL object. Uses the "is-url" module.
+   * Verifies that the variable is a valid URL string using the same method as
+   * `asUrlString()`, but instead returns the resulting URL instance.
    */
-  asUrlObject: () => Url|undefined;
+  asUrlObject: () => URL|undefined;
 
   /**
    * Verifies that the var being accessed is one of the given values
