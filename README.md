@@ -25,7 +25,7 @@ Node.js. Supports TypeScript!
 
 
 ## Install
-**Note:** env-var requires Node version 8 or later.
+**Note:** requires Node version 8 or later.
 
 ### npm
 ```
@@ -113,6 +113,55 @@ const env = require('env-var')
 const myVar = env.get('MY_VAR').asString()
 ```
 
+## Logging
+
+Logging is disabled by default in `env-var` to prevent accidentally logging
+secrets.
+
+To enable logging you need to create an `env-var` instance using the `from()`
+function that the API provides and pass it a logger. A built-in logger is
+available, but a custom logger is also supported.
+
+Always exercise caution when logging environment variables!
+
+### Using the Built-in Logger
+
+The built-in logger will print logs unless `NODE_ENV` is set to either `prod`
+or `production`.
+
+```js
+const { from, logger } =  require('env-var')
+const env = from(process.env, {}, logger)
+
+const API_KEY = env.get('API_KEY').required().asString()
+```
+
+Here's output from the built-in logger that can be seen by running
+*examples/logging.js* included in this repository:
+
+![logging example output](screenshots/logging.png)
+
+### Using a Custom Logger
+
+If you're using a logging solution such as `pino` this feature is useful to
+filter logs based on log levels, e.g `env-var` logs can be enabled for trace
+logging only.
+
+```js
+const pino = require('pino')()
+const customLogger = (varname, str) => {
+  // varname is the name of the variable being read, e.g "API_KEY"
+  // str is the log message, e.g "verifying variable value is not empty"
+  log.trace(`env-var log (${varname}): ${str}`)
+}
+
+const { from } =  require('env-var')
+const env = from(process.env, {}, customLogger)
+
+const API_KEY = env.get('API_KEY').required().asString()
+```
+
+
 ## API
 
 ### Structure:
@@ -143,10 +192,11 @@ const myVar = env.get('MY_VAR').asString()
       * [asUrlObject()](#asurlobject)
       * [asUrlString()](#asurlstring)
   * [EnvVarError()](#envvarerror)
+  * [accessors](#accessors)
 
-### from(values, extraAccessors)
+### from(values, extraAccessors, logger)
 This function is useful if you're not in a typical Node.js environment, or for
-testing. It allows you to generate an env-var instance that reads from the
+testing. It allows you to generate an `env-var` instance that reads from the
 given `values` instead of the default `process.env` Object.
 
 ```js
@@ -160,8 +210,22 @@ const apiUrl = env.get('API_BASE_URL').asUrlString()
 
 When calling `env.from()` you can also pass an optional parameter containing
 custom accessors that will be attached to any variables returned by that
-env-var instance. This feature is explained in the
+`env-var` instance. This feature is explained in the
 [extraAccessors section](#extraAccessors) of these docs.
+
+Logging can be enabled by passing a logger function that matches the signature:
+
+```js
+/**
+ * Logs the provided string argument
+ * @param {String} varname
+ * @param {String} str
+ */
+function yourLoggerFn (varname, str) {
+  // varname is the name of the variable being read, e.g "API_KEY"
+  // str is the log message, e.g "verifying variable value is not empty"
+}
+```
 
 ### get(varname)
 This function has two behaviours:
@@ -316,10 +380,10 @@ Attempt to parse the variable to a JSON Object or Array. Throws an exception if
 parsing fails.
 
 #### asJsonArray()
-The same as _asJson_ but checks that the data is a JSON Array, e.g [1,2].
+The same as _asJson_ but checks that the data is a JSON Array, e.g. [1,2].
 
 #### asJsonObject()
-The same as _asJson_ but checks that the data is a JSON Object, e.g {a: 1}.
+The same as _asJson_ but checks that the data is a JSON Object, e.g. {a: 1}.
 
 #### asArray([delimiter: string])
 Reads an environment variable as a string, then splits it on each occurence of
@@ -334,12 +398,18 @@ specific values are:
 #### asUrlString()
 Verifies that the variable is a valid URL string and returns the validated
 string. The validation is performed by passing the URL string to the
-[Node.js URL Constructor](https://nodejs.org/docs/latest/api/url.html).
+[Node.js URL constructor](https://nodejs.org/docs/latest/api/url.html#url_class_url).
+
+Note that URLs without paths will have a default path `/` appended when read, e.g.
+`https://api.acme.org` would become `https://api.acme.org/`. Always use URL
+safe utilities included in the
+[Node.js URL module](https://nodejs.org/docs/latest/api/url.html) to create
+valid URL strings, instead of error prone string concatenation.
 
 #### asUrlObject()
 Verifies that the variable is a valid URL string using the same method as
 `asUrlString()`, but instead returns the resulting URL instance. For details
-see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html).
+see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html#url_class_url).
 
 ### EnvVarError()
 This is the error class used to represent errors raised by this module. Sample
@@ -405,10 +475,29 @@ const commaArray = env.get('DASH_ARRAY').asArray('-');
 const enumVal = env.get('ENVIRONMENT').asEnum(['dev', 'test', 'live'])
 ```
 
+### accessors
+A property that exposes the built-in accessors that this module uses to parse
+and validate values. These work similarly to the *asString()* and other
+accessors exposed on the *variable* type documented above, however they accept
+a *String* as their first argument, e.g:
+
+```js
+const env = require('env-var')
+
+// Validate that the string is JSON, and return the parsed result
+const myJsonDirectAccessor = env.accessors.asJson(process.env.SOME_JSON)
+
+const myJsonViaEnvVar = env.get('SOME_JSON').asJson()
+```
+
+All of the documented *asX()* accessors above are available. These are useful
+if you need to build a custom accessor using the *extraAccessors* functionality
+described below.
+
 ## extraAccessors
 When calling `from()` you can also pass an optional parameter containing
 additional accessors that will be attached to any variables gotten by that
-env-var instance.
+`env-var` instance.
 
 Accessor functions must accept at least one argument:
 
@@ -521,6 +610,9 @@ const env = from(process.env, {
 env.get('ADMIN').asEmail()
 ```
 
+You can view an example of composing built-in accessors made available by 
+`env.accessors` in an extra accessor at *examples/custom-accessor.js*.
+
 ## Contributing
 Contributions are welcomed and discussed in the `CONTRIBUTING.md` file in this
 repo. If you'd like to discuss an idea open an issue, or a PR with an initial
@@ -528,6 +620,7 @@ implementation.
 
 ## Contributors
 * @caccialdo
+* @DigiPie
 * @evanshortiss
 * @gabrieloczkowski
 * @hhravn

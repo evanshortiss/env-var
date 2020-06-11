@@ -109,7 +109,7 @@ describe('env-var', function () {
     it('should throw an error due to malformed base64', function () {
       expect(() => {
         mod.get('INVALID_BASE_64').convertFromBase64().asString()
-      }).throw(/"INVALID_BASE_64" should be a valid base64 string if using convertFromBase64, but is set to "a|GV-sb*G8="/g)
+      }).throw(/"INVALID_BASE_64" should be a valid base64 string if using convertFromBase64/g)
     })
   })
 
@@ -122,7 +122,7 @@ describe('env-var', function () {
     it('should throw when value is not expected', function () {
       expect(() => {
         expect(mod.get('ENUM').asEnum(['INVALID']))
-      }).to.throw('env-var: "ENUM" should be one of [INVALID], but is set to "VALID"')
+      }).to.throw('env-var: "ENUM" should be one of [INVALID]')
     })
   })
 
@@ -144,7 +144,7 @@ describe('env-var', function () {
 
       expect(() => {
         mod.get('URL').asUrlString()
-      }).to.throw('env-var: "URL" should be a valid URL, but is set to "not a url"')
+      }).to.throw('env-var: "URL" should be a valid URL')
     })
   })
 
@@ -158,7 +158,7 @@ describe('env-var', function () {
 
       expect(() => {
         mod.get('URL').asUrlObject()
-      }).to.throw('env-var: "URL" should be a valid URL, but is set to "not a url"')
+      }).to.throw('env-var: "URL" should be a valid URL')
     })
   })
 
@@ -518,14 +518,14 @@ describe('env-var', function () {
 
       expect(function () {
         mod.get('PORT_NUMBER').asPortNumber()
-      }).to.throw('should be a positive integer, but is set to "-2"')
+      }).to.throw('should be a positive integer')
     })
     it('should raise an error for ports greater than 65535', function () {
       process.env.PORT_NUMBER = '700000'
 
       expect(function () {
         mod.get('PORT_NUMBER').asPortNumber()
-      }).to.throw('cannot assign a port number greater than 65535, but is set to "700000"')
+      }).to.throw('cannot assign a port number greater than 65535')
     })
 
     it('should return a number for valid ports', function () {
@@ -552,7 +552,7 @@ describe('env-var', function () {
     it('should throw an error with a valid example message', () => {
       expect(() => {
         fromMod.get('JSON_CONFIG').example(sampleConfig).asJsonArray()
-      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON, but is set to "{1,2]". An example of a valid value would be: ${sampleConfig}`)
+      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON. An example of a valid value would be: ${sampleConfig}`)
     })
 
     it('should throw an error with a valid example message', () => {
@@ -570,6 +570,23 @@ describe('env-var', function () {
         A_BOOL: 'true',
         A_STRING: 'blah'
       })
+    })
+
+    it('should send messages to the custom logger', () => {
+      let spyCallCount = 0
+      const data = {
+        JSON: JSON.stringify({ name: 'env-var' })
+      }
+
+      const env = mod.from(data, {}, (str) => {
+        expect(str).to.be.a('string')
+        spyCallCount++
+      })
+
+      const result = env.get('JSON').asJson()
+
+      expect(result).to.deep.equal({ name: 'env-var' })
+      expect(spyCallCount).to.be.greaterThan(0)
     })
 
     it('should get a from boolean', function () {
@@ -595,7 +612,7 @@ describe('env-var', function () {
       expect(fromMod.get()).to.have.property('A_STRING', 'blah')
     })
 
-    describe(':extraAccessors', function () {
+    describe('#extraAccessors', function () {
       it('should add custom accessors to subsequent gotten values', function () {
         const fromMod = mod.from({ STRING: 'Hello, world!' }, {
           asShout: function (value) {
@@ -633,6 +650,72 @@ describe('env-var', function () {
 
         expect(fromMod.get('STRING')).to.have.property('asNull')
         expect(otherMod.get('STRING')).not.to.have.property('asNull')
+      })
+    })
+
+    describe('#accessors', () => {
+      describe('#asArray', () => {
+        it('should return an array of strings', () => {
+          const arr = fromMod.accessors.asArray('1,2,3')
+
+          expect(arr).to.eql(['1', '2', '3'])
+        })
+
+        it('should return an array of strings split by period chars', () => {
+          const arr = fromMod.accessors.asArray('1.2.3', '.')
+
+          expect(arr).to.eql(['1', '2', '3'])
+        })
+      })
+
+      describe('#asInt', () => {
+        it('should return an integer', () => {
+          const ret = fromMod.accessors.asInt('1')
+
+          expect(ret).to.eql(1)
+        })
+      })
+    })
+
+    describe('#logger', () => {
+      const varname = 'SOME_VAR'
+      const msg = 'this is a test message'
+
+      it('should send a string to the given logger', () => {
+        let spyCalled = false
+        const spy = (str) => {
+          expect(str).to.equal(`env-var (${varname}): ${msg}`)
+          spyCalled = true
+        }
+
+        const log = require('../lib/logger')(spy)
+
+        log(varname, msg)
+        expect(spyCalled).to.equal(true)
+      })
+    })
+  })
+
+  describe('#accessors', () => {
+    describe('#asArray', () => {
+      it('should return an array of strings', () => {
+        const arr = mod.accessors.asArray('1,2,3')
+
+        expect(arr).to.eql(['1', '2', '3'])
+      })
+
+      it('should return an array of strings split by period chars', () => {
+        const arr = mod.accessors.asArray('1.2.3', '.')
+
+        expect(arr).to.eql(['1', '2', '3'])
+      })
+    })
+
+    describe('#asInt', () => {
+      it('should return an integer', () => {
+        const ret = mod.accessors.asInt('1')
+
+        expect(ret).to.eql(1)
       })
     })
   })

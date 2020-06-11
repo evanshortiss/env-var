@@ -37,7 +37,7 @@ const customEnv = env.from({
   ADMIN_EMAIL: 'admin@example.com'
 }, {
   asEmail
-})
+}, env.logger)
 
 const adminEmail = customEnv.get('ADMIN_EMAIL')
   .example('someone@example')
@@ -45,3 +45,9 @@ const adminEmail = customEnv.get('ADMIN_EMAIL')
   .asEmail()
 
 console.log('admin email is:', adminEmail)
+
+const log: env.LoggerFn = (varname, msg) => {
+  console.log(`Log for ${varname}: ${msg}`)
+}
+const loggerEnv = env.from(process.env, {}, log)
+console.log(`HOME is set to: ${loggerEnv.get('HOME').asString()}`)

@@ -11,7 +11,7 @@ const EnvVarError = require('./lib/env-error')
  * resulting object
  * @return {Object} a new module instance
  */
-const from = (container, extraAccessors) => {
+const from = (container, extraAccessors, logger) => {
   return {
     from: from,
 
@@ -35,8 +35,20 @@ const from = (container, extraAccessors) => {
         throw new EnvVarError('It looks like you passed more than one argument to env.get(). Since env-var@6.0.0 this is no longer supported. To set a default value use env.get(TARGET).default(DEFAULT)')
       }
 
-      return variable(container, variableName, extraAccessors || {})
-    }
+      return variable(container, variableName, extraAccessors || {}, logger || function noopLogger () {})
+    },
+
+    /**
+     * Provides access to the functions that env-var uses to parse
+     * process.env strings into valid types requested by the API
+     */
+    accessors: require('./lib/accessors/index'),
+
+    /**
+     * Provides a default logger that can be used to print logs.
+     * This will not print logs in a production environment (checks process.env.NODE_ENV)
+     */
+    logger: require('./lib/logger')(console.log, container.NODE_ENV)
   }
 }
 

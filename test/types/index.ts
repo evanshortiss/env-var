@@ -69,7 +69,7 @@ describe('typescript tests', () => {
 
       expect(() => {
         extendedEnv.get('INVALID_EMAIL').asEmailComponents()
-      }).to.throw('env-var: "INVALID_EMAIL" should be an email, but is set to "oops-example.com"')
+      }).to.throw('env-var: "INVALID_EMAIL" should be an email')
     })
 
     it('should support multiple extensions (with correct types)', () => {
@@ -160,6 +160,30 @@ describe('typescript tests', () => {
       const enums = e.get('ENUM').required().asEnum<'a' | 'b'>(['a', 'b'])
 
       assert<IsExact<typeof enums, 'a' | 'b'>>(true);
+    })
+  })
+
+  describe('env.accessors', () => {
+    describe('#asArray', () => {
+      it('should return an array of strings', () => {
+        const arr = env.accessors.asArray('1,2,3')
+
+        expect(arr).to.eql(['1','2','3'])
+      })
+
+      it('should return an array of strings split by period chars', () => {
+        const arr = env.accessors.asArray('1.2.3', '.')
+
+        expect(arr).to.eql(['1','2','3'])
+      })
+    })
+
+    describe('#asInt', () => {
+      it('should return an integer', () => {
+        const ret = env.accessors.asInt('1')
+
+        expect(ret).to.eql(1)
+      })
     })
   })
 })
