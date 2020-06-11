@@ -7,19 +7,19 @@ interface IPresentVariable<Exs extends Extensions = {}> {
   /**
    * Converts a bas64 environment variable to ut8
    */
-  convertFromBase64: () => IPresentVariable<Exs> & Exs
+  convertFromBase64: () => IPresentVariable<Exs> & ExtenderType<Exs>
 
   /**
    * Provide an example value that can be used in error output if the variable
    * is not set, or is set to an invalid value
    */
-  example: (example: string) => IPresentVariable<Exs> & Exs
+  example: (example: string) => IPresentVariable<Exs> & ExtenderType<Exs>
 
   /**
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Exs> & Exs;
+  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Exs> & ExtenderType<Exs>;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception
@@ -124,19 +124,19 @@ interface IOptionalVariable<Exs extends Extensions = {}> {
   /**
    * Decodes a base64-encoded environment variable
    */
-  convertFromBase64: () => IOptionalVariable<Exs> & Exs;
+  convertFromBase64: () => IOptionalVariable<Exs> & ExtenderTypeOptional<Exs>;
 
   /**
    * Provide an example value that can be used in error output if the variable
    * is not set, or is set to an invalid value
    */
-  example: (value: string) => IOptionalVariable<Exs> & Exs;
+  example: (value: string) => IOptionalVariable<Exs> & ExtenderTypeOptional<Exs>;
 
   /**
    * Set a default value for this variable. This will be used if a value is not
    * set in the process environment
    */
-  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Exs> & Exs;
+  default: (value: string|number|Record<string, any>|Array<any>) => IPresentVariable<Exs> & ExtenderType<Exs>;
 
   /**
    * Ensures the variable is set on process.env. If it's not set an exception will be thrown.
@@ -267,8 +267,9 @@ interface IEnv<PresentVariable, OptionalVariable> {
 }
 
 // Used internally only to support extension fns
-type ExtenderType<T extends Extensions> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]> }
-type ExtenderTypeOptional<T extends Extensions> = { [P in keyof T]: (...args: any[]) => ReturnType<T[P]>|undefined }
+type RestParams<F extends (...args: any[]) => any> = F extends (value: string, ...args: infer P) => any ? P : any[];
+type ExtenderType<T extends Extensions> = { [P in keyof T]: (...args: RestParams<T[P]>) => ReturnType<T[P]> }
+type ExtenderTypeOptional<T extends Extensions> = { [P in keyof T]: (...args: RestParams<T[P]>) => ReturnType<T[P]>|undefined }
 
 export type Extensions = {
   [key: string]: ExtensionFn<any>
