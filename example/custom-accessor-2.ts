@@ -49,8 +49,8 @@ try {
   let serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween(1, 10)
 
   // This will fail because min is not an integer
-  process.env['SERVER_INSTANCES'] = '1';
-  serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween('one', 10);
+  process.env['SERVER_INSTANCES'] = '1'
+  serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween('one', 10)
 
   // This will fail because out of range
   /*process.env.SERVER_INSTANCES = '0'
