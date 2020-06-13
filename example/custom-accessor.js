@@ -6,7 +6,9 @@
  * instance.
  *
  * Here we use the EnvVarError type to catch an error. If you run the program
- * without setting CATCH_ERROR it will print "we got an env-var error"
+ * without setting CATCH_ERROR it will print "we got an env-var error".
+ *
+ * To test out this example, run 'node custom-accessor.js'.
  */
 
 const env = require('../env-var')
@@ -47,8 +49,8 @@ try {
   let serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween(1, 10)
 
   // This will fail because min is not an integer
-  /* process.env['SERVER_INSTANCES'] = 1;
-  serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween('one', 10); */
+  /* process.env['SERVER_INSTANCES'] = 1
+  serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween('one', 10) */
 
   // This will fail because out of range
   process.env.SERVER_INSTANCES = 0
