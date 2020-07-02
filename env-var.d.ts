@@ -202,6 +202,12 @@ interface VariableAccessors <AlternateType = unknown> {
    * Verifies that the var being accessed is one of the given values
    */
   asEnum: <T extends string>(validValues: T[]) => AlternateType extends undefined ? undefined|T : T;
+
+  /**
+   * Verifies that the variable is a valid regular expression and returns the
+   * validated expression as a RegExp instance.
+   */
+  asUrlString: () => AlternateType extends undefined ? undefined|RegExp : RegExp;
 }
 
 interface IPresentVariable<Exs extends Extensions = {}> extends VariableAccessors {

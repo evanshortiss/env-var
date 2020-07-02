@@ -535,6 +535,39 @@ describe('env-var', function () {
     })
   })
 
+  describe('#asRegExp', function () {
+    it('should raise an error for invalid regular expressions', function () {
+      process.env.REG_EXP = '*'
+
+      expect(function () {
+        mod.get('REG_EXP').asRegExp()
+      }).to.throw('should be a valid regexp')
+    })
+
+    it('should raise an error for invalid flags', function () {
+      process.env.REG_EXP = '^valid$'
+
+      expect(function () {
+        mod.get('REG_EXP').asRegExp('ii')
+      }).to.throw('invalid regexp flags')
+    })
+
+    it('should return a RegExp object for valid regular expressions', function () {
+      process.env.REG_EXP = '^valid$'
+
+      const regExp = mod.get('REG_EXP').asRegExp()
+
+      expect(Object.prototype.toString.call(regExp)).to.equal('[object RegExp]')
+      expect(regExp.toString()).to.equal('/^valid$/')
+    })
+
+    it('should accept a flag argument to be passed along as the second argument to the RegExp constructor', function () {
+      process.env.REG_EXP = '^valid$'
+
+      expect(mod.get('REG_EXP').asRegExp('i').flags).to.equal('i')
+    })
+  })
+
   describe('#example', () => {
     let fromMod
 
