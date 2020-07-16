@@ -163,6 +163,22 @@ describe('typescript tests', () => {
     })
   })
 
+  describe('asRegExp', () => {
+    const e = env.from({
+      REG_EXP: '^.*$'
+    })
+
+    it('should return a RegExp instance', () => {
+      const regExp = e.get('REG_EXP').required().asRegExp()
+
+      assert<IsExact<typeof regExp, RegExp>>(true);
+    })
+
+    it('should accept a single string argument for flags', () => {
+      e.get('REG_EXP').required().asRegExp('ig')
+    })
+  })
+
   describe('env.accessors', () => {
     describe('#asArray', () => {
       it('should return an array of strings', () => {
