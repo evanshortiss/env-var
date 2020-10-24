@@ -32,6 +32,12 @@ const API_KEY = env.get('API_KEY').required().asString()
 
 ## Dotenv
 
+You can optionally use [dotenv](https://www.npmjs.com/package/dotenv) with [env-var](https://www.npmjs.com/package/env-var).
+
+1. Just `npm install dotenv` and use it whatever way you're used to. 
+2. You can use `dotenv` with `env-var` via a `require()` call in your code;
+3. Or you can preload it with the `--require` or `-r` flag in the `node` CLI.
+
 ### Pre-requisite
 
 - The examples below assume you have a `.env` file in your repository and it contains a line similar to `MY_VAR=a-string-value!`.
