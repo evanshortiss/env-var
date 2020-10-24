@@ -71,7 +71,7 @@ const PASSWORD = env.get('DB_PASSWORD')
 const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
-## Typescript example
+### Typescript example
 
 ```ts
 import * as env from 'env-var';
