@@ -71,7 +71,7 @@ const env = require('env-var')
 const myVar = env.get('MY_VAR').asString()
 ```
 
-### Other examples
+## Other examples
 
 The other examples are available in the `/example` directory.
 
