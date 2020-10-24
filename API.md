@@ -4,7 +4,7 @@ This document lists all API methods `env-var` has.
 ## Structure
 
 * module (env-var)
-  * [from()](#fromvalues-extraaccessors)
+  * [from()](#fromvalues-extraaccessors-logger)
   * [get()](#getvarname)
     * [variable](#variable)
       * [required()](#requiredisrequired--true)
