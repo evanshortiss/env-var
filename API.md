@@ -1,4 +1,5 @@
 # API
+
 This document lists all API methods `env-var` has.
 
 ## Structure
@@ -7,32 +8,33 @@ This document lists all API methods `env-var` has.
   * [from()](#fromvalues-extraaccessors-logger)
   * [get()](#getvarname)
     * [variable](#variable)
-      * [required()](#requiredisrequired--true)
-      * [covertFromBase64()](#convertfrombase64)
       * [example(string)](#examplestring)
       * [default(string)](#defaultstring)
+      * [required()](#requiredisrequired--true)
+      * [covertFromBase64()](#convertfrombase64)
       * [asArray()](#asarraydelimiter-string)
-      * [asBoolStrict()](#asboolstrict)
       * [asBool()](#asbool)
-      * [asPortNumber()](#asportnumber)
+      * [asBoolStrict()](#asboolstrict)
       * [asEnum()](#asenumvalidvalues-string)
+      * [asFloat()](#asfloat)
       * [asFloatNegative()](#asfloatnegative)
       * [asFloatPositive()](#asfloatpositive)
-      * [asFloat()](#asfloat)
+      * [asInt()](#asint)
       * [asIntNegative()](#asintnegative)
       * [asIntPositive()](#asintpositive)
-      * [asInt()](#asint)
+      * [asJson()](#asjson)
       * [asJsonArray()](#asjsonarray)
       * [asJsonObject()](#asjsonobject)
-      * [asJson()](#asjson)
+      * [asPortNumber()](#asportnumber)
+      * [asRegExp()](#asregexpflags-string)
       * [asString()](#asstring)
       * [asUrlObject()](#asurlobject)
       * [asUrlString()](#asurlstring)
-      * [asRegExp()](#asregexpflags-string)
   * [EnvVarError()](#envvarerror)
   * [accessors](#accessors)
 
-### from(values, extraAccessors, logger)
+## from(values, extraAccessors, logger)
+
 This function is useful if you are not in a typical Node.js environment, or for
 testing. It allows you to generate an `env-var` instance that reads from the
 given `values` instead of the default `process.env` Object.
@@ -65,7 +67,8 @@ function yourLoggerFn (varname, str) {
 }
 ```
 
-### get(varname)
+## get(varname)
+
 This function has two behaviours:
 
 1. Calling with a string argument will make it read that value from the environment
@@ -84,11 +87,13 @@ const allVars = env.get()
 ```
 
 ### variable
+
 A variable is returned by calling `env.get(varname)`. It exposes the following
 functions to validate and access the underlying value, set a default, or set
 an example value:
 
 #### example(string)
+
 Allows a developer to provide an example of a valid value for the environment
 variable. If the variable is not set (and `required()` was called), or the
 variable is set incorrectly this will be included in error output to help
@@ -114,6 +119,7 @@ of a valid value would be "admin@example.com"
 ```
 
 #### default(string)
+
 Allows a default value to be provided for use if the desired environment
 variable is not set in the program environment.
 
@@ -127,6 +133,7 @@ const POOL_SIZE = env.get('POOL_SIZE').default('10').asIntPositive()
 ```
 
 #### required(isRequired = true)
+
 Ensure the variable is set on *process.env*. If the variable is not set, or is
 set to an empty value, this function will cause an `EnvVarError` to be thrown
 when you attempt to read the value using `asString` or a similar function.
@@ -152,6 +159,7 @@ const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()
 ```
 
 #### convertFromBase64()
+
 It's a common need to set an environment variable in base64 format. This
 function can be used to decode a base64 environment variable to UTF8.
 
@@ -165,65 +173,8 @@ console.log(process.env.DB_PASSWORD) // prints "c2VjcmV0X3Bhc3N3b3Jk"
 const dbpass = env.get('DB_PASSWORD').convertFromBase64().asString()
 ```
 
-#### asPortNumber()
-Converts the value of the environment variable to an integer and verifies it's
-within the valid port range of 0-65535. As a result well known ports are
-considered valid by this function.
-
-#### asEnum(validValues: string[])
-Converts the value to a string, and matches against the list of valid values.
-If the value is not valid, an error will be raised describing valid input.
-
-#### asInt()
-Attempt to parse the variable to an integer. Throws an exception if parsing
-fails. This is a strict check, meaning that if the *process.env* value is "1.2",
-an exception will be raised rather than rounding up/down.
-
-#### asIntPositive()
-Performs the same task as _asInt()_, but also verifies that the number is
-positive (greater than or equal to zero).
-
-#### asIntNegative()
-Performs the same task as _asInt()_, but also verifies that the number is
-negative (less than or equal to zero).
-
-#### asFloat()
-Attempt to parse the variable to a float. Throws an exception if parsing fails.
-
-#### asFloatPositive()
-Performs the same task as _asFloat()_, but also verifies that the number is
-positive (greater than or equal to zero).
-
-#### asFloatNegative()
-Performs the same task as _asFloat()_, but also verifies that the number is
-negative (less than or equal to zero).
-
-#### asString()
-Return the variable value as a String. Throws an exception if value is not a
-String. It's highly unlikely that a variable will not be a String since all
-*process.env* entries you set in bash are Strings by default.
-
-#### asBool()
-Attempt to parse the variable to a Boolean. Throws an exception if parsing
-fails. The var must be set to either "true", "false" (upper or lowercase),
-0 or 1 to succeed.
-
-#### asBoolStrict()
-Attempt to parse the variable to a Boolean. Throws an exception if parsing
-fails. The var must be set to either "true" or "false" (upper or lowercase) to
-succeed.
-
-#### asJson()
-Attempt to parse the variable to a JSON Object or Array. Throws an exception if
-parsing fails.
-
-#### asJsonArray()
-The same as _asJson_ but checks that the data is a JSON Array, e.g. [1,2].
-
-#### asJsonObject()
-The same as _asJson_ but checks that the data is a JSON Object, e.g. {a: 1}.
-
 #### asArray([delimiter: string])
+
 Reads an environment variable as a string, then splits it on each occurence of
 the specified _delimiter_. By default a comma is used as the delimiter. For
 example a var set to "1,2,3" would become ['1', '2', '3']. Example outputs for
@@ -233,7 +184,92 @@ specific values are:
 * Reading `MY_ARRAY='1'` results in `['1']`
 * Reading `MY_ARRAY='1,2,3'` results in `['1', '2', '3']`
 
+#### asBool()
+
+Attempt to parse the variable to a Boolean. Throws an exception if parsing
+fails. The var must be set to either "true", "false" (upper or lowercase),
+0 or 1 to succeed.
+
+#### asBoolStrict()
+
+Attempt to parse the variable to a Boolean. Throws an exception if parsing
+fails. The var must be set to either "true" or "false" (upper or lowercase) to
+succeed.
+
+#### asEnum(validValues: string[])
+
+Converts the value to a string, and matches against the list of valid values.
+If the value is not valid, an error will be raised describing valid input.
+
+#### asFloat()
+
+Attempt to parse the variable to a float. Throws an exception if parsing fails.
+
+#### asFloatNegative()
+
+Performs the same task as _asFloat()_, but also verifies that the number is
+negative (less than or equal to zero).
+
+#### asFloatPositive()
+
+Performs the same task as _asFloat()_, but also verifies that the number is
+positive (greater than or equal to zero).
+
+#### asInt()
+
+Attempt to parse the variable to an integer. Throws an exception if parsing
+fails. This is a strict check, meaning that if the *process.env* value is "1.2",
+an exception will be raised rather than rounding up/down.
+
+#### asIntNegative()
+
+Performs the same task as _asInt()_, but also verifies that the number is
+negative (less than or equal to zero).
+
+#### asIntPositive()
+
+Performs the same task as _asInt()_, but also verifies that the number is
+positive (greater than or equal to zero).
+
+#### asJson()
+
+Attempt to parse the variable to a JSON Object or Array. Throws an exception if
+parsing fails.
+
+#### asJsonArray()
+
+The same as _asJson_ but checks that the data is a JSON Array, e.g. [1,2].
+
+#### asJsonObject()
+
+The same as _asJson_ but checks that the data is a JSON Object, e.g. {a: 1}.
+
+#### asPortNumber()
+
+Converts the value of the environment variable to an integer and verifies it's
+within the valid port range of 0-65535. As a result well known ports are
+considered valid by this function.
+
+#### asRegExp([flags: string])
+
+Read in the variable and construct a [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)
+instance using its value. An optional `flags` argument is supported. The string
+passed for `flags` is passed as the second argument to the `RegExp` constructor.
+
+#### asString()
+
+Return the variable value as a String. Throws an exception if value is not a
+String. It's highly unlikely that a variable will not be a String since all
+*process.env* entries you set in bash are Strings by default.
+
+#### asUrlObject()
+
+Verifies that the variable is a valid URL string using the same method as
+`asUrlString()`, but instead returns the resulting URL instance. For details
+see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html#url_class_url).
+
 #### asUrlString()
+
 Verifies that the variable is a valid URL string and returns the validated
 string. The validation is performed by passing the URL string to the
 [Node.js URL constructor](https://nodejs.org/docs/latest/api/url.html#url_class_url).
@@ -244,17 +280,8 @@ safe utilities included in the
 [Node.js URL module](https://nodejs.org/docs/latest/api/url.html) to create
 valid URL strings, instead of error prone string concatenation.
 
-#### asUrlObject()
-Verifies that the variable is a valid URL string using the same method as
-`asUrlString()`, but instead returns the resulting URL instance. For details
-see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html#url_class_url).
+## EnvVarError()
 
-#### asRegExp([flags: string])
-Read in the variable and construct a [`RegExp`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)
-instance using its value. An optional `flags` argument is supported. The string
-passed for `flags` is passed as the second argument to the `RegExp` constructor.
-
-### EnvVarError()
 This is the error class used to represent errors raised by this module. Sample
 usage:
 
@@ -277,7 +304,7 @@ try {
 }
 ```
 
-## Examples
+### Examples
 
 ```js
 const env = require('env-var');
@@ -318,7 +345,8 @@ const commaArray = env.get('DASH_ARRAY').asArray('-');
 const enumVal = env.get('ENVIRONMENT').asEnum(['dev', 'test', 'live'])
 ```
 
-### accessors
+## accessors
+
 A property that exposes the built-in accessors that this module uses to parse
 and validate values. These work similarly to the *asString()* and other
 accessors exposed on the *variable* type documented above, however they accept
@@ -338,6 +366,7 @@ if you need to build a custom accessor using the *extraAccessors* functionality
 described below.
 
 ## extraAccessors
+
 When calling `from()` you can also pass an optional parameter containing
 additional accessors that will be attached to any variables gotten by that
 `env-var` instance.
