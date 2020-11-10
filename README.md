@@ -30,7 +30,6 @@ Verification, sanitization, and type coercion for environment variables in Node.
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing](CONTRIBUTING.md)
 - [Examples](EXAMPLE.md): Example usage of `env-var`
-- [README.md](README.md): General and key information on this project
 
 ## Install
 
