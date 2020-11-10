@@ -1,6 +1,6 @@
 # API
 
-This document lists all API methods `env-var` has.
+A complete listing of the `env-var` API.
 
 ## Structure
 
@@ -35,7 +35,7 @@ This document lists all API methods `env-var` has.
 
 ## from(values, extraAccessors, logger)
 
-This function is useful if you are not in a typical Node.js environment, or for
+This function is useful if you are not in a typical Node.js environment, want to set defaults, or for
 testing. It allows you to generate an `env-var` instance that reads from the
 given `values` instead of the default `process.env` Object.
 
@@ -71,8 +71,8 @@ function yourLoggerFn (varname, str) {
 
 This function has two behaviours:
 
-1. Calling with a string argument will make it read that value from the environment
-2. If no string argument is passed it will return the entire environment object
+1. Passing a string argument will read that value from the environment
+2. If no argument is passed it will return the entire environment object
 
 Examples:
 
@@ -88,7 +88,7 @@ const allVars = env.get()
 
 ### variable
 
-A variable is returned by calling `env.get(varname)`. It exposes the following
+A variable is returned when `env.get(varname)` is called. It exposes the following
 functions to validate and access the underlying value, set a default, or set
 an example value:
 
@@ -118,10 +118,10 @@ env-var: "ADMIN_EMAIL" is a required variable, but it was not set. An example
 of a valid value would be "admin@example.com"
 ```
 
-#### default(string)
+#### default(defaultValue:  string)
 
 Allows a default value to be provided for use if the desired environment
-variable is not set in the program environment.
+variable is not set in the program environment, i.e not present on `process.env`.
 
 Example:
 
@@ -134,7 +134,7 @@ const POOL_SIZE = env.get('POOL_SIZE').default('10').asIntPositive()
 
 #### required(isRequired = true)
 
-Ensure the variable is set on *process.env*. If the variable is not set, or is
+Ensure the variable is set on `process.env`. If the variable is not set, or is
 set to an empty value, this function will cause an `EnvVarError` to be thrown
 when you attempt to read the value using `asString` or a similar function.
 
@@ -238,11 +238,11 @@ parsing fails.
 
 #### asJsonArray()
 
-The same as _asJson_ but checks that the data is a JSON Array, e.g. [1,2].
+The same as _asJson_ but verifies that the data is a JSON Array, e.g. [1,2].
 
 #### asJsonObject()
 
-The same as _asJson_ but checks that the data is a JSON Object, e.g. {a: 1}.
+The same as _asJson_ but verifies that the data is a JSON Object, e.g. {a: 1}.
 
 #### asPortNumber()
 
@@ -260,7 +260,7 @@ passed for `flags` is passed as the second argument to the `RegExp` constructor.
 
 Return the variable value as a String. Throws an exception if value is not a
 String. It's highly unlikely that a variable will not be a String since all
-*process.env* entries you set in bash are Strings by default.
+`process.env` entries you set in bash are Strings by default.
 
 #### asUrlObject()
 
@@ -272,7 +272,7 @@ see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html#url_class
 
 Verifies that the variable is a valid URL string and returns the validated
 string. The validation is performed by passing the URL string to the
-[Node.js URL constructor](https://nodejs.org/docs/latest/api/url.html#url_class_url).
+WHATWG URL constructor.
 
 Note that URLs without paths will have a default path `/` appended when read, e.g.
 `https://api.acme.org` would become `https://api.acme.org/`. Always use URL

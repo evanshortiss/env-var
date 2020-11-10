@@ -3,7 +3,7 @@
 <div align="center">
 
 [![NPM version](https://img.shields.io/npm/v/env-var.svg?style=flat)](https://www.npmjs.com/package/env-var)
-[![Typescript](https://badgen.net/npm/types/env-var)](http://www.Typescriptlang.org/)
+[![TypeScript](https://badgen.net/npm/types/env-var)](http://www.typescriptlang.org/)
 [![License](https://badgen.net/npm/license/env-var)](https://opensource.org/licenses/MIT)
 [![Travis CI](https://travis-ci.org/evanshortiss/env-var.svg?branch=master)](https://travis-ci.org/evanshortiss/env-var)
 [![Coverage Status](https://coveralls.io/repos/github/evanshortiss/env-var/badge.svg?branch=master)](https://coveralls.io/github/evanshortiss/env-var?branch=master)
@@ -11,7 +11,7 @@
 [![Known Vulnerabilities](https://snyk.io//test/github/evanshortiss/env-var/badge.svg?targetFile=package.json)](https://snyk.io//test/github/evanshortiss/env-var?targetFile=package.json)
 
 
-Verification, sanitization, and type coercion for environment variables in Node.js. Supports Typescript!
+Verification, sanitization, and type coercion for environment variables in Node.js and web applications. Supports TypeScript!
 <br>
 <br>
 </div>
@@ -20,16 +20,16 @@ Verification, sanitization, and type coercion for environment variables in Node.
 * 🧹 Clean and simple code, as [shown here](https://gist.github.com/evanshortiss/0cb049bf676b6138d13384671dad750d).
 * 🚫 [Fails fast](https://en.wikipedia.org/wiki/Fail-fast) if your environment is misconfigured.
 * 👩‍💻 Friendly error messages and example values for better debugging experience.
-* 🎉 Typescript support provides compile time safety and better developer experience.
-* 📦 Can be used for non-NodeJS projects such as [React and React-native projects](https://github.com/evanshortiss/env-var/pull/138).
+* 🎉 TypeScript support provides compile time safety and better developer experience.
+* 📦 Support for frontend projects, e.g in React, React Native, Angular, etc.
 
-## Documentation structure
+## Contents
 
-- [API.md](API.md): The full API set for `env-var`
-- [CHANGELOG.md](CHANGELOG.md)
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [EXAMPLE.md](EXAMPLE.md): Example usage of `env-var`
+- [API](API.md): The full API set for `env-var`
+- [Changelog](CHANGELOG.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Contributing](CONTRIBUTING.md)
+- [Examples](EXAMPLE.md): Example usage of `env-var`
 - [README.md](README.md): General and key information on this project
 
 ## Install
@@ -48,7 +48,7 @@ yarn add env-var
 
 ## Getting started
 
-You can use `env-var` in both Javascript and Typescript!
+You can use `env-var` in both JavaScript and TypeScript!
 
 ### Javascript example
 
@@ -71,7 +71,7 @@ const PASSWORD = env.get('DB_PASSWORD')
 const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
-### Typescript example
+### TypeScript example
 
 ```ts
 import * as env from 'env-var';
