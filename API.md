@@ -265,8 +265,7 @@ String. It's highly unlikely that a variable will not be a String since all
 #### asUrlObject()
 
 Verifies that the variable is a valid URL string using the same method as
-`asUrlString()`, but instead returns the resulting URL instance. For details
-see the [Node.js URL docs](https://nodejs.org/docs/latest/api/url.html#url_class_url).
+`asUrlString()`, but instead returns the resulting URL instance. It uses the WHATWG URL constructor.
 
 #### asUrlString()
 
