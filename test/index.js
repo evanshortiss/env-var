@@ -183,6 +183,14 @@ describe('env-var', function () {
         mod.get('INTEGER').asInt()
       }).to.throw()
     })
+
+    it('should throw an exception - non integer type found', function () {
+      process.env.INTEGER = '123nope'
+
+      expect(function () {
+        mod.get('INTEGER').asInt()
+      }).to.throw()
+    })
   })
 
   describe('#asIntPositive', function () {
@@ -222,6 +230,14 @@ describe('env-var', function () {
 
     it('should throw an exception - non float found', function () {
       process.env.FLOAT = 'nope'
+
+      expect(function () {
+        mod.get('FLOAT').asFloat()
+      }).to.throw()
+    })
+
+    it('should throw an exception - non float found', function () {
+      process.env.FLOAT = '192.168.1.1'
 
       expect(function () {
         mod.get('FLOAT').asFloat()
