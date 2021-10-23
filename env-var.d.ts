@@ -262,24 +262,24 @@ interface IOptionalVariable<Exs extends Extensions = {}> extends VariableAccesso
 
 export class EnvVarError extends Error {}
 
-interface IEnv<PresentVariable, OptionalVariable> {
+interface IEnv<OptionalVariable, Container> {
   /**
    * Returns an object containing all current environment variables
    */
-  get (): {[varName: string]: string},
+  get (): Container,
 
   /**
    * Gets an environment variable that is possibly not set to a value
    */
-  get (varName: string): OptionalVariable;
+  get (varName: keyof Container): OptionalVariable;
 
   /**
    * Returns a new env-var instance, where the given object is used for the environment variable mapping.
    * Use this when writing unit tests or in environments outside node.js.
    */
-  from<T extends Extensions>(values: NodeJS.ProcessEnv, extensions?: T, logger?: LoggerFn): IEnv<
-    IPresentVariable<T> & ExtenderType<T>,
-    IOptionalVariable<T> & ExtenderTypeOptional<T>
+  from<V, T extends Extensions>(values: V, extensions?: T, logger?: LoggerFn): IEnv<
+    IOptionalVariable<T> & ExtenderTypeOptional<T>, 
+    V
   >;
 
   accessors: PublicAccessors
@@ -299,14 +299,16 @@ type ExtenderTypeOptional<T extends Extensions> = { [P in keyof T]: (...args: Re
 export type Extensions = {
   [key: string]: ExtensionFn<any>
 }
+
 export type LoggerFn = (varname: string, str: string) => void
 export type RaiseErrorFn = (error: string) => void
 export type ExtensionFn<T> = (value: string, ...args: any[]) => T
-export function get(): {[varName: string]: string}
-export function get(varName: string): IOptionalVariable;
-export function from<T extends Extensions>(values: NodeJS.ProcessEnv, extensions?: T, logger?: LoggerFn): IEnv<
-  IPresentVariable<T> & ExtenderType<T>,
-  IOptionalVariable<T> & ExtenderTypeOptional<T>
->;
+
+export const accessors: PublicAccessors
+export const EnvVarError: EnvVarError
+
 export function logger (varname: string, str: string): void
-export let accessors: PublicAccessors
+
+type IDefaultEnv = IEnv<IOptionalVariable, NodeJS.ProcessEnv>
+export const get: IDefaultEnv['get']
+export const from: IDefaultEnv['from']
