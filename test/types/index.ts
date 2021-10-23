@@ -19,6 +19,7 @@ describe('typescript tests', () => {
       // env-var instance with no vars
       const e = env.from({})
 
+      // @ts-expect-error `PATH` is not in container object
       expect(e.get('PATH').asString()).to.equal(undefined)
     })
   })
@@ -28,6 +29,7 @@ describe('typescript tests', () => {
       const e = env.from({})
 
       expect(() => {
+        // @ts-expect-error `A_MISSING_VARIABLE` is not in container object
         e.get('A_MISSING_VARIABLE').required().asString()
       }).to.throw('env-var: "A_MISSING_VARIABLE" is a required variable, but it was not set')
     })
