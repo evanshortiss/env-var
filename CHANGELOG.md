@@ -1,3 +1,7 @@
+## 7.1.0
+* Support type narrowed `process.env`/record and remove unused type (#148)
+* Add support for `readonly T[]` generic use with `asEnum()`
+
 ## 7.0.1
 * Fix loose float and int parsing (PR #144)
 

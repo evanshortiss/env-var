@@ -65,7 +65,7 @@ const PASSWORD = env.get('DB_PASSWORD')
   .asString();
 
 // Read in a port (checks that PORT is in the range 0 to 65535)
-// Alternatively, use amdefault value of 5432 if PORT is not defined
+// Alternatively, use a default value of 5432 if PORT is not defined
 const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
@@ -143,6 +143,7 @@ Contributions are welcomed and discussed in [CONTRIBUTING.md](CONTRIBUTING.md). 
 * @itavy
 * @jerome-fox
 * @joh-klein
+* @Lioness100
 * @MikeyBurkman
 * @pepakriz
 * @rmblstrp
