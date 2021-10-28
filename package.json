@@ -5,7 +5,6 @@
   "main": "env-var.js",
   "typings": "env-var.d.ts",
   "scripts": {
-    "coveralls": "cat coverage/lcov.info | coveralls",
     "coverage": "nyc mocha test/*.js && nyc report --reporter=lcov",
     "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
     "unit": "mocha test/*.js",
