@@ -101,7 +101,7 @@ type PublicAccessors = {
   /**
    * Verifies that the var being accessed is one of the given values
    */
-  asEnum: <T extends string>(input: string, validValues: T[]) =>  T;
+  asEnum: <T extends string>(input: string, validValues: readonly T[]|T[]) =>  T;
 }
 
 interface VariableAccessors <AlternateType = unknown> {
@@ -201,7 +201,7 @@ interface VariableAccessors <AlternateType = unknown> {
   /**
    * Verifies that the var being accessed is one of the given values
    */
-  asEnum: <T extends string>(validValues: T[]) => AlternateType extends undefined ? undefined|T : T;
+  asEnum: <T extends string>(validValues: readonly T[]|T[]) => AlternateType extends undefined ? undefined|T : T;
 
   /**
    * Verifies that the variable is a valid regular expression and returns the
