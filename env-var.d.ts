@@ -305,7 +305,6 @@ export type RaiseErrorFn = (error: string) => void
 export type ExtensionFn<T> = (value: string, ...args: any[]) => T
 
 export const accessors: PublicAccessors
-export const EnvVarError: EnvVarError
 
 export function logger (varname: string, str: string): void
 
