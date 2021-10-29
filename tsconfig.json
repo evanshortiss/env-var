@@ -3,7 +3,7 @@
     "sourceMap": false,
     "target": "es5",
     "moduleResolution": "node",
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true
