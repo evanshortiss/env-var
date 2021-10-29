@@ -133,6 +133,7 @@ Contributions are welcomed and discussed in [CONTRIBUTING.md](CONTRIBUTING.md). 
 ## Contributors
 
 * @aautio
+* @avocadomaster
 * @caccialdo
 * @ChibiBlasphem
 * @DigiPie
