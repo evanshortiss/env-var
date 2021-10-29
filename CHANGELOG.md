@@ -1,4 +1,7 @@
-## 7.1.0
+## 7.1.1 (28/10/2021)
+* Fix duplicate identifier error for TypeScript builds (#151)
+
+## 7.1.0 (28/10/2021)
 * Support type narrowed `process.env`/record and remove unused type (#148)
 * Add support for `readonly T[]` generic use with `asEnum()`
 
