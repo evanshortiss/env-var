@@ -6,3 +6,5 @@ coverage
 .nyc_output
 package-lock.json
 .vscode
+lib/*.js
+env-var.js

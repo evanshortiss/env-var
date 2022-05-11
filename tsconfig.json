@@ -6,7 +6,8 @@
     "skipLibCheck": false,
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "experimentalDecorators": true
   },
-  "files": ["test/types/index.ts", "example/typescript.ts"]
+  "include": ["lib/**.ts", "env-var.ts", "test/types/index.ts", "example/typescript.ts"]
 }
