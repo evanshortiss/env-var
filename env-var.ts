@@ -3,24 +3,12 @@
 import { Extension, Variable } from './lib/variable'
 import EnvVarError from './lib/env-error'
 import genLogger from './lib/logger'
-import { EnvLogger } from './lib/types'
+import { EnvLogger, EnvVarConfig } from './lib/types'
 
 const container = process.env
 const logger = genLogger(console.log, container.NODE_ENV)
 
-
-
-export type ExtensionFn<T> = (value: string, ...args: any[]) => T
-export type Extensions = {
-  [key: string]: ExtensionFn<any>
-}
 export { Variable, logger }
-
-export type EnvVarConfig<Container extends NodeJS.ProcessEnv = NodeJS.ProcessEnv> = {
-  container: Container
-  // variableClass?: { new(...args: any[]): ExtendedVariable },
-  logger?: EnvLogger
-}
 
 export function get (): NodeJS.ProcessEnv
 export function get (variableName: string): Variable
@@ -54,22 +42,24 @@ export class EnvInstance {
   }
 }
 
-const asEmail: Extension<string> = (s, error) => {
-  if (s.includes('@')) {
-    return s
-  } else {
-    throw error('must be a string')
-  }
-}
+// const asEmail: Extension<string> = (s, error) => {
+//   if (s.includes('@')) {
+//     return s
+//   } else {
+//     throw error('must be a string')
+//   }
+// }
 
-const asObject: Extension<Record<string, unknown>> = (s, error) => {
-  return JSON.parse(s)
-}
-const instance = new EnvInstance({
-  container: process.env
-})
+// const asObject: Extension<Record<string, unknown>> = (s, error) => {
+//   return JSON.parse(s)
+// }
+// const instance = new EnvInstance({
+//   container: process.env
+// })
 
-const raw = instance.get('OK')
-const v: string = instance.get('OK').required().usingExtension(asEmail)
-const obj = instance.get('OK').usingExtension(asObject)
-const port: number = instance.get('OK').required().asPortNumber()
+// const raw = instance.get()
+
+// const v: string = instance.get('OK').required().usingExtension(asEmail)
+// const obj = instance.get('OK').usingExtension(asObject)
+// const port = instance.get('OK').required().asPortNumber()
+// const j = instance.get('JSON').required().asJson()

@@ -9,5 +9,5 @@
     "strictNullChecks": true,
     "experimentalDecorators": true
   },
-  "include": ["lib/**.ts", "env-var.ts", "test/types/index.ts", "example/typescript.ts"]
+  "include": ["lib/**.ts", "env-var.ts"]
 }
