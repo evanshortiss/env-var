@@ -4,11 +4,12 @@
   "description": "Verification, sanitization, and type coercion for environment variables in Node.js",
   "main": "env-var.js",
   "typings": "env-var.d.ts",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "coverage": "nyc mocha test/*.js && nyc report --reporter=lcov",
     "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
-    "unit": "exit 0; mocha test/*.js",
+    "unit": "npm run build && mocha test/*.js",
     "lint": "standard example/*.js *.js \"lib/**/*.js\" test/*.js --fix",
     "test": "npm run unit && npm run coverage && npm run check-coverage && npm run lint && npm run ts-verify",
     "ts-verify": "tsc && mocha test/types/*.js"
@@ -66,6 +67,6 @@
     "typescript": "^4.4.4"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   }
 }

@@ -38,10 +38,10 @@ describe('env-var', function () {
     })
   })
 
-  describe('getting process.env', function () {
+  describe('#get() should return process.env', function () {
     it('should return process.env object when no args provided', function () {
       var res = mod.get()
-
+      console.log(res)
       expect(res).to.be.an('object');
 
       ['STRING', 'FLOAT', 'INTEGER', 'BOOL', 'JSON'].forEach(function (name) {
@@ -589,7 +589,7 @@ describe('env-var', function () {
 
     beforeEach(() => {
       fromMod = mod.from({
-        JSON_CONFIG: '{1,2]'
+        variableContainer: { JSON_CONFIG: '{1,2]' }
       })
     })
 
@@ -601,7 +601,7 @@ describe('env-var', function () {
     it('should throw an error with a valid example message', () => {
       expect(() => {
         fromMod.get('JSON_CONFIG').example(sampleConfig).asJsonArray()
-      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON. An example of a valid value would be: ${sampleConfig}`)
+      }).to.throw(`env-var: "JSON_CONFIG" should be valid parseable JSON. An example of a valid value would be: ${sampleConfig}`)
     })
 
     it('should throw an error with a valid example message', () => {
@@ -616,8 +616,10 @@ describe('env-var', function () {
 
     beforeEach(function () {
       fromMod = mod.from({
-        A_BOOL: 'true',
-        A_STRING: 'blah'
+        variableContainer: {
+          A_BOOL: 'true',
+          A_STRING: 'blah'
+        }
       })
     })
 
@@ -627,9 +629,12 @@ describe('env-var', function () {
         JSON: JSON.stringify({ name: 'env-var' })
       }
 
-      const env = mod.from(data, {}, (str) => {
-        expect(str).to.be.a('string')
-        spyCallCount++
+      const env = mod.from({
+        variableContainer: data,
+        logger: (str) => {
+          expect(str).to.be.a('string')
+          spyCallCount++
+        }
       })
 
       const result = env.get('JSON').asJson()
@@ -661,72 +666,22 @@ describe('env-var', function () {
       expect(fromMod.get()).to.have.property('A_STRING', 'blah')
     })
 
-    describe('#extraAccessors', function () {
-      it('should add custom accessors to subsequent gotten values', function () {
-        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asShout: function (value) {
-            return value.toUpperCase()
-          }
+    describe('#usingExtension', function () {
+      it('should read value using suppplied ', function () {
+        const asShout = (value, error) => {
+          return value.toUpperCase()
+        }
+        const fromMod = mod.from({
+          variableContainer: { STRING: 'Hello, world!' }
         })
 
-        var gotten = fromMod.get('STRING')
+        const shouted = fromMod.get('STRING').usingExtension(asShout)
 
-        expect(gotten).to.have.property('asShout')
-        expect(gotten.asShout()).to.equal('HELLO, WORLD!')
-      })
-
-      it('should allow overriding existing accessors', function () {
-        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asString: function (value) {
-            // https://stackoverflow.com/a/959004
-            return value.split('').reverse().join('')
-          }
-        })
-
-        expect(fromMod.get('STRING').asString()).to.equal('!dlrow ,olleH')
-      })
-
-      it('should not attach accessors to other env instances', function () {
-        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asNull: function (value) {
-            return null
-          }
-        })
-
-        var otherMod = mod.from({
-          STRING: 'Hola, mundo!'
-        })
-
-        expect(fromMod.get('STRING')).to.have.property('asNull')
-        expect(otherMod.get('STRING')).not.to.have.property('asNull')
+        expect(shouted).to.equal('HELLO, WORLD!')
       })
     })
 
-    describe('#accessors', () => {
-      describe('#asArray', () => {
-        it('should return an array of strings', () => {
-          const arr = fromMod.accessors.asArray('1,2,3')
-
-          expect(arr).to.eql(['1', '2', '3'])
-        })
-
-        it('should return an array of strings split by period chars', () => {
-          const arr = fromMod.accessors.asArray('1.2.3', '.')
-
-          expect(arr).to.eql(['1', '2', '3'])
-        })
-      })
-
-      describe('#asInt', () => {
-        it('should return an integer', () => {
-          const ret = fromMod.accessors.asInt('1')
-
-          expect(ret).to.eql(1)
-        })
-      })
-    })
-
-    describe('#logger', () => {
+    describe('#createLogger', () => {
       const varname = 'SOME_VAR'
       const msg = 'this is a test message'
 
@@ -737,7 +692,7 @@ describe('env-var', function () {
           spyCalled = true
         }
 
-        const log = require('../lib/logger')(spy)
+        const log = require('../lib/logger').createLogger(spy, false)
 
         log(varname, msg)
         expect(spyCalled).to.equal(true)

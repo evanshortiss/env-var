@@ -1,15 +1,16 @@
 'use strict'
 
 import { accessors } from './accessors'
-import EnvVarError from './env-error'
-import { EnvContainer, EnvLogger } from './types'
+import { EnvVarError } from './env-error'
+import { EnvLogger } from './logger'
 const base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/
 
+export type VariableSource = Record<string, string|undefined>
 export type Extension<ReturnType> = (v: string, error: (s: string) => EnvVarError) => ReturnType
 
 export class Variable<T = undefined> {
   constructor(
-    protected container: EnvContainer,
+    protected container: VariableSource,
     protected varName: string,
     protected logger: EnvLogger,
     protected isBase64?: boolean,
@@ -105,7 +106,7 @@ export class Variable<T = undefined> {
       }
     }
 
-    if (value && this.isRequired) {
+    if (this.isRequired) {
       this.log('verifying variable value is not an empty string')
       // Need to verify that required variables aren't just whitespace
       if (value.trim().length === 0) {
@@ -113,7 +114,7 @@ export class Variable<T = undefined> {
       }
     }
 
-    if (value && this.isBase64) {
+    if (this.isBase64) {
       this.log('verifying variable is a valid base64 string')
       if (!value.match(base64Regex)) {
         throw this.createError('should be a valid base64 string if using convertFromBase64')
@@ -122,15 +123,11 @@ export class Variable<T = undefined> {
       value = Buffer.from(value, 'base64').toString()
     }
 
-    if (value) {
-      try {
-        return parser(value)
-      } catch (e) {
-        throw this.createError((e as Error).message)
-      }
+    try {
+      return parser(value)
+    } catch (e) {
+      throw this.createError((e as Error).message)
     }
-
-    return undefined!
   }
 
   public usingExtension<ReturnType> (ext: Extension<ReturnType>) {

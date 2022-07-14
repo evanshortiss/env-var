@@ -1,14 +1,19 @@
 'use strict'
 
-import { EnvLogger } from './types'
+import { EnvVarError } from "./env-error"
+
+export type EnvLogger = (varname: string, msg: string) => void
 
 /**
  * Default logger included with env-var.
- * Will not log anything if NODE_ENV is set to production
+ * Will not log anything if is set to production
  */
-export default function genLogger (out: (s: string) => void, prodFlag?: string) {
+export function createLogger (out: (s: string) => void, isProduction = true) {
+  if (typeof isProduction !== 'boolean') {
+    throw new EnvVarError('The second parameter passed to the createLogger function must be a boolean value')
+  }
   const envVarLogger: EnvLogger = (varname: string, msg: string) => {
-    if (!prodFlag || !prodFlag.match(/prod|production/)) {
+    if (isProduction !== true) {
       out(`env-var (${varname}): ${msg}`)
     }
   }

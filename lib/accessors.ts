@@ -1,3 +1,5 @@
+'use strict'
+
 export interface Acccessors<T> {
   asUrlString: (s: string) => string|T
   asUrlObject: (s: string) => URL|T
@@ -20,7 +22,7 @@ export interface Acccessors<T> {
 
 export const accessors: Acccessors<never> = {
 
-  asArray (s, delimiter) {
+  asArray (s, delimiter = ',') {
     if (!s.length) {
       return []
     } else {
