@@ -6,8 +6,7 @@
     "skipLibCheck": false,
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
-    "experimentalDecorators": true
+    "strictNullChecks": true
   },
   "include": ["lib/**.ts", "env-var.ts"]
 }

@@ -2,8 +2,9 @@ import { Variable, VariableSource } from './lib/variable'
 import { EnvVarError } from './lib/env-error'
 import { accessors } from './lib/accessors'
 import { EnvLogger, createLogger } from './lib/logger'
+import { isNode } from './lib/check-environment'
 
-export { Variable, VariableSource, EnvLogger, EnvVarError, accessors, createLogger }
+export { VariableSource, EnvLogger, EnvVarError, accessors, createLogger }
 
 export type EnvVarInstanceParams = {
   variableContainer: VariableSource
@@ -12,7 +13,7 @@ export type EnvVarInstanceParams = {
 }
 
 export function from (params: EnvVarInstanceParams) {
-  if (!params.variableContainer) {
+  if (!params || !params.variableContainer) {
     throw new EnvVarError('Since v8.0.0, from() parameters must be an object that contains a "variableContainer" property that contains all environment variables.')
   }
   
@@ -20,7 +21,7 @@ export function from (params: EnvVarInstanceParams) {
 }
 
 export function get <VariableSource>(varname?: string): Variable|VariableSource {
-  if (typeof process === 'undefined') {
+  if (!isNode()) {
     throw new EnvVarError('The exported get() function is only supported in Node.js environments. For all other environments use from() to create an EnvVarInstance first.')
   }
 

@@ -38,10 +38,17 @@ describe('env-var', function () {
     })
   })
 
+  describe('#EnvVarError', () => {
+    it('should be exported', () => {
+      const err = new mod.EnvVarError('custom error')
+
+      expect(err.name).to.equal('EnvVarError')
+    })
+  })
+
   describe('#get() should return process.env', function () {
     it('should return process.env object when no args provided', function () {
       var res = mod.get()
-      console.log(res)
       expect(res).to.be.an('object');
 
       ['STRING', 'FLOAT', 'INTEGER', 'BOOL', 'JSON'].forEach(function (name) {
@@ -410,6 +417,12 @@ describe('env-var', function () {
         mod.get('JSON').asJson()
       }).to.throw()
     })
+
+    it('should throw an exception - json parsed, but is not an object or array', function () {
+      process.env.JSON = '10'
+
+      expect(() => mod.get('JSON').asJson()).to.throw('env-var: "JSON" should be a valid JSON object or array')
+    })
   })
 
   describe('#required', function () {
@@ -623,6 +636,18 @@ describe('env-var', function () {
       })
     })
 
+    it('should throw an error if params is undefined', () => {
+      expect(() => {
+        mod.from()
+      }).to.throw('env-var: Since v8.0.0, from() parameters must be an object that contains a "variableContainer" property that contains all environment variables.')
+    })
+
+    it('should throw an error if params.variableContainer is undefined', () => {
+      expect(() => {
+        mod.from({})
+      }).to.throw('env-var: Since v8.0.0, from() parameters must be an object that contains a "variableContainer" property that contains all environment variables.')
+    })
+
     it('should send messages to the custom logger', () => {
       let spyCallCount = 0
       const data = {
@@ -666,6 +691,12 @@ describe('env-var', function () {
       expect(fromMod.get()).to.have.property('A_STRING', 'blah')
     })
 
+    it('shoud throw a deprecation error if get() is called with two arguments', () => {
+      expect(() => {
+        fromMod.get('SOMETHING', 'default somthing value').asString()
+      }).to.throw('env-var: It looks like you passed more than one argument to env.get(). Since env-var@6.0.0 this is no longer supported. To set a default value use env.get(TARGET).default(DEFAULT)')
+    })
+
     describe('#usingExtension', function () {
       it('should read value using suppplied ', function () {
         const asShout = (value, error) => {
@@ -678,6 +709,42 @@ describe('env-var', function () {
         const shouted = fromMod.get('STRING').usingExtension(asShout)
 
         expect(shouted).to.equal('HELLO, WORLD!')
+      })
+
+      it('should be able to throw an error', () => {
+        const asShout = (value, error) => {
+          error('should be louder')
+        }
+
+        const fromMod = mod.from({
+          variableContainer: { STRING: 'Hello, world!' }
+        })
+
+        expect(() => fromMod.get('STRING').usingExtension(asShout)).to.throw('env-var: "STRING" should be louder')
+      })
+
+      it('should work with undefined values', () => {
+        const asShout = (value, error) => {
+          return value.toUpperCase()
+        }
+
+        const fromMod = mod.from({
+          variableContainer: {}
+        })
+
+        expect(fromMod.get('STRING').usingExtension(asShout)).to.equal(undefined)
+      })
+
+      it('should throw an error for missing but required values', () => {
+        const asShout = (value, error) => {
+          return value.toUpperCase()
+        }
+
+        const fromMod = mod.from({
+          variableContainer: {}
+        })
+
+        expect(() => fromMod.get('STRING').required().usingExtension(asShout)).to.throw('env-var: "STRING" is a required variable, but it was not set')
       })
     })
 

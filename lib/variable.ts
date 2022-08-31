@@ -16,7 +16,8 @@ export class Variable<T = undefined> {
     protected isBase64?: boolean,
     protected isRequired?: boolean,
     protected defValue?: string,
-    protected exampleValue?: string
+    protected exampleValue?: string,
+    protected descriptionValue?: string
   ) {}
 
   /**
@@ -70,12 +71,22 @@ export class Variable<T = undefined> {
     return this
   }
 
+  public description (description: string) {
+    this.descriptionValue = description
+
+    return this
+  }
+
   /**
    * Throw an error with a consistent type/format.
    * @param {String} value
    */
   protected createError(msg: string): EnvVarError {
     let errMsg = `"${this.varName}" ${msg}`
+
+    if (this.descriptionValue) {
+      errMsg = `${errMsg}. ${this.descriptionValue}`
+    }
 
     if (this.exampleValue) {
       errMsg = `${errMsg}. An example of a valid value would be: ${this.exampleValue}`
@@ -134,7 +145,7 @@ export class Variable<T = undefined> {
     const value = this.asString()
 
     if (typeof value === 'string') {
-      return ext(value, (s: string) => this.createError(s))
+      return ext(value, (s: string) => { throw this.createError(s) })
     } else {
       return value
     }

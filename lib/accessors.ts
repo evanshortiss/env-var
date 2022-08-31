@@ -66,16 +66,20 @@ export const accessors: Acccessors<never> = {
   },
 
   asJson: (s) => {
-    try {
-      const val = JSON.parse(s)
+    let val
 
-      if (val && (Array.isArray(val) || typeof val === 'object')) {
-        // JSON.parse can be passed strings and will attempt to parse them, and
-        // even parses the string "null" to the value null. Filter those out...
-        return val
-      }
+    try {
+      val = JSON.parse(s)
     } catch (e) {
       throw new Error('should be valid parseable JSON')
+    }
+
+    if (val && (Array.isArray(val) || typeof val === 'object')) {
+      // JSON.parse can be passed strings and will attempt to parse them, and
+      // even parses the string "null" to the value null. Filter those out...
+      return val
+    } else {
+      throw new Error('should be a valid JSON object or array')
     }
   },
 

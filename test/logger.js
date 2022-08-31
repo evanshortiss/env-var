@@ -4,7 +4,7 @@
 
 const { expect } = require('chai')
 
-describe('#built-in logger', () => {
+describe('Logger', () => {
   const varname = 'SOME_VAR'
   const msg = 'this is a test message'
 
@@ -22,13 +22,25 @@ describe('#built-in logger', () => {
     expect(spyCalled)
   })
 
-  it('should not not send a string to the logger due to "prod" flag', () => {
+  it('should not not send a string to the logger since isProduction is set to true', () => {
     let spyCalled = false
     const spy = (str) => {
       spyCalled = true
     }
 
     const log = require('../lib/logger').createLogger(spy, true)
+
+    log(varname, msg)
+    expect(spyCalled).to.equal(false)
+  })
+
+  it('should not not send a string to the logger since isProduction is set to true by default', () => {
+    let spyCalled = false
+    const spy = (str) => {
+      spyCalled = true
+    }
+
+    const log = require('../lib/logger').createLogger(spy)
 
     log(varname, msg)
     expect(spyCalled).to.equal(false)
