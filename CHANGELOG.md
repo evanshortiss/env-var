@@ -1,3 +1,6 @@
+## 7.2.0 (01/09/2022)
+* Add `asEmailString()` accessor (#146)
+
 ## 7.1.1 (28/10/2021)
 * Fix duplicate identifier error for TypeScript builds (#151)
 
