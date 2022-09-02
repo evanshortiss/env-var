@@ -48,6 +48,11 @@ type PublicAccessors = {
   asString: (input: string) =>  string;
 
   /**
+   * Return the variable value as an Email. Throws an exception if value is not an Email.
+   */
+  asEmailString: (input: string) =>  string;
+
+  /**
    * Attempt to parse the variable to a JSON Object or Array. Throws an exception if parsing fails.
    */
   asJson: (input: string) => Object|Array<any>;
