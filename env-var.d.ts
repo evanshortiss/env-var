@@ -153,6 +153,11 @@ interface VariableAccessors <AlternateType = unknown> {
   asString: () => AlternateType extends undefined ? undefined|string : string;
 
   /**
+   * Return the variable value as an Email. Throws an exception if value is not an Email.
+   */
+  asEmailString: () => AlternateType extends undefined ? undefined|string : string;
+
+  /**
    * Attempt to parse the variable to a JSON Object or Array. Throws an exception if parsing fails.
    */
   asJson: () => AlternateType extends undefined ? undefined|Object|Array<any> : Object|Array<any>;
