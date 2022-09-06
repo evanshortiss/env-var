@@ -1,6 +1,6 @@
 {
   "name": "env-var",
-  "version": "7.2.0",
+  "version": "7.3.0",
   "description": "Verification, sanitization, and type coercion for environment variables in Node.js",
   "main": "env-var.js",
   "typings": "env-var.d.ts",

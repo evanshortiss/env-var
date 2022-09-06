@@ -1,3 +1,6 @@
+## 7.3.0 (06/09/2022)
+* Add missing `asEmailString()` typings (#160)
+
 ## 7.2.0 (01/09/2022)
 * Add `asEmailString()` accessor (#146)
 
