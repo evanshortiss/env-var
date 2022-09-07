@@ -9,7 +9,7 @@ A complete listing of the `env-var` API.
   * [get()](#getvarname)
     * [variable](#variable)
       * [example(string)](#examplestring)
-      * [default(string)](#defaultstring)
+      * [default(string)](#defaultdefaultvalue--string)
       * [required()](#requiredisrequired--true)
       * [covertFromBase64()](#convertfrombase64)
       * [asArray()](#asarraydelimiter-string)
