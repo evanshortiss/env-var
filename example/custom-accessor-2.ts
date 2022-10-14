@@ -11,56 +11,39 @@
  * of this example 'custom-accessor.js'.
  */
 
-import * as env from '../env-var'
-const { from, accessors } = env
+import { from, Extension } from '../env-var'
 
-// Add an accessor named 'asIntRange' which verifies whether the given value is
-// between the specified min and max values, inclusive
-const envInstance = from(process.env, {
-  asIntBetween: (value, min, max) => {
-    let ret: number, minInt: number, maxInt: number
-
-    try {
-      ret = accessors.asInt(value)
-      minInt = accessors.asInt(min)
-      maxInt = accessors.asInt(max)
-    } catch {
-      throw new Error('value, min, max must be integers')
-    }
-
-    if (ret < minInt || ret > maxInt) {
-      throw new Error(
-        `should be an integer between the range of [${min}, ${max}]`
-      )
-    }
-
-    return ret
+// Typically you'd pass process.env instead of a custom object, but using
+// a custom object makes this example easier to run and understand
+const { get } = from({
+  variables: {
+    CONCURRENCY: '50'
   }
 })
 
-try {
-  // Will throw an error if you have not set this environment variable
-  // We specified 'asIntBetween' as the name for the accessor above,
-  // so now we can call `asIntBetween()` like any other accessor on all
-  // env-var instances.
+// This is the custom extension. It will verify the value being read is between
+// the given min and max values.
+const numberBetween: Extension<number, { min: number, max: number }> = (value, error, args) => {
+  const num = parseInt(value)
+  const { min, max } = args
 
-  // This will pass
-  process.env.SERVER_INSTANCES = '10'
-  let serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween(1, 10)
-
-  // This will fail because min is not an integer
-  process.env['SERVER_INSTANCES'] = '1'
-  serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween('one', 10)
-
-  // This will fail because out of range
-  /*process.env.SERVER_INSTANCES = '0'
-  serverInstances = envInstance.get('SERVER_INSTANCES').asIntBetween(1, 10)*/
-
-  console.log(`SERVER_INSTANCES=${serverInstances}`)
-} catch (e) {
-  if (e instanceof env.EnvVarError) {
-    console.log('We got an env-var error', e)
+  if (num <= max && num >= min) {
+    return num
   } else {
-    console.log('Unexpected error', e)
+    // Throw a nicely formatted error message
+    throw error(`value ${num} was not between ${min} and ${max}`)
   }
 }
+
+// This will return 50, since it satisfies the extension logic
+const concurrency = get('CONCURRENCY')
+  .required()
+  .usingExtension(numberBetween, { min: 25, max: 75 })
+
+console.log('Read concurrency value from env is:', concurrency)
+
+// This will throw an error since the configured CONCURRENCY value of 50 does
+// not fall within the given min/max values
+const failedConcurrency = get('CONCURRENCY')
+  .required()
+  .usingExtension(numberBetween, { min: 100, max: 200 })

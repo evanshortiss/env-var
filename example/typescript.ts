@@ -25,35 +25,26 @@ const requiredInt = env.get('AN_INTEGER').default(10).required().asInt()
 console.log('the integer was', requiredInt)
 
 // Extension to built-in variable
-// Verify this works, and fluid API works with it
-class CustomVariable extends env.Variable {
-  public asEmail () {
-    this.getValue<string>((s) => {
-      const split = String(s).split('@')
-      if (split.length !== 2) {
-        throw new Error('must contain exactly one "@"')
-      }
-      return s
-    })
+const asEmail: env.Extension<string> = (s, error) => {
+  const split = String(s).split('@')
+  if (split.length !== 2) {
+    throw error('must contain exactly one "@"')
   }
+  return s
 }
-const customEnv = new env.EnvInstance<CustomVariable>({
-  container: {
-    ADMIN_EMAIL: 'admin@example.com'
-  },
-  variableClass: CustomVariable
-})
-const v = customEnv.get('ADMIN')
 
-const adminEmail = customEnv.get('ADMIN_EMAIL')
+const adminEmail = env.get('ADMIN_EMAIL')
   .example('someone@example')
   .required()
-  .asEmail()
+  .usingExtension(asEmail)
 
 console.log('admin email is:', adminEmail)
 
-const log: env.LoggerFn = (varname, msg) => {
+const logger: env.EnvLogger = (varname, msg) => {
   console.log(`Log for ${varname}: ${msg}`)
 }
-const loggerEnv = env.from(process.env, {}, log)
+const loggerEnv = env.from({
+  logger,
+  variables: process.env
+})
 console.log(`HOME is set to: ${loggerEnv.get('HOME').asString()}`)

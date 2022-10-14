@@ -6,8 +6,8 @@ import { EnvLogger } from './logger'
 const base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$/
 
 export type VariableSource = Record<string, string|undefined>
-export type Extension<ReturnType> = (v: string, error: (s: string) => EnvVarError) => ReturnType
 
+export type Extension<ReturnType, ArgsType = undefined> = (v: string, error: (s: string) => EnvVarError, args?: ArgsType) => ReturnType
 export class Variable<T = undefined> {
   constructor(
     protected container: VariableSource,
@@ -71,6 +71,12 @@ export class Variable<T = undefined> {
     return this
   }
 
+  /**
+   * Set a description. This is used to provide a more informative error
+   * message if the variable is missing or set to an invalid value.
+   * @param description 
+   * @returns 
+   */
   public description (description: string) {
     this.descriptionValue = description
 
@@ -141,11 +147,11 @@ export class Variable<T = undefined> {
     }
   }
 
-  public usingExtension<ReturnType> (ext: Extension<ReturnType>) {
+  public usingExtension<ReturnType, ArgsType> (ext: Extension<ReturnType, ArgsType>, args?: ArgsType) {
     const value = this.asString()
 
     if (typeof value === 'string') {
-      return ext(value, (s: string) => { throw this.createError(s) })
+      return ext(value, (s: string) => this.createError(s), args)
     } else {
       return value
     }
