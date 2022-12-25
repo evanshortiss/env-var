@@ -1,10 +1,10 @@
-import { Variable, VariableSource, Extension } from './lib/variable'
+import { Variable, VariableSource, Accessor } from './lib/variable'
 import { EnvVarError } from './lib/env-error'
 import { accessors } from './lib/accessors'
 import { EnvLogger, createLogger } from './lib/logger'
 import { isNode } from './lib/check-environment'
 
-export { VariableSource, EnvLogger, EnvVarError, accessors, createLogger,Extension }
+export { VariableSource, EnvLogger, EnvVarError, accessors, createLogger, Accessor }
 
 export type EnvVarInstanceParams = {
   variables: VariableSource
@@ -40,14 +40,15 @@ export type EnvVarInstanceParams = {
  * ```
  * 
  * @param {EnvVarInstanceParams} params 
- * @returns {EnvVarInstance}
  */
-export function from (params: EnvVarInstanceParams) {
+export function from<K extends EnvVarInstanceParams, T extends K['requiredByDefault']>(params: K): EnvVarInstance<T extends true ? undefined : unknown, K> {
   if (!params || !params.variables) {
-    throw new EnvVarError('Since v8.0.0, from() parameters must be an object that contains a "variables" object. The "variables" should be key-value pairs where all values are strings or undefined.')
+    throw new EnvVarError('Since v8.0.0, from() parameters must be an object that contains a "variables" object. The "variables" should be key-value pairs where all values are of type string or undefined.')
   }
   
-  return new EnvVarInstance(params)
+  const e = new EnvVarInstance(params)
+
+  return e
 }
 
 
@@ -80,7 +81,7 @@ export function get (varname?: string) {
     throw new EnvVarError('It looks like you passed more than one argument to env.get(). Since env-var@6.0.0 this is no longer supported. To set a default value use env.get(TARGET).default(DEFAULT)')
   }
 
-  return new EnvVarInstance<unknown>({
+  return new EnvVarInstance<unknown, any>({
     variables: process.env
   }).get(varname)
 }
@@ -89,13 +90,13 @@ export function get (varname?: string) {
  * An EnvVarInstance is typically created using the `from()` function. This
  * class is exposed for convenience, but isn't recommended for direct use. 
  */
-export class EnvVarInstance<VariableSource> {
-  constructor (private config: EnvVarInstanceParams) {}
+export class EnvVarInstance<VariableSource, T extends EnvVarInstanceParams> {
+  constructor (private config: T) {}
 
   public get<V extends VariableSource> (): V
-  public get (variableName: string): Variable
-  public get (variableName?: string): Variable
-  public get (variableName?: string) {
+  public get (variableName: Extract<keyof T['variables'], string>): Variable
+  public get (variableName?: Extract<keyof T['variables'], string>): Variable
+  public get (variableName?: Extract<keyof T['variables'], string>) {
     if (!variableName) {
       return this.config.variables
     }

@@ -86,7 +86,7 @@ directory.
 
 `env-var` supports many accessor functions such as `asFloatPositive()`, `asJson()` and `asRegExp()`. For a full list of `env-var` API calls, check out [API.md](API.md).
 
-You can also create your own custom accessor; refer to the ['usingExtension' section of API.md](API.md#usingExtension).
+You can also create your own custom accessor; refer to the ['usingAccessor' section of API.md](API.md#usingAccessor).
 
 ## FAQ / Examples
 
@@ -94,6 +94,7 @@ You can also create your own custom accessor; refer to the ['usingExtension' sec
 * Logging
 * React
 * Next.js
+* Vite
 * Custom Accessors & Validation Logic
 
 ## Contributing

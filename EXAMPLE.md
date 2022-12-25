@@ -8,6 +8,7 @@ For more examples, refer to the `/example` directory.
 * [Dotenv](#dotenv)
 * [Next.js](#nextjs)
 * [React](#react)
+* [Vite](#vite)
 * [Other examples](#other-examples)
 
 ## Logging
@@ -143,6 +144,18 @@ const url = get('REACT_APP_BASE_URL').asUrlString()
 
 Read the [React documentation](https://create-react-app.dev/docs/adding-custom-environment-variables/) to get a better understanding of this.
 
+## Vite
+
+Vite exposes variables via the `import.meta.env` variable. It's necessary to
+explicitly reference the variable per the Vite documentation.
+
+```ts
+import { from } from 'env-var'
+
+const env = from({
+  BASE_URL: import.meta.env.BASE_URL
+})
+```
 
 ## Other examples
 

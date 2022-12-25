@@ -2,7 +2,7 @@
 
 /**
  * This example demonstrates logging env-var activity.
- * 
+ *
  * Run this script using node example/logging.js
  */
 

@@ -8,5 +8,5 @@
     "noImplicitAny": true,
     "strictNullChecks": true
   },
-  "include": ["lib/**.ts", "env-var.ts"]
+  "include": ["lib/**.ts", "test/types", "env-var.ts"]
 }

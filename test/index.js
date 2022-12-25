@@ -671,13 +671,13 @@ describe('env-var', function () {
     it('should throw an error if params is undefined', () => {
       expect(() => {
         mod.from()
-      }).to.throw('env-var: Since v8.0.0, from() parameters must be an object that contains a "variables" property that contains all environment variables.')
+      }).to.throw('Since v8.0.0, from() parameters must be an object that contains a "variables" object. The "variables" should be key-value pairs where all values are of type string or undefined.')
     })
 
     it('should throw an error if params.variables is undefined', () => {
       expect(() => {
         mod.from({})
-      }).to.throw('env-var: Since v8.0.0, from() parameters must be an object that contains a "variables" property that contains all environment variables.')
+      }).to.throw('Since v8.0.0, from() parameters must be an object that contains a "variables" object. The "variables" should be key-value pairs where all values are of type string or undefined.')
     })
 
     it('should send messages to the custom logger', () => {
@@ -748,7 +748,7 @@ describe('env-var', function () {
     })
   })
 
-  describe('#usingExtension', function () {
+  describe('#usingAccessor', function () {
     it('should read value using suppplied ', function () {
       const asShout = (value, error) => {
         return value.toUpperCase()
@@ -757,7 +757,7 @@ describe('env-var', function () {
         variables: { STRING: 'Hello, world!' }
       })
 
-      const shouted = fromMod.get('STRING').usingExtension(asShout)
+      const shouted = fromMod.get('STRING').usingAccessor(asShout)
 
       expect(shouted).to.equal('HELLO, WORLD!')
     })
@@ -771,7 +771,7 @@ describe('env-var', function () {
         variables: { STRING: 'Hello, world!' }
       })
 
-      expect(() => fromMod.get('STRING').usingExtension(asShout)).to.throw('env-var: "STRING" should be louder')
+      expect(() => fromMod.get('STRING').usingAccessor(asShout)).to.throw('env-var: "STRING" should be louder')
     })
 
     it('should work with undefined values', () => {
@@ -783,7 +783,7 @@ describe('env-var', function () {
         variables: {}
       })
 
-      expect(fromMod.get('STRING').usingExtension(asShout)).to.equal(undefined)
+      expect(fromMod.get('STRING').usingAccessor(asShout)).to.equal(undefined)
     })
 
     it('should throw an error for missing but required values', () => {
@@ -795,7 +795,7 @@ describe('env-var', function () {
         variables: {}
       })
 
-      expect(() => fromMod.get('STRING').required().usingExtension(asShout)).to.throw('env-var: "STRING" is a required variable, but it was not set')
+      expect(() => fromMod.get('STRING').required().usingAccessor(asShout)).to.throw('env-var: "STRING" is a required variable, but it was not set')
     })
 
     it('should support custom arguments', () => {
@@ -823,13 +823,13 @@ describe('env-var', function () {
       expect(
         fromMod.get('SMALL_NUMBER')
           .required()
-          .usingExtension(asIntLessThanEqualTo, { max: maxValue })
+          .usingAccessor(asIntLessThanEqualTo, { max: maxValue })
       ).to.eql(12)
 
       expect(() => {
         fromMod.get('BIGGER_NUMBER')
           .required()
-          .usingExtension(asIntLessThanEqualTo, { max: maxValue })
+          .usingAccessor(asIntLessThanEqualTo, { max: maxValue })
       }).to.throw('env-var: "BIGGER_NUMBER" value 40 is greater than the max value 20')
     })
   })

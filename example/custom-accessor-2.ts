@@ -11,7 +11,7 @@
  * of this example 'custom-accessor.js'.
  */
 
-import { from, Extension } from '../env-var'
+import { from, Accessor } from '../env-var'
 
 // Typically you'd pass process.env instead of a custom object, but using
 // a custom object makes this example easier to run and understand
@@ -21,9 +21,9 @@ const { get } = from({
   }
 })
 
-// This is the custom extension. It will verify the value being read is between
+// This is the custom accessor. It will verify the value being read is between
 // the given min and max values.
-const numberBetween: Extension<number, { min: number, max: number }> = (value, error, args) => {
+const numberBetween: Accessor<number, { min: number, max: number }> = (value, error, args) => {
   const num = parseInt(value)
   const { min, max } = args
 
@@ -35,10 +35,10 @@ const numberBetween: Extension<number, { min: number, max: number }> = (value, e
   }
 }
 
-// This will return 50, since it satisfies the extension logic
+// This will return 50, since it satisfies the accessor logic
 const concurrency = get('CONCURRENCY')
   .required()
-  .usingExtension(numberBetween, { min: 25, max: 75 })
+  .usingAccessor(numberBetween, { min: 25, max: 75 })
 
 console.log('Read concurrency value from env is:', concurrency)
 
@@ -46,4 +46,4 @@ console.log('Read concurrency value from env is:', concurrency)
 // not fall within the given min/max values
 const failedConcurrency = get('CONCURRENCY')
   .required()
-  .usingExtension(numberBetween, { min: 100, max: 200 })
+  .usingAccessor(numberBetween, { min: 100, max: 200 })

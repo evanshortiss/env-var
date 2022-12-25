@@ -360,29 +360,29 @@ const myJsonViaEnvVar = env.get('SOME_JSON').asJson()
 ```
 
 All of the documented *asX()* accessors above are available. These are useful
-if you need to build a custom accessor using the *usingExtension* functionality
+if you need to build a custom accessor using the *usingAccessor* functionality
 described below.
 
-## usingExtension
+## usingAccessor
 
-When reading a variable you can use the `usingExtension()` function to define
+When reading a variable you can use the `usingAccessor()` function to define
 custom validation logic.
 
 const asShout = (value, error) => {
   return value.toUpperCase()
 }
-const shouted = fromMod.get('STRING').usingExtension(asShout)
+const shouted = fromMod.get('STRING').usingAccessor(asShout)
 
-Extensions must accept at least one argument:
+Accessors must accept at least one argument:
 
-- `{*} value`: The string value, from the environment, that the extension should process.
+- `{*} value`: The string value, from the environment, that the accessor should process.
 
 Example:
 ```js
 const { get } = require('env-var')
 
 /**
- * Define the extension function.
+ * Define the accessor function.
  * 
  * "value" is the string from process.env that corresponds to variable name
  * provided.
@@ -390,7 +390,7 @@ const { get } = require('env-var')
  * "error" is a function that accepts a string, and will raise an error with
  * that string as a message.
  * 
- * "args" can be any value you wish to pass to the extension
+ * "args" can be any value you wish to pass to the accessor
  */
 const asIntLessThanEqualTo = (value, error, args) => {
   const num = parseInt(value)
@@ -404,15 +404,15 @@ const asIntLessThanEqualTo = (value, error, args) => {
 
 const value = get('SOME_NUMBER')
   .required()
-  .usingExtension(asIntLessThanEqualTo, { max: 100 })
+  .usingAccessor(asIntLessThanEqualTo, { max: 100 })
 ```
 
 This feature is also available for Typescript users. The 
-`Extension<ReturnType, ArgsTypoe>` type is exposed to help in the creation of
+`AccessorFn<ReturnType, ArgsType>` type is exposed to help in the creation of
 these new accessors.
 
 ```ts
-import { from, ExtensionFn } from 'env-var'
+import { from, AccessorFn } from 'env-var'
 
 const { get } = from({
   variables: process.env
@@ -423,9 +423,9 @@ type ConcurrencyRange = {
   max: number
 }
 
-// This is the custom extension. It will verify the value being read is between
+// This is the custom accessor. It will verify the value being read is between
 // the given min and max values.
-const numberBetween: Extension<number, ConcurrencyRange> = (value, error, args) => {
+const numberBetween: AccessorFn<number, ConcurrencyRange> = (value, error, args) => {
   const num = parseInt(value)
 
   const { min, max } = args

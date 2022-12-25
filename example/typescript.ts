@@ -24,8 +24,8 @@ const requiredInt = env.get('AN_INTEGER').default(10).required().asInt()
 
 console.log('the integer was', requiredInt)
 
-// Extension to built-in variable
-const asEmail: env.Extension<string> = (s, error) => {
+// Accessor to built-in variable
+const asEmail: env.Accessor<string> = (s, error) => {
   const split = String(s).split('@')
   if (split.length !== 2) {
     throw error('must contain exactly one "@"')
@@ -36,7 +36,7 @@ const asEmail: env.Extension<string> = (s, error) => {
 const adminEmail = env.get('ADMIN_EMAIL')
   .example('someone@example')
   .required()
-  .usingExtension(asEmail)
+  .usingAccessor(asEmail)
 
 console.log('admin email is:', adminEmail)
 

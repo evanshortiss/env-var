@@ -7,7 +7,7 @@ const base64Regex = /^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-
 
 export type VariableSource = Record<string, string|undefined>
 
-export type Extension<ReturnType, ArgsType = undefined> = (v: string, error: (s: string) => EnvVarError, args?: ArgsType) => ReturnType
+export type Accessor<ReturnType, ArgsType = undefined> = (v: string, error: (s: string) => EnvVarError, args?: ArgsType) => ReturnType
 export class Variable<T = undefined> {
   constructor(
     protected container: VariableSource,
@@ -147,7 +147,7 @@ export class Variable<T = undefined> {
     }
   }
 
-  public usingExtension<ReturnType, ArgsType> (ext: Extension<ReturnType, ArgsType>, args?: ArgsType) {
+  public usingAccessor<ReturnType, ArgsType> (ext: Accessor<ReturnType, ArgsType>, args?: ArgsType) {
     const value = this.asString()
 
     if (typeof value === 'string') {
@@ -191,8 +191,9 @@ export class Variable<T = undefined> {
     return this.getValue(accessors.asBool)
   }
 
-  public asEnum (validValues: readonly string[] | string[]) {
-    return this.getValue(s => accessors.asEnum(s, validValues))
+  // TODO: fix to a constrained return type based on allowed values
+  public asEnum <V extends string>(validValues: V[]): V|T {
+    return this.getValue(s => accessors.asEnum<V>(s as V, validValues))
   }
 
   public asFloat() {

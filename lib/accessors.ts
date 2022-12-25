@@ -16,8 +16,8 @@ export interface Acccessors<T> {
   asJsonArray: (s: string) => Array<unknown>|T
   asBool: (s: string) => boolean|T
   asBoolStrict: (s: string) => boolean|T
-  asEnum: (s: string, validValues: readonly string[] | string[]) => string|T
-  asArray: (s: string, delimiter: string) => string[]|T
+  asEnum: <V extends string>(s: V, validValues: Readonly<V[]>|V[]) => V|T
+  asArray: (s: string, delimiter?: string) => string[]|T
 }
 
 export const accessors: Acccessors<never> = {
@@ -30,8 +30,8 @@ export const accessors: Acccessors<never> = {
     }
   },
 
-  asEnum(s, validValues) {
-    if (validValues.indexOf(s) < 0) {
+  asEnum (s, validValues) {
+    if ((validValues).indexOf(s) < 0) {
       throw new Error(`should be one of [${validValues.join(', ')}]`)
     }
 
