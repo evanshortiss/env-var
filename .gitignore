@@ -8,3 +8,4 @@ package-lock.json
 .vscode
 lib/*.js
 env-var.js
+*.d.ts
