@@ -63,7 +63,9 @@ export function from<K extends EnvVarInstanceParams, T extends K['requiredByDefa
  * 
  * const get = from({
  *   variables: {
- *     BASE_URL: 'https://foo.bar.com'
+ *     // For example, in React an explicit reference to
+ *     // process.env.REACT_APP_BASE_URL is required
+ *     REACT_APP_BASE_URL: process.env.REACT_APP_BASE_URL
  *   }
  * })
  * 

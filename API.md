@@ -368,10 +368,12 @@ described below.
 When reading a variable you can use the `usingAccessor()` function to define
 custom validation logic.
 
-const asShout = (value, error) => {
+```js
+const asShout = (value) => {
   return value.toUpperCase()
 }
 const shouted = fromMod.get('STRING').usingAccessor(asShout)
+```
 
 Accessors must accept at least one argument:
 
@@ -398,7 +400,7 @@ const asIntLessThanEqualTo = (value, error, args) => {
   if (num <= args.max) {
     return num
   } else {
-    error(`value ${num} is greater than the max value ${args.max}`)
+    throw error(`value ${num} is greater than the max value ${args.max}`)
   }
 }
 

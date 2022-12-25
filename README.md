@@ -24,8 +24,8 @@ Verification, sanitization, and type coercion for environment variables in Node.
 
 ## Contents
 
-- [API](API.md): Complete API documentation for `env-var`
-- [Examples](EXAMPLE.md)
+- [API](API.md): Complete API documentation.
+- [Examples](EXAMPLE.md): Includes examples for use with React, Vite, etc.
 - [Changelog](CHANGELOG.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Contributing](CONTRIBUTING.md)
@@ -72,11 +72,11 @@ const PORT = env.get('PORT').default('5432').asPortNumber()
 ### TypeScript example
 
 ```ts
-import * as env from 'env-var';
+import { get } from 'env-var';
 
 // Read the PORT environment variable. An EnvVarError will be thrown if the
 // variable is not set, or if is not in the range 0 to 65535
-const PORT: number = env.get('PORT').required().asPortNumber();
+const PORT: number = get('PORT').required().asPortNumber();
 ```
 
 For more examples refer to [EXAMPLE.md](EXAMPLE.md) and the `/example`
@@ -86,7 +86,7 @@ directory.
 
 `env-var` supports many accessor functions such as `asFloatPositive()`, `asJson()` and `asRegExp()`. For a full list of `env-var` API calls, check out [API.md](API.md).
 
-You can also create your own custom accessor; refer to the ['usingAccessor' section of API.md](API.md#usingAccessor).
+You can also create your own custom accessor; refer to the [`usingAccessor` section of API.md](API.md#usingAccessor).
 
 ## FAQ / Examples
 
