@@ -24,6 +24,7 @@ describe('env-var', function () {
     ARRAY_WITH_DELIMITER_PREFIX: ',value',
     DASH_ARRAY: '1-2-3',
     URL: 'http://google.com/',
+    EMAIL: 'email@example.com',
     ENUM: 'VALID',
     EMPTY_STRING: '',
     EMPTY_STRING_WITH_WHITESPACE: '  '
@@ -594,6 +595,21 @@ describe('env-var', function () {
       process.env.REG_EXP = '^valid$'
 
       expect(mod.get('REG_EXP').asRegExp('i').flags).to.equal('i')
+    })
+  })
+
+  describe('#asEmailString', function () {
+    it('should return an email address', function () {
+      expect(mod.get('EMAIL').asEmailString()).to.be.a('string')
+      expect(mod.get('EMAIL').asEmailString()).to.equal(TEST_VARS.EMAIL)
+    })
+
+    it('should throw due to a bad email address', function () {
+      process.env.EMAIL = '.invalid@example.com'
+
+      expect(() => {
+        mod.get('EMAIL').asEmailString()
+      }).to.throw('env-var: "EMAIL" should be a valid email address')
     })
   })
 

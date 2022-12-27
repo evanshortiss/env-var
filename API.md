@@ -15,6 +15,7 @@ A complete listing of the `env-var` API.
       * [asArray()](#asarraydelimiter-string)
       * [asBool()](#asbool)
       * [asBoolStrict()](#asboolstrict)
+      * [asEmailString()](#asemailstring)
       * [asEnum()](#asenumvalidvalues-string)
       * [asFloat()](#asfloat)
       * [asFloatNegative()](#asfloatnegative)
@@ -194,6 +195,11 @@ fails. The var must be set to either "true", "false" (upper or lowercase),
 Attempt to parse the variable to a Boolean. Throws an exception if parsing
 fails. The var must be set to either "true" or "false" (upper or lowercase) to
 succeed.
+
+#### asEmailString()
+
+Read the variable and validate that it's an email address. Throws an exception
+if the value is not an email address.
 
 #### asEnum(validValues: string[])
 

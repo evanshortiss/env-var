@@ -247,4 +247,8 @@ export class Variable<T = undefined> {
   public asUrlString() {
     return this.getValue(accessors.asUrlString)
   }
+
+  public asEmailString() {
+    return this.getValue(accessors.asEmailString)
+  }
 }

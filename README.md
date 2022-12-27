@@ -53,8 +53,8 @@ You can use `env-var` in both JavaScript and TypeScript!
 ```js
 const env = require('env-var');
 
-// Import syntax is also supported
-// import * as env from 'env-var'
+// Or using module import syntax:
+// import env from 'env-var'
 
 const PASSWORD = env.get('DB_PASSWORD')
   // Throw an error if the DB_PASSWORD variable is not set (optional)

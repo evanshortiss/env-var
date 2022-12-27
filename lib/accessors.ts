@@ -17,7 +17,8 @@ export interface Acccessors<T> {
   asBool: (s: string) => boolean|T
   asBoolStrict: (s: string) => boolean|T
   asEnum: <V extends string>(s: V, validValues: Readonly<V[]>|V[]) => V|T
-  asArray: (s: string, delimiter?: string) => string[]|T
+  asArray: (s: string, delimiter?: string) => string[]|T,
+  asEmailString: (s: string) => string|T
 }
 
 export const accessors: Acccessors<never> = {
@@ -35,6 +36,16 @@ export const accessors: Acccessors<never> = {
       throw new Error(`should be one of [${validValues.join(', ')}]`)
     }
 
+    return s
+  },
+
+  asEmailString (s) {
+    const EMAIL_REGEX = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\u0001-\u0008\u000b\u000c\u000e-\u001f\u0021\u0023-\u005b\u005d-\u007f]|\\[\u0001-\u0009\u000b\u000c\u000e-\u007f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\u0001-\u0008\u000b\u000c\u000e-\u001f\u0021-\u005a\u0053-\u007f]|\\[\u0001-\u0009\u000b\u000c\u000e-\u007f])+)\])$/
+    
+    if (!EMAIL_REGEX.test(s)) {
+      throw new Error('should be a valid email address')
+    }
+  
     return s
   },
 
