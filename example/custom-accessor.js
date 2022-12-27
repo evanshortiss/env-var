@@ -14,7 +14,7 @@
 const env = require('../env-var')
 const { from, accessors } = env
 
-// Add an accessor named 'asIntRange' which verifies whether the given value is
+// Add an accessor named 'asIntBetween' which verifies whether the given value is
 // between the specified min and max values, inclusive
 const envInstance = from(process.env, {
   asIntBetween: (value, min, max) => {
