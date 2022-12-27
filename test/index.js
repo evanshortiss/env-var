@@ -39,10 +39,17 @@ describe('env-var', function () {
     })
   })
 
-  describe('getting process.env', function () {
+  describe('#EnvVarError', () => {
+    it('should be exported', () => {
+      const err = new mod.EnvVarError('custom error')
+
+      expect(err.name).to.equal('EnvVarError')
+    })
+  })
+
+  describe('#get() should return process.env', function () {
     it('should return process.env object when no args provided', function () {
       var res = mod.get()
-
       expect(res).to.be.an('object');
 
       ['STRING', 'FLOAT', 'INTEGER', 'BOOL', 'JSON'].forEach(function (name) {
@@ -411,6 +418,12 @@ describe('env-var', function () {
         mod.get('JSON').asJson()
       }).to.throw()
     })
+
+    it('should throw an exception - json parsed, but is not an object or array', function () {
+      process.env.JSON = '10'
+
+      expect(() => mod.get('JSON').asJson()).to.throw('env-var: "JSON" should be a valid JSON object or array')
+    })
   })
 
   describe('#required', function () {
@@ -605,7 +618,7 @@ describe('env-var', function () {
 
     beforeEach(() => {
       fromMod = mod.from({
-        JSON_CONFIG: '{1,2]'
+        variables: { JSON_CONFIG: '{1,2]' }
       })
     })
 
@@ -617,7 +630,7 @@ describe('env-var', function () {
     it('should throw an error with a valid example message', () => {
       expect(() => {
         fromMod.get('JSON_CONFIG').example(sampleConfig).asJsonArray()
-      }).to.throw(`env-var: "JSON_CONFIG" should be valid (parseable) JSON. An example of a valid value would be: ${sampleConfig}`)
+      }).to.throw(`env-var: "JSON_CONFIG" should be valid parseable JSON. An example of a valid value would be: ${sampleConfig}`)
     })
 
     it('should throw an error with a valid example message', () => {
@@ -627,14 +640,60 @@ describe('env-var', function () {
     })
   })
 
+  describe('#description', () => {
+    let fromMod
+
+    beforeEach(() => {
+      fromMod = mod.from({
+        variables: {}
+      })
+    })
+
+    const description = 'This value is used to send alerts to SRE'
+    const example = 'foo@bar.com'
+
+    it('should throw an error with a valid description in the error message', () => {
+      expect(() => {
+        fromMod.get('ALERT_EMAIL')
+          .required()
+          .description(description)
+          .asString()
+      }).to.throw(`env-var: "ALERT_EMAIL" is a required variable, but it was not set. ${description}`)
+    })
+
+    it('should throw an error with a description and valid example in the error message', () => {
+      expect(() => {
+        fromMod.get('ALERT_EMAIL')
+          .required()
+          .description(description)
+          .example(example)
+          .asString()
+      }).to.throw(`env-var: "ALERT_EMAIL" is a required variable, but it was not set. ${description}. An example of a valid value would be: foo@bar.com`)
+    })
+  })
+
   describe('#from', function () {
     var fromMod
 
     beforeEach(function () {
       fromMod = mod.from({
-        A_BOOL: 'true',
-        A_STRING: 'blah'
+        variables: {
+          A_BOOL: 'true',
+          A_STRING: 'blah'
+        }
       })
+    })
+
+    it('should throw an error if params is undefined', () => {
+      expect(() => {
+        mod.from()
+      }).to.throw('Since v8.0.0, from() parameters must be an object that contains a "variables" object. The "variables" should be key-value pairs where all values are of type string or undefined.')
+    })
+
+    it('should throw an error if params.variables is undefined', () => {
+      expect(() => {
+        mod.from({})
+      }).to.throw('Since v8.0.0, from() parameters must be an object that contains a "variables" object. The "variables" should be key-value pairs where all values are of type string or undefined.')
     })
 
     it('should send messages to the custom logger', () => {
@@ -643,9 +702,12 @@ describe('env-var', function () {
         JSON: JSON.stringify({ name: 'env-var' })
       }
 
-      const env = mod.from(data, {}, (str) => {
-        expect(str).to.be.a('string')
-        spyCallCount++
+      const env = mod.from({
+        variables: data,
+        logger: (str) => {
+          expect(str).to.be.a('string')
+          spyCallCount++
+        }
       })
 
       const result = env.get('JSON').asJson()
@@ -677,72 +739,13 @@ describe('env-var', function () {
       expect(fromMod.get()).to.have.property('A_STRING', 'blah')
     })
 
-    describe('#extraAccessors', function () {
-      it('should add custom accessors to subsequent gotten values', function () {
-        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asShout: function (value) {
-            return value.toUpperCase()
-          }
-        })
-
-        var gotten = fromMod.get('STRING')
-
-        expect(gotten).to.have.property('asShout')
-        expect(gotten.asShout()).to.equal('HELLO, WORLD!')
-      })
-
-      it('should allow overriding existing accessors', function () {
-        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asString: function (value) {
-            // https://stackoverflow.com/a/959004
-            return value.split('').reverse().join('')
-          }
-        })
-
-        expect(fromMod.get('STRING').asString()).to.equal('!dlrow ,olleH')
-      })
-
-      it('should not attach accessors to other env instances', function () {
-        const fromMod = mod.from({ STRING: 'Hello, world!' }, {
-          asNull: function (value) {
-            return null
-          }
-        })
-
-        var otherMod = mod.from({
-          STRING: 'Hola, mundo!'
-        })
-
-        expect(fromMod.get('STRING')).to.have.property('asNull')
-        expect(otherMod.get('STRING')).not.to.have.property('asNull')
-      })
+    it('shoud throw a deprecation error if get() is called with two arguments', () => {
+      expect(() => {
+        fromMod.get('SOMETHING', 'default somthing value').asString()
+      }).to.throw('env-var: It looks like you passed more than one argument to env.get(). Since env-var@6.0.0 this is no longer supported. To set a default value use env.get(TARGET).default(DEFAULT)')
     })
 
-    describe('#accessors', () => {
-      describe('#asArray', () => {
-        it('should return an array of strings', () => {
-          const arr = fromMod.accessors.asArray('1,2,3')
-
-          expect(arr).to.eql(['1', '2', '3'])
-        })
-
-        it('should return an array of strings split by period chars', () => {
-          const arr = fromMod.accessors.asArray('1.2.3', '.')
-
-          expect(arr).to.eql(['1', '2', '3'])
-        })
-      })
-
-      describe('#asInt', () => {
-        it('should return an integer', () => {
-          const ret = fromMod.accessors.asInt('1')
-
-          expect(ret).to.eql(1)
-        })
-      })
-    })
-
-    describe('#logger', () => {
+    describe('#createLogger', () => {
       const varname = 'SOME_VAR'
       const msg = 'this is a test message'
 
@@ -753,11 +756,97 @@ describe('env-var', function () {
           spyCalled = true
         }
 
-        const log = require('../lib/logger')(spy)
+        const log = require('../lib/logger').createLogger(spy, false)
 
         log(varname, msg)
         expect(spyCalled).to.equal(true)
       })
+    })
+  })
+
+  describe('#usingAccessor', function () {
+    it('should read value using suppplied ', function () {
+      const asShout = (value, error) => {
+        return value.toUpperCase()
+      }
+      const fromMod = mod.from({
+        variables: { STRING: 'Hello, world!' }
+      })
+
+      const shouted = fromMod.get('STRING').usingAccessor(asShout)
+
+      expect(shouted).to.equal('HELLO, WORLD!')
+    })
+
+    it('should be able to throw an error', () => {
+      const asShout = (value, error) => {
+        throw error('should be louder')
+      }
+
+      const fromMod = mod.from({
+        variables: { STRING: 'Hello, world!' }
+      })
+
+      expect(() => fromMod.get('STRING').usingAccessor(asShout)).to.throw('env-var: "STRING" should be louder')
+    })
+
+    it('should work with undefined values', () => {
+      const asShout = (value, error) => {
+        return value.toUpperCase()
+      }
+
+      const fromMod = mod.from({
+        variables: {}
+      })
+
+      expect(fromMod.get('STRING').usingAccessor(asShout)).to.equal(undefined)
+    })
+
+    it('should throw an error for missing but required values', () => {
+      const asShout = (value, error) => {
+        return value.toUpperCase()
+      }
+
+      const fromMod = mod.from({
+        variables: {}
+      })
+
+      expect(() => fromMod.get('STRING').required().usingAccessor(asShout)).to.throw('env-var: "STRING" is a required variable, but it was not set')
+    })
+
+    it('should support custom arguments', () => {
+      const maxValue = 20
+
+      const fromMod = mod.from({
+        variables: {
+          SMALL_NUMBER: '12',
+          BIGGER_NUMBER: String(maxValue * 2)
+        }
+      })
+
+      const asIntLessThanEqualTo = (value, error, args) => {
+        expect(args.max).to.eql(maxValue)
+
+        const num = parseInt(value)
+
+        if (num <= args.max) {
+          return num
+        } else {
+          throw error(`value ${num} is greater than the max value ${args.max}`)
+        }
+      }
+
+      expect(
+        fromMod.get('SMALL_NUMBER')
+          .required()
+          .usingAccessor(asIntLessThanEqualTo, { max: maxValue })
+      ).to.eql(12)
+
+      expect(() => {
+        fromMod.get('BIGGER_NUMBER')
+          .required()
+          .usingAccessor(asIntLessThanEqualTo, { max: maxValue })
+      }).to.throw('env-var: "BIGGER_NUMBER" value 40 is greater than the max value 20')
     })
   })
 

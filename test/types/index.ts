@@ -1,5 +1,5 @@
 
-import * as env from '../../';
+import * as env from '../../env-var';
 import { expect } from 'chai'
 import 'mocha'
 import { assert, IsExact } from 'conditional-type-checks'
@@ -9,15 +9,21 @@ describe('typescript tests', () => {
     it('should return an env-var instance and read with asString()', () => {
       const A_STRING = 'hello, world!'
       const e = env.from({
-        A_STRING
+        variables: {
+          A_STRING
+        }
       })
 
+      env.get('')
+      
       expect(e.get('A_STRING').asString()).to.equal(A_STRING)
     })
 
     it('should return an env-var instance be missing system vars', () => {
       // env-var instance with no vars
-      const e = env.from({})
+      const e = env.from({
+        variables: {}
+      })
 
       // @ts-expect-error `PATH` is not in container object
       expect(e.get('PATH').asString()).to.equal(undefined)
@@ -26,7 +32,9 @@ describe('typescript tests', () => {
 
   describe('#accessors', () => {
     it('required().asString() should throw if missing', () => {
-      const e = env.from({})
+      const e = env.from({
+        variables: {}
+      })
 
       expect(() => {
         // @ts-expect-error `A_MISSING_VARIABLE` is not in container object
@@ -35,16 +43,16 @@ describe('typescript tests', () => {
     })
   })
 
-  describe('#ExtensionFn', () => {
+  describe('#Accessor', () => {
     interface EmailComponents {
       username: string
       domain: string
     }
-    const asEmailComponents: env.ExtensionFn<EmailComponents> = (value) => {
+    const asEmailComponents: env.Accessor<EmailComponents> = (value, error) => {
       const parts = value.split('@')
 
       if (parts.length != 2) {
-        throw new Error('should be an email')
+        throw error('should be an email')
       } else {
         return {
           username: parts[0],
@@ -55,27 +63,27 @@ describe('typescript tests', () => {
 
     it('should return the email parts for a valid email, throw for invalid', () => {
       const extendedEnv = env.from({
-        VALID_EMAIL: 'hello@example.com',
-        INVALID_EMAIL: 'oops-example.com'
-      }, {
-        asEmailComponents
+        variables: {
+          VALID_EMAIL: 'hello@example.com',
+          INVALID_EMAIL: 'oops-example.com'
+        }
       })
 
       // We use required() here to verify chaining typings work
       expect(
-        extendedEnv.get('VALID_EMAIL').required().asEmailComponents()
+        extendedEnv.get('VALID_EMAIL').required().usingAccessor(asEmailComponents)
       ).to.deep.equal({
         username: 'hello',
         domain: 'example.com'
       })
 
       expect(() => {
-        extendedEnv.get('INVALID_EMAIL').asEmailComponents()
+        extendedEnv.get('INVALID_EMAIL').usingAccessor(asEmailComponents)
       }).to.throw('env-var: "INVALID_EMAIL" should be an email')
     })
 
-    it('should support multiple extensions (with correct types)', () => {
-      const asNumberZero: env.ExtensionFn<number> = (value) => {
+    it('should support multiple accessor (with correct types)', () => {
+      const asNumberZero: env.Accessor<number> = (value) => {
         const n = parseInt(value)
 
         if (n === 0) {
@@ -86,70 +94,41 @@ describe('typescript tests', () => {
       }
 
       const extendedEnv = env.from({
-        EMAIL: 'hello@example.com',
-        ZERO: '0'
-      }, {
-        asEmailComponents,
-        asNumberZero
-      })
-
-      expect(
-        extendedEnv.get('ZERO').required().asNumberZero()
-      ).to.equal(0)
-
-      expect(
-        extendedEnv.get('ZERO').asNumberZero()
-      ).to.equal(0)
-
-      expect(
-        extendedEnv.get('EMAIL').required().asEmailComponents()
-      ).to.deep.equal({
-        username: 'hello',
-        domain: 'example.com'
-      })
-
-      expect(
-        extendedEnv.get('EMAIL').asEmailComponents()
-      ).to.deep.equal({
-        username: 'hello',
-        domain: 'example.com'
-      })
-    })
-
-    it('should carry extension functions to a child with from()', () => {
-      const asNumberZero: env.ExtensionFn<number> = (value) => {
-        const n = parseInt(value)
-
-        if (n === 0) {
-          return 0
+        variables: {
+          EMAIL: 'hello@example.com',
+          ZERO: '0'
         }
-
-        throw new env.EnvVarError('was not zero')
-      }
-
-      const extendedEnvA = env.from({
-        ZERO: '0'
-      })
-
-      const extendedEnvB = extendedEnvA.from({
-        ZERO: '0'
-      }, {
-        asNumberZero
       })
 
       expect(
-        extendedEnvB.get('ZERO').required().asNumberZero()
+        extendedEnv.get('ZERO').required().usingAccessor(asNumberZero)
       ).to.equal(0)
 
       expect(
-        extendedEnvB.get('ZERO').asNumberZero()
+        extendedEnv.get('ZERO').usingAccessor(asNumberZero)
       ).to.equal(0)
+
+      expect(
+        extendedEnv.get('EMAIL').required().usingAccessor(asEmailComponents)
+      ).to.deep.equal({
+        username: 'hello',
+        domain: 'example.com'
+      })
+
+      expect(
+        extendedEnv.get('EMAIL').usingAccessor(asEmailComponents)
+      ).to.deep.equal({
+        username: 'hello',
+        domain: 'example.com'
+      })
     })
   })
 
   describe('asEnum', () => {
     const e = env.from({
-      ENUM: 'a'
+      variables: {
+        ENUM: 'a'
+      }
     })
 
     it('should work with generic defaults', () => {
@@ -160,14 +139,16 @@ describe('typescript tests', () => {
 
     it('should work with generic params', () => {
       const enums = e.get('ENUM').required().asEnum<'a' | 'b'>(['a', 'b'])
-
+      // enums === ''
       assert<IsExact<typeof enums, 'a' | 'b'>>(true);
     })
   })
 
   describe('asRegExp', () => {
     const e = env.from({
-      REG_EXP: '^.*$'
+      variables: {
+        REG_EXP: '^.*$'
+      }
     })
 
     it('should return a RegExp instance', () => {

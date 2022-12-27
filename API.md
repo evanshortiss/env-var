@@ -164,8 +164,7 @@ const SECRET = env.get('SECRET').required(NODE_ENV === 'production').asString()
 It's a common need to set an environment variable in base64 format. This
 function can be used to decode a base64 environment variable to UTF8.
 
-For example if we run the script script below, using the command `DB_PASSWORD=
-$(echo -n 'secret_password' | base64) node`, we'd get the following results:
+For example if we run the script script below, using the command: `DB_PASSWORD=$(echo -n 'secret_password' | base64) node`, we'd get the following results:
 
 ```js
 console.log(process.env.DB_PASSWORD) // prints "c2VjcmV0X3Bhc3N3b3Jk"
@@ -367,124 +366,85 @@ const myJsonViaEnvVar = env.get('SOME_JSON').asJson()
 ```
 
 All of the documented *asX()* accessors above are available. These are useful
-if you need to build a custom accessor using the *extraAccessors* functionality
+if you need to build a custom accessor using the *usingAccessor* functionality
 described below.
 
-## extraAccessors
+## usingAccessor
 
-When calling `from()` you can also pass an optional parameter containing
-additional accessors that will be attached to any variables gotten by that
-`env-var` instance.
+When reading a variable you can use the `usingAccessor()` function to define
+custom validation logic.
 
-Accessor functions must accept at least one argument:
+```js
+const asShout = (value) => {
+  return value.toUpperCase()
+}
+const shouted = fromMod.get('STRING').usingAccessor(asShout)
+```
 
-- `{*} value`: The value that the accessor should process.
+Accessors must accept at least one argument:
 
-**Important:** Do not assume that `value` is a string!
+- `{*} value`: The string value, from the environment, that the accessor should process.
 
 Example:
 ```js
-const { from } = require('env-var')
+const { get } = require('env-var')
 
-// Environment variable that we will use for this example:
-process.env.ADMIN = 'admin@example.com'
+/**
+ * Define the accessor function.
+ * 
+ * "value" is the string from process.env that corresponds to variable name
+ * provided.
+ * 
+ * "error" is a function that accepts a string, and will raise an error with
+ * that string as a message.
+ * 
+ * "args" can be any value you wish to pass to the accessor
+ */
+const asIntLessThanEqualTo = (value, error, args) => {
+  const num = parseInt(value)
 
-// Add an accessor named 'asEmail' that verifies that the value is a
-// valid-looking email address.
-const env = from(process.env, {
-  asEmail: (value) => {
-    const split = String(value).split('@')
-
-    // Validating email addresses is hard.
-    if (split.length !== 2) {
-      throw new Error('must contain exactly one "@"')
-    }
-
-    return value
+  if (num <= args.max) {
+    return num
+  } else {
+    throw error(`value ${num} is greater than the max value ${args.max}`)
   }
-})
-
-// We specified 'asEmail' as the name for the accessor above, so now
-// we can call `asEmail()` like any other accessor.
-let validEmail = env.get('ADMIN').asEmail()
-```
-
-The accessor function may accept additional arguments if desired; these must be
-provided explicitly when the accessor is invoked.
-
-For example, we can modify the `asEmail()` accessor from above so that it
-optionally verifies the domain of the email address:
-```js
-const { from } = require('env-var')
-
-// Environment variable that we will use for this example:
-process.env.ADMIN = 'admin@example.com'
-
-// Add an accessor named 'asEmail' that verifies that the value is a
-// valid-looking email address.
-//
-// Note that the accessor function also accepts an optional second
-// parameter `requiredDomain` which can be provided when the accessor is
-// invoked (see below).
-const env = from(process.env, {
-  asEmail: (value, requiredDomain) => {
-    const split = String(value).split('@')
-
-    // Validating email addresses is hard.
-    if (split.length !== 2) {
-      throw new Error('must contain exactly one "@"')
-    }
-
-    if (requiredDomain && (split[1] !== requiredDomain)) {
-      throw new Error(`must end with @${requiredDomain}`)
-    }
-
-    return value
-  }
-})
-
-// We specified 'asEmail' as the name for the accessor above, so now
-// we can call `asEmail()` like any other accessor.
-//
-// `env-var` will provide the first argument for the accessor function
-// (`value`), but we declared a second argument `requiredDomain`, which
-// we can provide when we invoke the accessor.
-
-// Calling the accessor without additional parameters accepts an email
-// address with any domain.
-let validEmail = env.get('ADMIN').asEmail()
-
-// If we specify a parameter, then the email address must end with the
-// domain we specified.
-let invalidEmail = env.get('ADMIN').asEmail('github.com')
-```
-
-This feature is also available for Typescript users. The `ExtensionFn` type is
-exposed to help in the creation of these new accessors.
-
-```ts
-import { from, ExtensionFn, EnvVarError } from 'env-var'
-
-// Environment variable that we will use for this example:
-process.env.ADMIN = 'admin@example.com'
-
-const asEmail: ExtensionFn<string> = (value) => {
-  const split = String(value).split('@')
-
-  // Validating email addresses is hard.
-  if (split.length !== 2) {
-    throw new Error('must contain exactly one "@"')
-  }
-
-  return value
 }
 
-const env = from(process.env, {
-  asEmail
+const value = get('SOME_NUMBER')
+  .required()
+  .usingAccessor(asIntLessThanEqualTo, { max: 100 })
+```
+
+This feature is also available for Typescript users. The 
+`AccessorFn<ReturnType, ArgsType>` type is exposed to help in the creation of
+these new accessors.
+
+```ts
+import { from, AccessorFn } from 'env-var'
+
+const { get } = from({
+  variables: process.env
 })
 
-// Returns the email string if it's valid, otherwise it will throw
-env.get('ADMIN').asEmail()
+type ConcurrencyRange = {
+  min: number,
+  max: number
+}
+
+// This is the custom accessor. It will verify the value being read is between
+// the given min and max values.
+const numberBetween: AccessorFn<number, ConcurrencyRange> = (value, error, args) => {
+  const num = parseInt(value)
+
+  const { min, max } = args
+
+  if (num <= max && num >= min) {
+    return num
+  } else {
+    // Throw a nicely formatted error message
+    throw error(`value ${num} was not between ${min} and ${max}`)
+  }
+}
 ```
 
 You can view an example of composing built-in accessors made available by
