@@ -232,6 +232,14 @@ describe('env-var', function () {
     })
 
     it('should throw an exception - non float found', function () {
+      process.env.FLOAT = '1.o'
+
+      expect(function () {
+        mod.get('FLOAT').asFloat()
+      }).to.throw()
+    })
+
+    it('should throw an exception - non float found', function () {
       process.env.FLOAT = 'nope'
 
       expect(function () {
