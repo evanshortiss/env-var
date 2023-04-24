@@ -12,6 +12,7 @@ describe('env-var', function () {
     INVALID_BASE_64: 'a|GV-sb*G8=',
     STRING: 'oh hai',
     FLOAT: '12.43',
+    FLOAT_INTEGER: '1.0',
     INTEGER: '5',
     BOOL: 'false',
     JSON: '{"name":"value"}',
@@ -227,6 +228,15 @@ describe('env-var', function () {
     it('should return a float', function () {
       expect(mod.get('FLOAT').asFloat()).to.be.a('number')
       expect(mod.get('FLOAT').asFloat()).to.equal(parseFloat(TEST_VARS.FLOAT))
+      expect(mod.get('FLOAT_INTEGER').asFloat()).to.equal(parseFloat(TEST_VARS.FLOAT_INTEGER))
+    })
+
+    it('should throw an exception - non float found', function () {
+      process.env.FLOAT = '1.o'
+
+      expect(function () {
+        mod.get('FLOAT').asFloat()
+      }).to.throw()
     })
 
     it('should throw an exception - non float found', function () {
