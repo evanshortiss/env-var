@@ -137,6 +137,7 @@ Contributions are welcomed and discussed in [CONTRIBUTING.md](CONTRIBUTING.md). 
 * @caccialdo
 * @ChibiBlasphem
 * @DigiPie
+* @dror-weiss
 * @evanshortiss
 * @gabrieloczkowski
 * @hhravn

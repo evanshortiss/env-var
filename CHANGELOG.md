@@ -1,3 +1,6 @@
+## 7.3.1 (24/04/2023)
+* Fix parsing even floating point numbers (#166)
+
 ## 7.3.0 (06/09/2022)
 * Add missing `asEmailString()` typings (#160)
 
