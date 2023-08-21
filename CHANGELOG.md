@@ -1,3 +1,6 @@
+## 7.4.0 (21/08/2023)
+* Do not use `process.env` by default in non-Node.js environments (#155)
+
 ## 7.3.1 (24/04/2023)
 * Fix parsing even floating point numbers (#166)
 

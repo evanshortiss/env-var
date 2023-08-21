@@ -52,4 +52,4 @@ const from = (container, extraAccessors, logger) => {
   }
 }
 
-module.exports = from(process.env)
+module.exports = from(typeof process === 'undefined' ? {} : process.env)

@@ -48,7 +48,7 @@ yarn add env-var
 
 You can use `env-var` in both JavaScript and TypeScript!
 
-### Javascript example
+### Node.js Javascript example
 
 ```js
 const env = require('env-var');
@@ -69,7 +69,7 @@ const PASSWORD = env.get('DB_PASSWORD')
 const PORT = env.get('PORT').default('5432').asPortNumber()
 ```
 
-### TypeScript example
+### Node.js TypeScript example
 
 ```ts
 import * as env from 'env-var';
@@ -78,6 +78,21 @@ import * as env from 'env-var';
 // An EnvVarError will be thrown if the variable is not set, or if it
 // is not a positive integer.
 const PORT: number = env.get('PORT').required().asIntPositive();
+```
+
+### WebApp Example
+
+When using environment variables in a web application, usually your tooling
+such as `vite` imposes special conventions and doesn't expose `process.env`.
+Use `from` function to workaround this, and create an `env` object like so:
+
+```ts
+import { from } from 'env-var'
+
+const env = from({
+  BASE_URL: import.meta.env.BASE_URL
+  VITE_CUSTOM_VARIABLE: import.meta.env.CUSTOM_VARIABLE
+})
 ```
 
 For more examples, refer to the `/example` directory and [EXAMPLE.md](EXAMPLE.md). A summary of the examples available in `/example` is written in the ['Other examples' section of EXAMPLE.md](EXAMPLE.md#other-examples).
