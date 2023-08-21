@@ -52,4 +52,5 @@ const from = (container, extraAccessors, logger) => {
   }
 }
 
+/* istanbul ignore next */
 module.exports = from(typeof process === 'undefined' ? {} : process.env)
