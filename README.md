@@ -90,7 +90,7 @@ Use `from` function to workaround this, and create an `env` object like so:
 import { from } from 'env-var'
 
 const env = from({
-  BASE_URL: import.meta.env.BASE_URL
+  BASE_URL: import.meta.env.BASE_URL,
   VITE_CUSTOM_VARIABLE: import.meta.env.CUSTOM_VARIABLE
 })
 ```
