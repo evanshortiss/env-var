@@ -52,5 +52,19 @@ const from = (container, extraAccessors, logger) => {
   }
 }
 
+/**
+ * Makes a best-effort attempt to load environment variables in
+ * different environments, e.g create-react-app, vite, Node.js
+ * @returns Object
+ */
+function getProcessEnv () {
+  /* istanbul ignore next */
+  try {
+    return process.env
+  } catch (e) {
+    return {}
+  }
+}
+
 /* istanbul ignore next */
-module.exports = from(typeof process === 'undefined' ? {} : process.env)
+module.exports = from(getProcessEnv())

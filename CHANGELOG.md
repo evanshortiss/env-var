@@ -1,3 +1,6 @@
+## 7.4.1 (29/08/2023)
+* Fix 7.4.0 issues with `create-react-app` polyfill (#168)
+
 ## 7.4.0 (21/08/2023)
 * Do not use `process.env` by default in non-Node.js environments (#155)
 
