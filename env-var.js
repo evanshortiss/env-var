@@ -52,10 +52,19 @@ const from = (container, extraAccessors, logger) => {
   }
 }
 
-// When older versions of create-react-app processes this code they blindly
-// replace process.env with an object, e.g { URL: 'http://foo.bar }
-// Setting up the env object and using that in the ternary instead of directly
-// referencing process.env means this code will work with create-react-app
-const env = process.env
+/**
+ * Makes a best-effort attempt to load environment variables in
+ * different environments, e.g create-react-app, vite, Node.js
+ * @returns Object
+ */
+function getProcessEnv () {
+  /* istanbul ignore next */
+  try {
+    return process.env
+  } catch (e) {
+    return {}
+  }
+}
+
 /* istanbul ignore next */
-module.exports = from(typeof env === 'undefined' ? {} : env)
+module.exports = from(getProcessEnv())
