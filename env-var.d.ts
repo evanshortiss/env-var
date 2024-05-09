@@ -16,12 +16,12 @@ type PublicAccessors = {
   asFloat: (input: string) => number;
 
   /**
-   * Performs the same task as asFloat(), but also verifies that the number is positive (greater than zero).
+   * Performs the same task as asFloat(), but also verifies that the number is positive (greater than or equal to zero).
    */
   asFloatPositive: (input: string) =>  number;
 
   /**
-   * Performs the same task as asFloat(), but also verifies that the number is negative (less than zero).
+   * Performs the same task as asFloat(), but also verifies that the number is negative (less than or equal to zero).
    */
   asFloatNegative: (input: string) => number;
 
@@ -32,12 +32,12 @@ type PublicAccessors = {
   asInt: (input: string) => number;
 
   /**
-   * Performs the same task as asInt(), but also verifies that the number is positive (greater than zero).
+   * Performs the same task as asInt(), but also verifies that the number is positive (greater than or equal to zero).
    */
   asIntPositive: (input: string) => number;
 
   /**
-   * Performs the same task as asInt(), but also verifies that the number is negative (less than zero).
+   * Performs the same task as asInt(), but also verifies that the number is negative (less than or equal to zero).
    */
   asIntNegative: (input: string) => number;
 
@@ -121,12 +121,12 @@ interface VariableAccessors <AlternateType = unknown> {
   asFloat: () => AlternateType extends undefined ? undefined|number : number;
 
   /**
-   * Performs the same task as asFloat(), but also verifies that the number is positive (greater than zero).
+   * Performs the same task as asFloat(), but also verifies that the number is positive (greater than or equal to zero).
    */
   asFloatPositive: () => AlternateType extends undefined ? undefined|number : number;
 
   /**
-   * Performs the same task as asFloat(), but also verifies that the number is negative (less than zero).
+   * Performs the same task as asFloat(), but also verifies that the number is negative (less than or equal to zero).
    */
   asFloatNegative: () => AlternateType extends undefined ? undefined|number : number;
 
@@ -137,12 +137,12 @@ interface VariableAccessors <AlternateType = unknown> {
   asInt: () => AlternateType extends undefined ? undefined|number : number;
 
   /**
-   * Performs the same task as asInt(), but also verifies that the number is positive (greater than zero).
+   * Performs the same task as asInt(), but also verifies that the number is positive (greater than or equal to zero).
    */
   asIntPositive: () => AlternateType extends undefined ? undefined|number : number;
 
   /**
-   * Performs the same task as asInt(), but also verifies that the number is negative (less than zero).
+   * Performs the same task as asInt(), but also verifies that the number is negative (less than or equal to zero).
    */
   asIntNegative: () => AlternateType extends undefined ? undefined|number : number;
 
