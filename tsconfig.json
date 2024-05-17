@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "sourceMap": false,
+    "lib": ["es2015"],
     "target": "es5",
     "moduleResolution": "node",
     "skipLibCheck": false,

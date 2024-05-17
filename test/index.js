@@ -539,6 +539,36 @@ describe('env-var', function () {
     })
   })
 
+  describe('#asSet', function () {
+    it('should return an empty set when not set', function () {
+      expect(mod.get('.NOPE.').asSet()).to.deep.equal(undefined)
+    })
+
+    it('should return a set that was split on commas', function () {
+      expect(mod.get('COMMA_ARRAY').asSet()).to.deep.equal(new Set(['1', '2', '3']))
+    })
+
+    it('should return a set that was split on dashes', function () {
+      expect(mod.get('DASH_ARRAY').asSet('-')).to.deep.equal(new Set(['1', '2', '3']))
+    })
+
+    it('should return an empty set if empty env var was set', function () {
+      expect(mod.get('EMPTY_ARRAY').asSet()).to.deep.equal(new Set())
+    })
+
+    it('should return set with only one value if env var doesn\'t contain delimiter', function () {
+      expect(mod.get('ARRAY_WITHOUT_DELIMITER').asSet()).to.deep.equal(new Set(['value']))
+    })
+
+    it('should return set with only one value if env var contain delimiter', function () {
+      expect(mod.get('ARRAY_WITH_DELIMITER').asSet()).to.deep.equal(new Set(['value']))
+    })
+
+    it('should return set with only one value if env var contain delimiter as prefix', function () {
+      expect(mod.get('ARRAY_WITH_DELIMITER_PREFIX').asSet()).to.deep.equal(new Set(['value']))
+    })
+  })
+
   describe('#asPortNumber', function () {
     it('should raise an error for ports less than 0', function () {
       process.env.PORT_NUMBER = '-2'

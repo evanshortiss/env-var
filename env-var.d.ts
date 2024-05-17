@@ -74,6 +74,12 @@ type PublicAccessors = {
   asArray: (input: string, delimiter?: string) => Array<string>;
 
   /**
+   * Reads an environment variable as a string, then splits it on each occurrence of the specified delimiter.
+   * By default a comma is used as the delimiter. For example a var set to "1,2,3" would become new Set(['1', '2', '3']).
+   */
+  asSet: (input: string, delimiter?: string) => Set<string>;
+
+  /**
    * Attempt to parse the variable to a Boolean. Throws an exception if parsing fails.
    * The var must be set to either "true", "false" (upper or lowercase), 0 or 1 to succeed.
    */
@@ -177,6 +183,12 @@ interface VariableAccessors <AlternateType = unknown> {
    * By default a comma is used as the delimiter. For example a var set to "1,2,3" would become ['1', '2', '3'].
    */
   asArray: (delimiter?: string) => AlternateType extends undefined ? undefined|Array<string> : Array<string>;
+
+  /**
+   * Reads an environment variable as a string, then splits it on each occurrence of the specified delimiter.
+   * By default a comma is used as the delimiter. For example a var set to "1,2,3" would become new Set(['1', '2', '3']).
+   */
+  asSet: (delimiter?: string) => AlternateType extends undefined ? undefined|Set<string> : Set<string>;
 
   /**
    * Attempt to parse the variable to a Boolean. Throws an exception if parsing fails.
