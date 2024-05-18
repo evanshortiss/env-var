@@ -20,6 +20,7 @@ describe('env-var', function () {
     JSON_ARRAY: '[1,2,3]',
     COMMA_ARRAY: '1,2,3',
     EMPTY_ARRAY: '',
+    DUPLICATE_ARRAY: '1,1,2,2,3,3',
     ARRAY_WITHOUT_DELIMITER: 'value',
     ARRAY_WITH_DELIMITER: 'value,',
     ARRAY_WITH_DELIMITER_PREFIX: ',value',
@@ -566,6 +567,10 @@ describe('env-var', function () {
 
     it('should return set with only one value if env var contain delimiter as prefix', function () {
       expect(mod.get('ARRAY_WITH_DELIMITER_PREFIX').asSet()).to.deep.equal(new Set(['value']))
+    })
+
+    it('should return a set of unique values', function () {
+      expect(mod.get('DUPLICATE_ARRAY').asSet()).to.deep.equal(new Set(['1', '2', '3']))
     })
   })
 
