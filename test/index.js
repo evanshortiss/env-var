@@ -20,6 +20,7 @@ describe('env-var', function () {
     JSON_ARRAY: '[1,2,3]',
     COMMA_ARRAY: '1,2,3',
     EMPTY_ARRAY: '',
+    DUPLICATE_ARRAY: '1,1,2,2,3,3',
     ARRAY_WITHOUT_DELIMITER: 'value',
     ARRAY_WITH_DELIMITER: 'value,',
     ARRAY_WITH_DELIMITER_PREFIX: ',value',
@@ -536,6 +537,40 @@ describe('env-var', function () {
 
     it('should return array with only one value if env var contain delimiter as prefix', function () {
       expect(mod.get('ARRAY_WITH_DELIMITER_PREFIX').asArray()).to.deep.equal(['value'])
+    })
+  })
+
+  describe('#asSet', function () {
+    it('should return an empty set when not set', function () {
+      expect(mod.get('.NOPE.').asSet()).to.deep.equal(undefined)
+    })
+
+    it('should return a set that was split on commas', function () {
+      expect(mod.get('COMMA_ARRAY').asSet()).to.deep.equal(new Set(['1', '2', '3']))
+    })
+
+    it('should return a set that was split on dashes', function () {
+      expect(mod.get('DASH_ARRAY').asSet('-')).to.deep.equal(new Set(['1', '2', '3']))
+    })
+
+    it('should return an empty set if empty env var was set', function () {
+      expect(mod.get('EMPTY_ARRAY').asSet()).to.deep.equal(new Set())
+    })
+
+    it('should return set with only one value if env var doesn\'t contain delimiter', function () {
+      expect(mod.get('ARRAY_WITHOUT_DELIMITER').asSet()).to.deep.equal(new Set(['value']))
+    })
+
+    it('should return set with only one value if env var contain delimiter', function () {
+      expect(mod.get('ARRAY_WITH_DELIMITER').asSet()).to.deep.equal(new Set(['value']))
+    })
+
+    it('should return set with only one value if env var contain delimiter as prefix', function () {
+      expect(mod.get('ARRAY_WITH_DELIMITER_PREFIX').asSet()).to.deep.equal(new Set(['value']))
+    })
+
+    it('should return a set of unique values', function () {
+      expect(mod.get('DUPLICATE_ARRAY').asSet()).to.deep.equal(new Set(['1', '2', '3']))
     })
   })
 

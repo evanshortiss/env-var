@@ -196,6 +196,20 @@ describe('typescript tests', () => {
       })
     })
 
+    describe('#asSet', () => {
+      it('should return a Set of strings', () => {
+        const set = env.accessors.asSet('1,2,3');
+
+        expect(set).to.eql(new Set(['1', '2', '3']));
+      });
+
+      it('should return a Set of strings split by period chars', () => {
+        const set = env.accessors.asSet('1.2.3', '.');
+
+        expect(set).to.eql(new Set(['1', '2', '3']));
+      });
+    });
+
     describe('#asInt', () => {
       it('should return an integer', () => {
         const ret = env.accessors.asInt('1')
