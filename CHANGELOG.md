@@ -1,4 +1,7 @@
-## 7.4.2 (10/08/2024)
+## 7.5.0 (20/05/2024)
+* Add `AsSet()` accessor (#173)
+
+## 7.4.2 (10/05/2024)
 * Fix docstrings for positive/negative int/float validators (#172)
 
 ## 7.4.1 (29/08/2023)
