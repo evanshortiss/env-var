@@ -31,6 +31,7 @@ A complete listing of the `env-var` API.
       * [asString()](#asstring)
       * [asUrlObject()](#asurlobject)
       * [asUrlString()](#asurlstring)
+      * [asDateISOString()](#asdateisostring)
   * [EnvVarError()](#envvarerror)
   * [accessors](#accessors)
 
@@ -284,6 +285,13 @@ Note that URLs without paths will have a default path `/` appended when read, e.
 safe utilities included in the
 [Node.js URL module](https://nodejs.org/docs/latest/api/url.html) to create
 valid URL strings, instead of error prone string concatenation.
+
+#### asDateISOString()
+
+Verifies that the variable is a valid ISO 8601 date string or date-only
+calendar value. Full timestamps must use the canonical format returned by
+`Date#toISOString()`, such as `2026-06-09T12:34:56.789Z`; date-only values
+such as `2026-09-01` are also accepted. The original string is returned.
 
 ## EnvVarError()
 

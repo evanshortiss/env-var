@@ -26,6 +26,7 @@ describe('env-var', function () {
     ARRAY_WITH_DELIMITER_PREFIX: ',value',
     DASH_ARRAY: '1-2-3',
     URL: 'http://google.com/',
+    DATE_ISO_STRING: '2026-06-09T12:34:56.789Z',
     EMAIL: 'email@example.com',
     ENUM: 'VALID',
     EMPTY_STRING: '',
@@ -162,6 +163,42 @@ describe('env-var', function () {
       expect(() => {
         mod.get('URL').asUrlObject()
       }).to.throw('env-var: "URL" should be a valid URL')
+    })
+  })
+
+  describe('#asDateISOString', function () {
+    it('should return a valid date ISO string', function () {
+      expect(mod.get('DATE_ISO_STRING').asDateISOString()).to.equal(TEST_VARS.DATE_ISO_STRING)
+    })
+
+    it('should throw due to an invalid date ISO string', function () {
+      process.env.DATE_ISO_STRING = '2026-6-9'
+
+      expect(function () {
+        mod.get('DATE_ISO_STRING').asDateISOString()
+      }).to.throw('env-var: "DATE_ISO_STRING" should be a valid date ISO string')
+    })
+
+    it('should throw due to an invalid date', function () {
+      process.env.DATE_ISO_STRING = '2026-02-30T12:34:56.789Z'
+
+      expect(function () {
+        mod.get('DATE_ISO_STRING').asDateISOString()
+      }).to.throw('env-var: "DATE_ISO_STRING" should be a valid date ISO string')
+    })
+
+    it('should return a valid date-only ISO string', function () {
+      process.env.DATE_ISO_STRING = '2026-09-01'
+
+      expect(mod.get('DATE_ISO_STRING').asDateISOString()).to.equal('2026-09-01')
+    })
+
+    it('should throw due to an invalid date-only ISO string', function () {
+      process.env.DATE_ISO_STRING = '2026-02-30'
+
+      expect(function () {
+        mod.get('DATE_ISO_STRING').asDateISOString()
+      }).to.throw('env-var: "DATE_ISO_STRING" should be a valid date ISO string')
     })
   })
 
