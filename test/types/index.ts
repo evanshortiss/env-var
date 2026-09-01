@@ -181,6 +181,15 @@ describe('typescript tests', () => {
     })
   })
 
+  describe('asDateISOString', () => {
+    it('should return a string', () => {
+      const e = env.from({ DATE: '2026-06-09T12:34:56.789Z' })
+      const date = e.get('DATE').required().asDateISOString()
+
+      assert<IsExact<typeof date, string>>(true);
+    })
+  })
+
   describe('env.accessors', () => {
     describe('#asArray', () => {
       it('should return an array of strings', () => {

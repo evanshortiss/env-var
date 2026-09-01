@@ -110,6 +110,12 @@ type PublicAccessors = {
   asUrlObject: (input: string) => URL;
 
   /**
+   * Verifies that the variable is a valid ISO 8601 date string or date-only
+   * calendar value.
+   */
+  asDateISOString: (input: string) => string;
+
+  /**
    * Verifies that the var being accessed is one of the given values
    */
   asEnum: <T extends string>(input: string, validValues: readonly T[]|T[]) =>  T;
@@ -219,6 +225,12 @@ interface VariableAccessors <AlternateType = unknown> {
    * `asUrlString()`, but instead returns the resulting URL instance.
    */
   asUrlObject: () => AlternateType extends undefined ? undefined|URL : URL;
+
+  /**
+   * Verifies that the variable is a valid ISO 8601 date string or date-only
+   * calendar value.
+   */
+  asDateISOString: () => AlternateType extends undefined ? undefined|string : string;
 
   /**
    * Verifies that the var being accessed is one of the given values
