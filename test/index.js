@@ -18,6 +18,10 @@ describe('env-var', function () {
     JSON: '{"name":"value"}',
     JSON_OBJECT: '{"name":"value"}',
     JSON_ARRAY: '[1,2,3]',
+    JSON_NULL: 'null',
+    JSON_NUMBER: '42',
+    JSON_STRING: '"text"',
+    JSON_BOOLEAN: 'true',
     COMMA_ARRAY: '1,2,3',
     EMPTY_ARRAY: '',
     DUPLICATE_ARRAY: '1,1,2,2,3,3',
@@ -501,6 +505,14 @@ describe('env-var', function () {
       expect(function () {
         mod.get('JSON_ARRAY').asJsonObject()
       }).to.throw()
+    })
+
+    it('should throw an error - value was null, a number, a string or a boolean', function () {
+      ['JSON_NULL', 'JSON_NUMBER', 'JSON_STRING', 'JSON_BOOLEAN'].forEach(function (name) {
+        expect(function () {
+          mod.get(name).asJsonObject()
+        }).to.throw('should be a parseable JSON Object')
+      })
     })
 
     it('should return a JSON Object', function () {
