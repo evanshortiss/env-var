@@ -82,7 +82,8 @@ describe('typescript tests', () => {
           return 0
         }
 
-        throw new env.EnvVarError('was not zero')
+        const err: env.EnvVarError = new env.EnvVarError('was not zero')
+        throw err
       }
 
       const extendedEnv = env.from({
@@ -124,7 +125,8 @@ describe('typescript tests', () => {
           return 0
         }
 
-        throw new env.EnvVarError('was not zero')
+        const err: env.EnvVarError = new env.EnvVarError('was not zero')
+        throw err
       }
 
       const extendedEnvA = env.from({

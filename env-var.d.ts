@@ -282,7 +282,8 @@ interface IOptionalVariable<Exs extends Extensions = {}> extends VariableAccesso
   required: (isRequired?: boolean) => IPresentVariable & ExtenderType<Exs>;
 }
 
-export class EnvVarError extends Error {}
+declare class EnvVarError extends Error {}
+type EnvVarErrorAlias = EnvVarError
 
 interface IEnv<OptionalVariable, Container> {
   /**
@@ -306,11 +307,13 @@ interface IEnv<OptionalVariable, Container> {
 
   accessors: PublicAccessors
 
+  logger: LoggerFn
+
   /**
    * This is the error type used to represent error returned by this module.
    * Useful for filtering errors and responding appropriately.
    */
-  EnvVarError: EnvVarError
+  EnvVarError: typeof EnvVarError
 }
 
 // Used internally only to support extension fns
@@ -318,18 +321,22 @@ type RestParams<F extends (...args: any[]) => any> = F extends (value: string, .
 type ExtenderType<T extends Extensions> = { [P in keyof T]: (...args: RestParams<T[P]>) => ReturnType<T[P]> }
 type ExtenderTypeOptional<T extends Extensions> = { [P in keyof T]: (...args: RestParams<T[P]>) => ReturnType<T[P]>|undefined }
 
-export type Extensions = {
-  [key: string]: ExtensionFn<any>
+declare namespace env {
+  export type EnvVarError = EnvVarErrorAlias
+
+  export type Extensions = {
+    [key: string]: ExtensionFn<any>
+  }
+
+  export type LoggerFn = (varname: string, str: string) => void
+  export type RaiseErrorFn = (error: string) => void
+  export type ExtensionFn<T> = (value: string, ...args: any[]) => T
 }
 
-export type LoggerFn = (varname: string, str: string) => void
-export type RaiseErrorFn = (error: string) => void
-export type ExtensionFn<T> = (value: string, ...args: any[]) => T
-
-export const accessors: PublicAccessors
-
-export function logger (varname: string, str: string): void
+type Extensions = env.Extensions
+type LoggerFn = env.LoggerFn
 
 type IDefaultEnv = IEnv<IOptionalVariable, NodeJS.ProcessEnv>
-export const get: IDefaultEnv['get']
-export const from: IDefaultEnv['from']
+
+declare const env: IDefaultEnv
+export = env
