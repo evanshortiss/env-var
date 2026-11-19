@@ -66,5 +66,7 @@ function getProcessEnv () {
   }
 }
 
+const { get, accessors, logger } = from(getProcessEnv())
+
 /* istanbul ignore next */
-module.exports = from(getProcessEnv())
+module.exports = { from, EnvVarError, get, accessors, logger }
